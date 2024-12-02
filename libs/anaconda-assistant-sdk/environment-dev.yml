@@ -1,0 +1,11 @@
+# Local dev conda dependencies
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python=3.11
+- tox=3
+- tox-conda
+- pip
+- pip:
+    - "-e .[dev]"
