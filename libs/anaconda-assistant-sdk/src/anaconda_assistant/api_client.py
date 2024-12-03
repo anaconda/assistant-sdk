@@ -43,11 +43,12 @@ class APIClient(BaseClient):
             kwargs["client_source"] = client_source
 
         config.__init__(**kwargs)
+        self._config = config.model_copy()
 
-        self.headers["X-Client-Source"] = config.client_source
-        self.headers["X-Client-Version"] = config.api_version
+        self.headers["X-Client-Source"] = self._config.client_source
+        self.headers["X-Client-Version"] = self._config.api_version
 
-        self._base_uri = f"https://{config.domain}"
+        self._base_uri = f"https://{self._config.domain}"
 
     def urljoin(self, url: str):
         if url.startswith("http"):

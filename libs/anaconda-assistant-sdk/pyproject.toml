@@ -25,7 +25,8 @@ dev = [
   "pytest-cov",
   "pytest-mock",
   "tox",
-  "types-requests"
+  "types-requests",
+  "responses"
 ]
 ell = [
   "ell-ai"
