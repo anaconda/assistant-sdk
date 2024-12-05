@@ -54,5 +54,5 @@ class APIClient(BaseClient):
         if url.startswith("http"):
             return url
 
-        joined = f"{self._base_uri.strip('/')}/{config.api_version}/{url.lstrip('/')}"
+        joined = f"{self._base_uri.strip('/')}/{self._config.api_version}/{url.lstrip('/')}"
         return joined
