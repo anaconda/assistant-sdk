@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 
 from anaconda_cloud_auth.client import BaseClient
 
@@ -17,8 +17,8 @@ class APIClient(BaseClient):
         user_agent: Optional[str] = None,
         api_version: Optional[str] = None,
         client_source: Optional[str] = None,
-        ssl_verify: bool | None = None,
-        extra_headers: str | dict | None = None,
+        ssl_verify: Optional[bool] = None,
+        extra_headers: Optional[Union[str, dict]] = None,
     ):
         super().__init__(
             domain=auth_domain,
