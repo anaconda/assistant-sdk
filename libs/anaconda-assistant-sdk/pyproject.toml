@@ -128,22 +128,11 @@ passenv =
   ANACONDA_CLOUD_API_DOMAIN
   ANACONDA_ASSISTANT_DOMAIN
   ANACONDA_ASSISTANT_CLIENT_SOURCE
-deps =
-    mypy
-    pytest
-    pytest-cov
-    pytest-mock
+extras = dev
 commands = pytest
 
 [testenv:mypy]
-deps =
-    mypy
-    pytest
-    pytest-cov
-    pytest-mock
-    types-requests
-    typer
-    rich
+extras = dev
 commands = mypy
 
 [testenv:report]
