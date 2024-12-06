@@ -91,6 +91,14 @@ module = "*._version"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
+module = "llm.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "pandasai.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
 module = "rich_click.*"
 
 [tool.pytest.ini_options]

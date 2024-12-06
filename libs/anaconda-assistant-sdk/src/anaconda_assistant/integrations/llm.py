@@ -1,4 +1,4 @@
-from typing import Iterator, Union
+from typing import Iterator, Union, Callable
 from uuid import uuid4
 
 import llm
@@ -7,7 +7,7 @@ from anaconda_assistant.core import ChatClient
 
 
 @llm.hookimpl
-def register_models(register):
+def register_models(register: Callable) -> None:
     register(AnacondaAssistantChat())
 
 

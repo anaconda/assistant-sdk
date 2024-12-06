@@ -201,7 +201,7 @@ class ChatSession:
 
         self.id: str = str(uuid4())
         self.messages = []
-        self.usage: dict = {"tokens_used": 0, "token_limit": 0}
+        self.usage = {"tokens_used": 0, "token_limit": 0}
 
     def _stream(self, response: ChatResponse) -> Generator[str, None, None]:
         """Stream and save the response"""

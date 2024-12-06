@@ -1,5 +1,5 @@
 from uuid import uuid4
-from typing import Callable, Any, List, Optional, Dict
+from typing import Callable, Any, List, Optional, Dict, Tuple
 from warnings import warn
 
 import ell
@@ -14,11 +14,11 @@ class AnacondaAssistantProvider(Provider):
     def provider_call_function(
         self,
         client: ChatClient,
-        api_call_params: Optional[ell.Dict[str, ell.Any]] = None,
+        api_call_params: Optional[Dict[str, Any]] = None,
     ) -> Callable[..., Any]:
         return client.completions
 
-    def translate_to_provider(self, ell_call: EllCallParams) -> ell.Dict[str, Any]:
+    def translate_to_provider(self, ell_call: EllCallParams) -> Dict[str, Any]:
         final_call_params = {}
 
         if ell_call.api_params.get("api_params", {}).get("stream", False):
@@ -41,7 +41,7 @@ class AnacondaAssistantProvider(Provider):
         provider_call_params: Dict[str, Any],
         origin_id: Optional[str] = None,
         logger: Optional[Callable[..., None]] = None,
-    ) -> ell.Tuple[List[Message], Metadata]:
+    ) -> Tuple[List[Message], Metadata]:
         usage = {}
         metadata: Metadata = {}
 
@@ -59,9 +59,9 @@ class AnacondaAssistantProvider(Provider):
 
         if not did_stream:
             content = ContentBlock(
-                text=_lstr("".join(c.text for c in content), origin_trace=origin_id)
+                text=_lstr("".join(c.text for c in content), origin_trace=origin_id)  # type: ignore
             )
-        message = Message(role="assistant", content=content)
+        message = Message(role="assistant", content=content)  # type: ignore
         tracked_results.append(message)
 
         usage["prompt_tokens"] = 0
