@@ -19,6 +19,9 @@ requires-python = ">=3.9"
 anaconda = "anaconda_assistant.integrations.llm"
 
 [project.optional-dependencies]
+all = [
+  "anaconda-assistant-sdk[ell,langchain,llm,panel]"
+]
 dev = [
   "mypy",
   "pytest",
@@ -132,7 +135,7 @@ extras = dev
 commands = pytest
 
 [testenv:mypy]
-extras = dev
+extras = [dev, all]
 commands = mypy
 
 [testenv:report]
