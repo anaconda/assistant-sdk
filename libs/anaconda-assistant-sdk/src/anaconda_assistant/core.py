@@ -3,6 +3,10 @@ import os
 import re
 from typing import Any
 from typing import Generator
+from typing import Optional
+from typing import List
+from typing import Dict
+from typing import Union
 from uuid import uuid4
 
 from requests import Response
@@ -28,7 +32,7 @@ class ChatResponse:
 
     def __init__(self, response: Response) -> None:
         self._response = response
-        self._message: str | None = None
+        self._message: Optional[str] = None
         self.tokens_used: int = 0
         self.token_limit: int = 0
 
@@ -39,7 +43,7 @@ class ChatResponse:
 
         return json.loads(self._response.request.body)["response_message_id"]
 
-    def _match_tokens(self, text) -> dict[str, Any]:
+    def _match_tokens(self, text) -> Dict[str, Any]:
         matched = re.match(TOKEN_COUNT, text)
         if matched is None:
             return {"message": text, "used": None, "limit": None}
@@ -79,7 +83,7 @@ class ChatResponse:
         self,
         chunk_size: int = 512,
         decode_unicode: bool = True,
-        delimiter: str | None = None,
+        delimiter: Optional[str] = None,
     ) -> Generator[str, None, None]:
         message = ""
         for chunk in self._response.iter_lines(
@@ -100,11 +104,11 @@ class ChatResponse:
 class ChatClient:
     def __init__(
         self,
-        system_message: str | None = None,
-        example_messages: list[dict[str, str]] | None = None,
-        domain: str | None = None,
-        api_key: str | None = None,
-        api_version: str | None = None,
+        system_message: Optional[str] = None,
+        example_messages: Optional[List[Dict[str, str]]] = None,
+        domain: Optional[str] = None,
+        api_key: Optional[str] = None,
+        api_version: Optional[str] = None,
     ) -> None:
         """Anaconda Assistant Client
 
@@ -122,8 +126,8 @@ class ChatClient:
 
     def completions(
         self,
-        messages: list[dict[str, str]],
-        variables: dict[str, Any] | None = None,
+        messages: List[Dict[str, str]],
+        variables: Optional[Dict[str, Any]] = None,
     ) -> ChatResponse:
         """Return completions from the Anaconda Assistant as a ChatResponse type"""
 
@@ -175,10 +179,10 @@ class ChatSession:
 
     def __init__(
         self,
-        system_message: str | None = None,
-        domain: str | None = None,
-        api_key: str | None = None,
-        api_version: str | None = None,
+        system_message: Optional[str] = None,
+        domain: Optional[str] = None,
+        api_key: Optional[str] = None,
+        api_version: Optional[str] = None,
     ) -> None:
         self.client = ChatClient(
             system_message=system_message,
@@ -227,7 +231,7 @@ class ChatSession:
 
     def chat(
         self, message: str, stream: bool = False
-    ) -> str | Generator[str, None, None]:
+    ) -> Union[str, Generator[str, None, None]]:
         """Chat with the Assistant appending your current message to the stack"""
         this_message = {"role": "user", "content": message, "message_id": str(uuid4())}
 
