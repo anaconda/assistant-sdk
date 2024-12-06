@@ -142,10 +142,12 @@ passenv =
   ANACONDA_CLOUD_API_DOMAIN
   ANACONDA_ASSISTANT_DOMAIN
   ANACONDA_ASSISTANT_CLIENT_SOURCE
+deps = pytest
 extras = dev
 commands = pytest
 
 [testenv:mypy]
+deps = mypy
 extras = dev,all
 commands = mypy
 
