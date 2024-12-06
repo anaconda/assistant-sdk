@@ -184,7 +184,7 @@ class ChatSession:
             system_message=system_message,
             domain=domain,
             api_key=api_key,
-            api_version=api_version
+            api_version=api_version,
         )
         self.messages: list = []
         self.usage: dict = {"tokens_used": 0, "token_limit": 0}
