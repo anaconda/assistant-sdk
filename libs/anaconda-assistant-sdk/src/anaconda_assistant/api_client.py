@@ -50,7 +50,7 @@ class APIClient(BaseClient):
 
         self._base_uri = f"https://{self._config.domain}"
 
-    def urljoin(self, url: str):
+    def urljoin(self, url: str) -> str:
         if url.startswith("http"):
             return url
 

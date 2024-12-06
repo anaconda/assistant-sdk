@@ -43,7 +43,7 @@ class ChatResponse:
 
         return json.loads(self._response.request.body)["response_message_id"]
 
-    def _match_tokens(self, text) -> Dict[str, Any]:
+    def _match_tokens(self, text: str) -> Dict[str, Any]:
         matched = re.match(TOKEN_COUNT, text)
         if matched is None:
             return {"message": text, "used": None, "limit": None}
@@ -193,7 +193,7 @@ class ChatSession:
         self.messages: list = []
         self.usage: dict = {"tokens_used": 0, "token_limit": 0}
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset chat history
 
         This will remove all input messages and responses and
