@@ -20,7 +20,7 @@ anaconda = "anaconda_assistant.integrations.llm"
 
 [project.optional-dependencies]
 all = [
-  "anaconda-assistant-sdk[ell,langchain,llm,panel]"
+  "anaconda-assistant-sdk[ell,langchain,llm,pandasai,panel]"
 ]
 dev = [
   "mypy",
@@ -39,6 +39,9 @@ langchain = [
 ]
 llm = [
   "llm"
+]
+pandasai = [
+  "pandasai"
 ]
 panel = [
   "panel"
@@ -135,7 +138,7 @@ extras = dev
 commands = pytest
 
 [testenv:mypy]
-extras = [dev, all]
+extras = dev,all
 commands = mypy
 
 [testenv:report]
