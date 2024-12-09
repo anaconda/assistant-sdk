@@ -19,6 +19,9 @@ requires-python = ">=3.9"
 anaconda = "anaconda_assistant.integrations.llm"
 
 [project.optional-dependencies]
+all = [
+  "anaconda-assistant-sdk[ell,langchain,llm,pandasai,panel]"
+]
 dev = [
   "mypy",
   "pytest",
@@ -36,6 +39,9 @@ langchain = [
 ]
 llm = [
   "llm"
+]
+pandasai = [
+  "pandasai"
 ]
 panel = [
   "panel"
@@ -85,6 +91,14 @@ module = "*._version"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
+module = "llm.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "pandasai.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
 module = "rich_click.*"
 
 [tool.pytest.ini_options]
@@ -128,22 +142,13 @@ passenv =
   ANACONDA_CLOUD_API_DOMAIN
   ANACONDA_ASSISTANT_DOMAIN
   ANACONDA_ASSISTANT_CLIENT_SOURCE
-deps =
-    mypy
-    pytest
-    pytest-cov
-    pytest-mock
+deps = pytest
+extras = dev
 commands = pytest
 
 [testenv:mypy]
-deps =
-    mypy
-    pytest
-    pytest-cov
-    pytest-mock
-    types-requests
-    typer
-    rich
+deps = mypy
+extras = dev,all
 commands = mypy
 
 [testenv:report]

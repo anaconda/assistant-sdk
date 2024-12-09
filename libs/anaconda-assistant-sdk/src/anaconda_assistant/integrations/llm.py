@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Union, Callable
 from uuid import uuid4
 
 import llm
@@ -7,7 +7,7 @@ from anaconda_assistant.core import ChatClient
 
 
 @llm.hookimpl
-def register_models(register):
+def register_models(register: Callable) -> None:
     register(AnacondaAssistantChat())
 
 
@@ -23,7 +23,7 @@ class AnacondaAssistantChat(llm.Model):
         prompt: llm.Prompt,
         stream: bool,
         response: llm.Response,
-        conversation: llm.Conversation | None,
+        conversation: Union[llm.Conversation, None],
     ) -> Iterator[str]:
         messages = self.build_messages(prompt, conversation)
         response._prompt_json = {"messages": messages}
@@ -39,7 +39,7 @@ class AnacondaAssistantChat(llm.Model):
             yield response.response_json["message"]["content"]
 
     def build_messages(
-        self, prompt: llm.Prompt, conversation: llm.Conversation | None
+        self, prompt: llm.Prompt, conversation: Union[llm.Conversation, None]
     ) -> list[dict[str, str]]:
         messages = []
         if not conversation:

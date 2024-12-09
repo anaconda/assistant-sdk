@@ -1,5 +1,5 @@
 from uuid import uuid4
-from typing import Callable, Any, List
+from typing import Callable, Any, List, Optional, Dict, Tuple
 from warnings import warn
 
 import ell
@@ -12,11 +12,13 @@ from anaconda_assistant.core import ChatClient, ChatResponse
 
 class AnacondaAssistantProvider(Provider):
     def provider_call_function(
-        self, client: ChatClient, api_call_params: ell.Dict[str, ell.Any] | None = None
+        self,
+        client: ChatClient,
+        api_call_params: Optional[Dict[str, Any]] = None,
     ) -> Callable[..., Any]:
         return client.completions
 
-    def translate_to_provider(self, ell_call: EllCallParams) -> ell.Dict[str, Any]:
+    def translate_to_provider(self, ell_call: EllCallParams) -> Dict[str, Any]:
         final_call_params = {}
 
         if ell_call.api_params.get("api_params", {}).get("stream", False):
@@ -36,10 +38,10 @@ class AnacondaAssistantProvider(Provider):
         self,
         provider_response: ChatResponse,
         ell_call: EllCallParams,
-        provider_call_params: dict[str, Any],
-        origin_id: str | None = None,
-        logger: Callable[..., None] | None = None,
-    ) -> ell.Tuple[List[Message], Metadata]:
+        provider_call_params: Dict[str, Any],
+        origin_id: Optional[str] = None,
+        logger: Optional[Callable[..., None]] = None,
+    ) -> Tuple[List[Message], Metadata]:
         usage = {}
         metadata: Metadata = {}
 
@@ -57,9 +59,9 @@ class AnacondaAssistantProvider(Provider):
 
         if not did_stream:
             content = ContentBlock(
-                text=_lstr("".join(c.text for c in content), origin_trace=origin_id)
+                text=_lstr("".join(c.text for c in content), origin_trace=origin_id)  # type: ignore
             )
-        message = Message(role="assistant", content=content)
+        message = Message(role="assistant", content=content)  # type: ignore
         tracked_results.append(message)
 
         usage["prompt_tokens"] = 0
@@ -70,7 +72,7 @@ class AnacondaAssistantProvider(Provider):
         return tracked_results, metadata
 
 
-def format_messages(message: Message) -> dict[str, Any]:
+def format_messages(message: Message) -> Dict[str, Any]:
     if message.images or message.audios or message.tool_calls or message.tool_results:
         warn("This message contains non-text content, which is ignored.")
 
@@ -87,7 +89,6 @@ anaconda_assistant_provider = AnacondaAssistantProvider()
 ell.register_provider(anaconda_assistant_provider, ChatClient)
 
 client = ChatClient()
-client.api_key = "none"
 
 ell.config.register_model(
     name="anaconda-assistant", default_client=client, supports_streaming=True

@@ -16,7 +16,7 @@ def mocked_api_client(mocker: MockerFixture) -> Generator[APIClient, None, None]
     mocker.patch(
         "anaconda_cloud_auth.client.BaseClient.email",
         return_value="me@example.com",
-        new_callable=mocker.PropertyMock
+        new_callable=mocker.PropertyMock,
     )
 
     api_client = APIClient(domain="mocking-assistant")
@@ -29,25 +29,29 @@ def mocked_api_client(mocker: MockerFixture) -> Generator[APIClient, None, None]
                 "I am Anaconda Assistant, an AI designed to help you with a variety of tasks, "
                 "answer questions, and provide information on a wide range of topics. How can "
                 "I assist you today?__TOKENS_42/424242__"
-            )
+            ),
         )
         yield api_client
 
 
 @pytest.fixture
-def mocked_chat_client(mocked_api_client: APIClient) -> Generator[ChatClient, None, None]:
+def mocked_chat_client(
+    mocked_api_client: APIClient,
+) -> Generator[ChatClient, None, None]:
     client = ChatClient(domain=mocked_api_client._config.domain)
     yield client
 
 
 @pytest.fixture
-def mocked_chat_session(mocked_api_client: APIClient) -> Generator[ChatSession, None, None]:
+def mocked_chat_session(
+    mocked_api_client: APIClient,
+) -> Generator[ChatSession, None, None]:
     session = ChatSession(domain=mocked_api_client._config.domain)
     yield session
 
 
 def test_token_regex(mocked_chat_client: ChatClient) -> None:
-    messages = [{"role":"user", "content": "Who are you?", "message_id": "0"}]
+    messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
     res = mocked_chat_client.completions(messages=messages)
 
     assert res.message == (
@@ -60,7 +64,7 @@ def test_token_regex(mocked_chat_client: ChatClient) -> None:
 
 
 def test_consume_stream_cached_message(mocked_chat_client: ChatClient) -> None:
-    messages = [{"role":"user", "content": "Who are you?", "message_id": "0"}]
+    messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
     res = mocked_chat_client.completions(messages=messages)
 
     for _ in res.iter_content():
@@ -81,25 +85,32 @@ def test_consume_stream_cached_message(mocked_chat_client: ChatClient) -> None:
 def test_chat_client_system_message(mocked_api_client: APIClient) -> None:
     system_message = "You are a kitty"
 
-    client = ChatClient(system_message=system_message, domain=mocked_api_client._config.domain)
+    client = ChatClient(
+        system_message=system_message, domain=mocked_api_client._config.domain
+    )
 
-    messages = [{"role":"user", "content": "Who are you?", "message_id": "0"}]
+    messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
     res = client.completions(messages=messages)
 
     assert res._response.request.body is not None
     body = json.loads(res._response.request.body)
 
-    assert body.get("custom_prompt", {}).get("system_message", "") == {"role": "system", "content": system_message}
+    assert body.get("custom_prompt", {}).get("system_message", "") == {
+        "role": "system",
+        "content": system_message,
+    }
 
 
-def test_chat_session_history(mocked_chat_session: ChatSession, is_not_none: Any) -> None:
+def test_chat_session_history(
+    mocked_chat_session: ChatSession, is_not_none: Any
+) -> None:
     assert mocked_chat_session.messages == []
 
     _ = mocked_chat_session.chat("Who are you?")
 
     assert mocked_chat_session.messages == [
         {"role": "user", "content": "Who are you?", "message_id": is_not_none},
-        {"role": "assistant", "content": is_not_none, "message_id": is_not_none}
+        {"role": "assistant", "content": is_not_none, "message_id": is_not_none},
     ]
 
     _ = mocked_chat_session.chat("What do you want?")
@@ -108,7 +119,7 @@ def test_chat_session_history(mocked_chat_session: ChatSession, is_not_none: Any
         {"role": "user", "content": "Who are you?", "message_id": is_not_none},
         {"role": "assistant", "content": is_not_none, "message_id": is_not_none},
         {"role": "user", "content": "What do you want?", "message_id": is_not_none},
-        {"role": "assistant", "content": is_not_none, "message_id": is_not_none}
+        {"role": "assistant", "content": is_not_none, "message_id": is_not_none},
     ]
 
     mocked_chat_session.reset()

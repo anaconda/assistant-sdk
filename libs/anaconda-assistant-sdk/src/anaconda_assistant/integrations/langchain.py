@@ -2,6 +2,7 @@ from collections.abc import Iterator
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import cast
 from uuid import uuid4
 
@@ -54,8 +55,8 @@ class AnacondaAssistant(BaseChatModel):
     def _generate(
         self,
         messages: List[BaseMessage],
-        stop: List[str] | None = None,
-        run_manager: CallbackManagerForLLMRun | None = None,
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> ChatResult:
         client = ChatClient(**kwargs)
@@ -76,8 +77,8 @@ class AnacondaAssistant(BaseChatModel):
     def _stream(
         self,
         messages: List[BaseMessage],
-        stop: List[str] | None = None,
-        run_manager: CallbackManagerForLLMRun | None = None,
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         client = ChatClient(**kwargs)

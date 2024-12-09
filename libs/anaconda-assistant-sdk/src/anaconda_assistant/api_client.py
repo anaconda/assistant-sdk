@@ -1,9 +1,9 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 
 from anaconda_cloud_auth.client import BaseClient
 
 from anaconda_assistant import __version__ as version
-from anaconda_assistant.config import config
+from anaconda_assistant.config import AssistantConfig
 
 
 class APIClient(BaseClient):
@@ -17,8 +17,8 @@ class APIClient(BaseClient):
         user_agent: Optional[str] = None,
         api_version: Optional[str] = None,
         client_source: Optional[str] = None,
-        ssl_verify: bool | None = None,
-        extra_headers: str | dict | None = None,
+        ssl_verify: Optional[bool] = None,
+        extra_headers: Optional[Union[str, dict]] = None,
     ):
         super().__init__(
             domain=auth_domain,
@@ -42,17 +42,18 @@ class APIClient(BaseClient):
         if client_source is not None:
             kwargs["client_source"] = client_source
 
-        config.__init__(**kwargs)
-        self._config = config.model_copy()
+        self._config = AssistantConfig(**kwargs)
 
         self.headers["X-Client-Source"] = self._config.client_source
         self.headers["X-Client-Version"] = self._config.api_version
 
         self._base_uri = f"https://{self._config.domain}"
 
-    def urljoin(self, url: str):
+    def urljoin(self, url: str) -> str:
         if url.startswith("http"):
             return url
 
-        joined = f"{self._base_uri.strip('/')}/{self._config.api_version}/{url.lstrip('/')}"
+        joined = (
+            f"{self._base_uri.strip('/')}/{self._config.api_version}/{url.lstrip('/')}"
+        )
         return joined

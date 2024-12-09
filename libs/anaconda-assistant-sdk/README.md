@@ -53,7 +53,7 @@ for chunk in response.iter_content():
     print(chunk, end="")
 ```
 
-You can only consume the mesage with `.iter_content()` once, but the result is captured to the `.message` attribute
+You can only consume the message with `.iter_content()` once, but the result is captured to the `.message` attribute
 while streaming.
 
 ## Integrations

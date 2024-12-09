@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, cast
 
 from pandasai.llm.base import LLM
 from pandasai.pipelines.pipeline_context import PipelineContext
@@ -23,4 +23,4 @@ class AnacondaAssistant(LLM):
         self.last_prompt = instruction.to_string()
 
         text = self.session.chat(self.last_prompt, stream=False)
-        return text
+        return cast(str, text)
