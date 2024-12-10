@@ -4,13 +4,33 @@ import typer
 
 from anaconda_cli_base.console import console
 from anaconda_cli_base.cli import ErrorHandledGroup
-from conda import plugins
+from conda import plugins, CondaError
+from conda.exception_handler import ExceptionHandler
 from rich.markdown import Markdown
 from rich.live import Live
 from rich.console import Console
 
 from anaconda_assistant import ChatSession
 from anaconda_assistant_conda.config import AssistantCondaConfig
+
+
+def error_handler(_):
+    ExceptionHandler._orig_print_conda_exception = (
+        ExceptionHandler._print_conda_exception
+    )
+
+    def assistant_exception_handler(self, exc_val: CondaError, exc_tb):
+        self._orig_print_conda_exception(exc_val, exc_tb)
+        report = self.get_error_report(exc_val, exc_tb)
+        command = " ".join(report["command"].split()[1:])
+
+        console.print("[bold green]Hello from Anaconda Assistant![/green bold]")
+        session = ChatSession()
+        prompt = f"For this conda command\n{command}\nthe following error was reported {exc_val.message}. Suggest how I can change the command to avoid the error."
+        response = session.chat(prompt)
+        print(response)
+
+    ExceptionHandler._print_conda_exception = assistant_exception_handler
 
 
 def search(
@@ -77,4 +97,21 @@ def conda_post_commands():
         name="assist-search-recommendation",
         action=recommend_assist_search,
         run_for={"search"},
+    )
+
+
+@plugins.hookimpl
+def conda_pre_commands():
+    yield plugins.CondaPreCommand(
+        name="error-handler",
+        action=error_handler,
+        run_for={
+            "create",
+            "install",
+            "remove",
+            "uninstall",
+            "update",
+            "env_create",
+            "env_update",
+        },
     )
