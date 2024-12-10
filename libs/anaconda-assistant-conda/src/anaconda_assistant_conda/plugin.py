@@ -1,5 +1,5 @@
 import argparse
-from typing import Generator
+from typing import Generator, cast
 
 from requests.exceptions import HTTPError
 
@@ -13,16 +13,16 @@ from rich.live import Live
 from anaconda_assistant import ChatSession
 from anaconda_assistant_conda.config import AssistantCondaConfig
 
+STREAM_RESPONSE = Generator[str, None, None]
 
-def _perform_search(
-    prompt: str, ask_to_login: bool = False
-) -> Generator[str, None, None]:
+
+def _perform_search(prompt: str, ask_to_login: bool = False) -> STREAM_RESPONSE:
     console.print("[green bold]Hello from Anaconda Assistant![/green bold]")
 
     config = AssistantCondaConfig()
-    session = ChatSession(system_prompt=config.system_prompt)
+    session = ChatSession(system_message=config.system_message)
     try:
-        _ = session.auth_client.account
+        _ = session.client.auth_client.account
     except HTTPError as e:
         if e.response.status_code not in [401, 403]:
             raise e
@@ -38,11 +38,11 @@ def _perform_search(
         else:
             raise SystemExit(1)
 
-    response = session.chat(prompt, stream=True)
+    response = cast(STREAM_RESPONSE, session.chat(prompt, stream=True))
     return response
 
 
-def perform_search(args):
+def perform_search(args) -> None:
     full_text = ""
     with Live(
         Markdown(full_text),
@@ -59,7 +59,7 @@ def perform_search(args):
     raise SystemExit(0)
 
 
-def handle_assistant_subcommands(args):
+def handle_assistant_subcommands(args) -> None:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(required=True)
 
