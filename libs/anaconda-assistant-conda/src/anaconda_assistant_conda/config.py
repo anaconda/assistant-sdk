@@ -11,5 +11,7 @@ You will provide a single example block of code.
 """)
 
 
-class AssistantCondaConfig(AnacondaBaseSettings, plugin_name=("assistant", "conda")):
+class AssistantCondaConfig(
+    AnacondaBaseSettings, plugin_name=("assistant", "integrations", "conda")
+):
     system_prompt: str = SYSTEM_PROMPT
