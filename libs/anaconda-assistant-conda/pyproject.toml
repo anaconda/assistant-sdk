@@ -113,7 +113,9 @@ passenv =
   ANACONDA_CLOUD_API_KEY
   ANACONDA_CLOUD_DOMAIN
   ANACONDA_CLOUD_CLIENT_ID
-deps = pytest
+deps =
+  pytest
+  ../anaconda-assistant-sdk
 extras = dev
 conda_channels =
     anaconda-cloud
@@ -123,7 +125,9 @@ conda_deps =
 commands = pytest
 
 [testenv:mypy]
-deps = mypy
+deps =
+    mypy
+    ../anaconda-assistant-sdk
 extras = dev
 commands = mypy
 """
