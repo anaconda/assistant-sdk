@@ -1,48 +1,24 @@
-import argparse
-from typing import Generator, cast
+from typing_extensions import Annotated
 
-from requests.exceptions import HTTPError
+import typer
 
 from anaconda_cli_base.console import console
-from anaconda_cloud_auth.actions import login
+from anaconda_cli_base.cli import ErrorHandledGroup
 from conda import plugins
 from rich.markdown import Markdown
-from rich.prompt import Confirm
 from rich.live import Live
+from rich.console import Console
 
 from anaconda_assistant import ChatSession
 from anaconda_assistant_conda.config import AssistantCondaConfig
 
-STREAM_RESPONSE = Generator[str, None, None]
 
-
-def _perform_search(prompt: str, ask_to_login: bool = False) -> STREAM_RESPONSE:
+def search(
+    query: Annotated[str, typer.Argument(help="A package that can ...")],
+) -> None:
+    """Ask Anaconda Assistant to find a conda package based on requested capabilities"""
     console.print("[green bold]Hello from Anaconda Assistant![/green bold]")
 
-    config = AssistantCondaConfig()
-    session = ChatSession(system_message=config.system_message)
-    try:
-        _ = session.client.auth_client.account
-    except HTTPError as e:
-        if e.response.status_code not in [401, 403]:
-            raise e
-
-        if not ask_to_login:
-            raise SystemExit(1)
-        should_do_login = Confirm.ask(
-            "You must login to use the assistant. Would you like to login?",
-            default=True,
-        )
-        if should_do_login:
-            login()
-        else:
-            raise SystemExit(1)
-
-    response = cast(STREAM_RESPONSE, session.chat(prompt, stream=True))
-    return response
-
-
-def perform_search(args) -> None:
     full_text = ""
     with Live(
         Markdown(full_text),
@@ -50,8 +26,10 @@ def perform_search(args) -> None:
         vertical_overflow="visible",
         console=console,
     ) as live:
-        prompt = f"Find a conda package that can {args.query}"
-        response = _perform_search(prompt, ask_to_login=True)
+        config = AssistantCondaConfig()
+        session = ChatSession(system_message=config.system_message)
+        response = session.chat(query, stream=True)
+
         for chunk in response:
             full_text += chunk
             md = Markdown(full_text)
@@ -60,17 +38,21 @@ def perform_search(args) -> None:
 
 
 def handle_assistant_subcommands(args) -> None:
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(required=True)
-
-    parser_search = subparsers.add_parser(
-        "search", help="find a package, using the Anaconda Assistant"
+    app = typer.Typer(
+        help="The conda assistant, powered by Anaconda Assistant",
+        add_help_option=True,
+        no_args_is_help=True,
+        add_completion=False,
+        cls=ErrorHandledGroup,
     )
-    parser_search.add_argument("query", type=str, help="package search prompt")
-    parser_search.set_defaults(func=perform_search)
 
-    args = parser.parse_args(args)
-    args.func(args)
+    @app.callback(invoke_without_command=True, no_args_is_help=True)
+    def _():
+        pass
+
+    app.command(name="search", no_args_is_help=True)(search)
+
+    app(args=args)
 
 
 @plugins.hookimpl
@@ -79,4 +61,20 @@ def conda_subcommands():
         name="assist",
         summary="Anaconda Assistant integration",
         action=handle_assistant_subcommands,
+    )
+
+
+def recommend_assist_search(_) -> None:
+    console = Console(stderr=True)
+    console.print("[bold green]Conda Assistant:[/bold green]")
+    console.print("If you're not finding what you're looking for try")
+    console.print('  conda assist search "A package that can ..."')
+
+
+@plugins.hookimpl
+def conda_post_commands():
+    yield plugins.CondaPostCommand(
+        name="assist-search-recommendation",
+        action=recommend_assist_search,
+        run_for={"search"},
     )
