@@ -171,4 +171,4 @@ jobs:
           --summary \
           "The Anaconda Assistant Python SDK" \
           $LABEL \
-          --force \
+          --force
