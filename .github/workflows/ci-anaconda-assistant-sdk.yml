@@ -138,7 +138,6 @@ jobs:
           --user anaconda-cloud \
           $LABEL \
           --force \
-          --private \
           ~/anaconda-assistant-sdk-conda-bld/noarch/anaconda-assistant-sdk-*
 
   publish-wheel-to-anaconda-dot-org:
@@ -172,5 +171,4 @@ jobs:
           --summary \
           "The Anaconda Assistant Python SDK" \
           $LABEL \
-          --force \
-          --private
+          --force
