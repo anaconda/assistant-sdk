@@ -137,11 +137,6 @@ python =
     3.12: py312
 
 [testenv]
-passenv =
-  ANACONDA_CLOUD_API_KEY
-  ANACONDA_CLOUD_API_DOMAIN
-  ANACONDA_ASSISTANT_DOMAIN
-  ANACONDA_ASSISTANT_CLIENT_SOURCE
 deps = pytest
 extras = dev
 commands = pytest

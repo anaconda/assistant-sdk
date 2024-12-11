@@ -44,12 +44,6 @@ jobs:
           python -m pip config set global.extra-index-url "https://pypi.anaconda.org/t/$TOKEN/anaconda-cloud/label/dev/simple"
           python -m pip install tox tox-gh-actions
       - name: Test with tox
-        env:
-          ANACONDA_CLOUD_API_KEY: ${{ secrets.TEST_API_KEY }}
-          ANACONDA_CLOUD_API_DOMAIN: nucleus-latest.anacondaconnect.com
-          ANACONDA_CLOUD_CLIENT_ID: cloud-cli-test-4
-          ANACONDA_ASSISTANT_DOMAIN: jupyterassistant.anacondaconnect.com
-          ANACONDA_ASSISTANT_CLIENT_SOURCE: anaconda-cli-dev
         run: tox
 
   build-conda-package:
