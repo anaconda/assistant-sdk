@@ -8,7 +8,8 @@ dependencies = [
   "anaconda-cli-base >=0.4",
   "anaconda-assistant-sdk",
   "rich",
-  "requests"
+  "requests",
+  "pydantic >=2"
 ]
 description = "The Anaconda Assistant conda plugin"
 dynamic = ["version"]

@@ -2,7 +2,6 @@ from typing_extensions import Annotated
 
 import typer
 
-from anaconda_cli_base.console import console
 from anaconda_cli_base.cli import ErrorHandledGroup
 from conda import plugins, CondaError
 from conda.exception_handler import ExceptionHandler
@@ -13,22 +12,46 @@ from rich.console import Console
 from anaconda_assistant import ChatSession
 from anaconda_assistant_conda.config import AssistantCondaConfig
 
+console = Console()
 
-def error_handler(_):
+
+def _stream_response(system_message, prompt) -> None:
+    full_text = ""
+    with Live(
+        Markdown(full_text),
+        auto_refresh=False,
+        vertical_overflow="visible",
+        console=console,
+    ) as live:
+        session = ChatSession(system_message=system_message)
+        response = session.chat(prompt, stream=True)
+
+        for chunk in response:
+            full_text += chunk
+            md = Markdown(full_text)
+            live.update(md, refresh=True)
+
+
+def error_handler(_) -> None:
+    config = AssistantCondaConfig()
+    if not config.suggest_correction_on_error:
+        return
+
     ExceptionHandler._orig_print_conda_exception = (
         ExceptionHandler._print_conda_exception
     )
 
     def assistant_exception_handler(self, exc_val: CondaError, exc_tb):
         self._orig_print_conda_exception(exc_val, exc_tb)
+        if exc_val.return_code == 0:
+            return
+
         report = self.get_error_report(exc_val, exc_tb)
-        command = " ".join(report["command"].split()[1:])
 
         console.print("[bold green]Hello from Anaconda Assistant![/green bold]")
-        session = ChatSession()
-        prompt = f"For this conda command\n{command}\nthe following error was reported {exc_val.message}. Suggest how I can change the command to avoid the error."
-        response = session.chat(prompt)
-        print(response)
+        console.print("I'm going to help you diagnose and correct this error.")
+        prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
+        _stream_response(config.system_messages.error, prompt)
 
     ExceptionHandler._print_conda_exception = assistant_exception_handler
 
@@ -39,21 +62,8 @@ def search(
     """Ask Anaconda Assistant to find a conda package based on requested capabilities"""
     console.print("[green bold]Hello from Anaconda Assistant![/green bold]")
 
-    full_text = ""
-    with Live(
-        Markdown(full_text),
-        auto_refresh=False,
-        vertical_overflow="visible",
-        console=console,
-    ) as live:
-        config = AssistantCondaConfig()
-        session = ChatSession(system_message=config.system_message)
-        response = session.chat(query, stream=True)
-
-        for chunk in response:
-            full_text += chunk
-            md = Markdown(full_text)
-            live.update(md, refresh=True)
+    config = AssistantCondaConfig()
+    _stream_response(config.system_messages.search, query)
     raise SystemExit(0)
 
 
