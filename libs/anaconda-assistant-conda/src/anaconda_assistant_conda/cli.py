@@ -29,5 +29,5 @@ def search(
     console.print("[green bold]Hello from Anaconda Assistant![/green bold]")
 
     config = AssistantCondaConfig()
-    stream_response(config.system_messages.search, query)
+    stream_response(system_message=config.system_messages.search, prompt=query)
     raise SystemExit(0)

@@ -1,6 +1,8 @@
+import json
 from functools import partial
 from pathlib import Path
 from typing import Any
+from typing import Generator
 from typing import IO
 from typing import Mapping
 from typing import Optional
@@ -10,12 +12,16 @@ from typing import Union
 from typing import cast
 
 import pytest
+import requests
+import responses
 import typer
 from typer.testing import CliRunner
 from click.testing import Result
 from pytest import MonkeyPatch
+from pytest_mock import MockerFixture
 
 from anaconda_cli_base.cli import app
+from anaconda_assistant.api_client import APIClient
 
 
 @pytest.fixture()
@@ -67,3 +73,50 @@ def invoke_cli() -> CLIInvoker:
     runner = CliRunner()
 
     return partial(runner.invoke, cast(typer.Typer, app))
+
+
+@pytest.fixture
+def is_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
+    mocked = mocker.patch("anaconda_cloud_auth.cli.sys")
+    mocked.stdout.isatty.return_value = True
+    yield
+
+
+@pytest.fixture
+def is_not_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
+    mocked = mocker.patch("anaconda_cloud_auth.cli.sys")
+    mocked.stdout.isatty.return_value = False
+    yield
+
+
+@pytest.fixture
+def mocked_assistant_domain(mocker: MockerFixture) -> Generator[str, None, None]:
+    mocker.patch(
+        "anaconda_cloud_auth.client.BaseClient.email",
+        return_value="me@example.com",
+        new_callable=mocker.PropertyMock,
+    )
+
+    api_client = APIClient(domain="mocking-assistant")
+
+    with responses.RequestsMock() as resp:
+
+        def api_key_required(request: requests.PreparedRequest) -> tuple:
+            if "Authorization" not in request.headers:
+                return (401, {}, json.dumps({"error": {"code": "auth_required"}}))
+            elif request.headers["Authorization"] != "Bearer api-key":
+                return (403, {}, "Incorrect access token")
+            else:
+                body = (
+                    "I am Anaconda Assistant, an AI designed to help you with a variety of tasks, "
+                    "answer questions, and provide information on a wide range of topics. How can "
+                    "I assist you today?__TOKENS_42/424242__"
+                )
+                return (201, {}, body)
+
+        resp.add_callback(
+            responses.POST,
+            api_client.urljoin("/completions"),
+            callback=api_key_required,
+        )
+        yield api_client._config.domain

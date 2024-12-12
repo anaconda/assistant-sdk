@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 console = Console()
 
 
-def stream_response(system_message, prompt) -> None:
+def stream_response(system_message: str, prompt: str) -> None:
     fake_app = typer.Typer(
         help="fake app to support error handling", cls=ErrorHandledGroup
     )
