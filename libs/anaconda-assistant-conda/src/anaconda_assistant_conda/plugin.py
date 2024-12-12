@@ -45,7 +45,7 @@ def conda_subcommands():
 
 def recommend_assist_search(_) -> None:
     console = Console(stderr=True)
-    console.print("[bold green]Conda Assistant:[/bold green]")
+    console.print("[bold green]Hello from Anaconda Assistant![/bold green]")
     console.print("If you're not finding what you're looking for try")
     console.print('  conda assist search "A package that can ..."')
 
