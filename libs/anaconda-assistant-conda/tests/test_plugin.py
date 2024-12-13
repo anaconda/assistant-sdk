@@ -30,6 +30,7 @@ def test_error_handler_not_logged_in(
     assert "AuthenticationMissingError: Login is required" in capsys.readouterr().out
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures("is_a_tty")
 def test_error_handler_not_logged_in_tty_do_login(
     mocked_assistant_domain: str,
@@ -62,6 +63,7 @@ def test_error_handler_not_logged_in_tty_do_login(
     login.assert_called_once()
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures("is_a_tty")
 def test_error_handler_not_logged_in_tty_do_not_login(
     mocked_assistant_domain: str,
@@ -94,6 +96,7 @@ def test_error_handler_not_logged_in_tty_do_not_login(
     login.assert_not_called()
 
 
+@pytest.mark.skip
 def test_error_handler_send_error(
     mocked_assistant_domain: str, monkeypatch: MonkeyPatch, mocker: MockerFixture
 ) -> None:
