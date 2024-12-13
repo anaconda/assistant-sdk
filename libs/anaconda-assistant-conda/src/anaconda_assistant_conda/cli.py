@@ -1,3 +1,5 @@
+import sys
+
 import typer
 from anaconda_cli_base.cli import ErrorHandledGroup
 from anaconda_cli_base.console import console
@@ -29,5 +31,8 @@ def search(
     console.print("[green bold]Hello from Anaconda Assistant![/green bold]")
 
     config = AssistantCondaConfig()
-    stream_response(system_message=config.system_messages.search, prompt=query)
+    tty = sys.stdout.isatty()
+    stream_response(
+        system_message=config.system_messages.search, prompt=query, is_a_tty=tty
+    )
     raise SystemExit(0)

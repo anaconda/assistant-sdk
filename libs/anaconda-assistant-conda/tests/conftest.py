@@ -77,15 +77,27 @@ def invoke_cli() -> CLIInvoker:
 
 @pytest.fixture
 def is_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
-    mocked = mocker.patch("anaconda_cloud_auth.cli.sys")
-    mocked.stdout.isatty.return_value = True
+    mocked1 = mocker.patch("anaconda_cloud_auth.cli.sys")
+    mocked1.stdout.isatty.return_value = True
+
+    mocked2 = mocker.patch("anaconda_assistant_conda.plugin.sys")
+    mocked2.stdout.isatty.return_value = True
+
+    mocked3 = mocker.patch("anaconda_assistant_conda.cli.sys")
+    mocked3.stdout.isatty.return_value = True
     yield
 
 
 @pytest.fixture
 def is_not_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
-    mocked = mocker.patch("anaconda_cloud_auth.cli.sys")
-    mocked.stdout.isatty.return_value = False
+    mocked1 = mocker.patch("anaconda_cloud_auth.cli.sys")
+    mocked1.stdout.isatty.return_value = False
+
+    mocked2 = mocker.patch("anaconda_assistant_conda.plugin.sys")
+    mocked2.stdout.isatty.return_value = False
+
+    mocked3 = mocker.patch("anaconda_assistant_conda.cli.sys")
+    mocked3.stdout.isatty.return_value = False
     yield
 
 
