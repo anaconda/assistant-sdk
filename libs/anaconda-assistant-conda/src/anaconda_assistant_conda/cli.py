@@ -19,7 +19,7 @@ app = typer.Typer(
 
 
 @app.callback(invoke_without_command=True, no_args_is_help=True)
-def _():
+def _() -> None:
     pass
 
 

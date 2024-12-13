@@ -19,7 +19,7 @@ def test_error_handler_not_logged_in(
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
 
-    def mocked_command():
+    def mocked_command() -> None:
         raise CondaError("mocked-command failed")
 
     exception_handler = ExceptionHandler()
@@ -41,14 +41,14 @@ def test_error_handler_not_logged_in_tty_do_login(
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
 
-    def set_api_key():
+    def set_api_key() -> None:
         monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
 
     login = mocker.patch("anaconda_cloud_auth.cli.login", side_effect=set_api_key)
 
     mocker.patch("rich.prompt.Confirm.ask", return_value=True)
 
-    def mocked_command():
+    def mocked_command() -> None:
         raise CondaError("mocked-command failed")
 
     exception_handler = ExceptionHandler()
@@ -73,14 +73,14 @@ def test_error_handler_not_logged_in_tty_do_not_login(
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
 
-    def set_api_key():
+    def set_api_key() -> None:
         monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
 
     login = mocker.patch("anaconda_cloud_auth.cli.login", side_effect=set_api_key)
 
     mocker.patch("rich.prompt.Confirm.ask", return_value=False)
 
-    def mocked_command():
+    def mocked_command() -> None:
         raise CondaError("mocked-command failed")
 
     exception_handler = ExceptionHandler()
@@ -106,7 +106,7 @@ def test_error_handler_send_error(
     chat = mocker.spy(anaconda_assistant_conda.core.ChatSession, "chat")
     ChatSession = mocker.spy(anaconda_assistant_conda.core, "ChatSession")
 
-    def mocked_command():
+    def mocked_command() -> None:
         raise CondaError("mocked-command failed")
 
     exc = ExceptionHandler()

@@ -1,4 +1,6 @@
 import sys
+import traceback
+from typing import Generator, Any
 
 from conda import plugins, CondaError
 from conda.cli.conda_argparse import BUILTIN_COMMANDS
@@ -34,19 +36,23 @@ BUILD_COMMANDS = {
 console = Console()
 
 
-def error_handler(_) -> None:
+def error_handler(_: Any) -> None:
     is_a_tty = sys.stdout.isatty()
 
     config = AssistantCondaConfig()
     if not config.suggest_correction_on_error:
         return
 
-    ExceptionHandler._orig_print_conda_exception = (
+    ExceptionHandler._orig_print_conda_exception = (  # type: ignore
         ExceptionHandler._print_conda_exception
     )
 
-    def assistant_exception_handler(self, exc_val: CondaError, exc_tb):
-        self._orig_print_conda_exception(exc_val, exc_tb)
+    def assistant_exception_handler(
+        self: ExceptionHandler,
+        exc_val: CondaError,
+        exc_tb: traceback.TracebackException,
+    ) -> None:
+        self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
         if exc_val.return_code == 0:
             return
 
@@ -57,11 +63,11 @@ def error_handler(_) -> None:
         prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
         stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
 
-    ExceptionHandler._print_conda_exception = assistant_exception_handler
+    ExceptionHandler._print_conda_exception = assistant_exception_handler  # type: ignore
 
 
 @plugins.hookimpl
-def conda_subcommands():
+def conda_subcommands() -> Generator[plugins.CondaSubcommand, None, None]:
     yield plugins.CondaSubcommand(
         name="assist",
         summary="Anaconda Assistant integration",
@@ -69,7 +75,7 @@ def conda_subcommands():
     )
 
 
-def recommend_assist_search(_) -> None:
+def recommend_assist_search(_: Any) -> None:
     console = Console(stderr=True)
     console.print("[bold green]Hello from Anaconda Assistant![/bold green]")
     console.print("If you're not finding what you're looking for try")
@@ -77,7 +83,7 @@ def recommend_assist_search(_) -> None:
 
 
 @plugins.hookimpl
-def conda_post_commands():
+def conda_post_commands() -> Generator[plugins.CondaPostCommand, None, None]:
     yield plugins.CondaPostCommand(
         name="assist-search-recommendation",
         action=recommend_assist_search,
@@ -86,7 +92,7 @@ def conda_post_commands():
 
 
 @plugins.hookimpl
-def conda_pre_commands():
+def conda_pre_commands() -> Generator[plugins.CondaPreCommand, None, None]:
     yield plugins.CondaPreCommand(
         name="error-handler",
         action=error_handler,
