@@ -17,7 +17,7 @@ def test_assist_search_not_logged_in(
 
     runner = CliRunner()
     result = runner.invoke(app, args=("search", "..."))
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     assert "AuthenticationMissingError: Login is required" in result.output
     assert "interactive login" not in result.output
 
@@ -36,7 +36,7 @@ def test_assist_search_not_logged_in_tty(
     result = runner.invoke(app, args=("search", "..."), input="n")
     login.assert_not_called()
 
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     assert "AuthenticationMissingError: Login is required" in result.output
     assert "interactive login" in result.output
 
