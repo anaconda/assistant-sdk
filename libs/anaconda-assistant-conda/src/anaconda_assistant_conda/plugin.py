@@ -1,4 +1,7 @@
+import sys
+
 from conda import plugins, CondaError
+from conda.cli.conda_argparse import BUILTIN_COMMANDS
 from conda.exception_handler import ExceptionHandler
 from rich.console import Console
 
@@ -6,11 +9,34 @@ from .config import AssistantCondaConfig
 from .core import stream_response
 from .cli import app
 
+ENV_COMMANDS = {
+    "env_config",
+    "env_create",
+    "env_export",
+    "env_list",
+    "env_remove",
+    "env_update",
+}
+
+BUILD_COMMANDS = {
+    "build",
+    "convert",
+    "debug",
+    "develop",
+    "index",
+    "inspect",
+    "metapackage",
+    "render",
+    "skeleton",
+}
+
 
 console = Console()
 
 
 def error_handler(_) -> None:
+    is_a_tty = sys.stdout.isatty()
+
     config = AssistantCondaConfig()
     if not config.suggest_correction_on_error:
         return
@@ -29,7 +55,7 @@ def error_handler(_) -> None:
         console.print("[bold green]Hello from Anaconda Assistant![/green bold]")
         console.print("I'm going to help you diagnose and correct this error.")
         prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
-        stream_response(config.system_messages.error, prompt)
+        stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
 
     ExceptionHandler._print_conda_exception = assistant_exception_handler
 
@@ -64,13 +90,5 @@ def conda_pre_commands():
     yield plugins.CondaPreCommand(
         name="error-handler",
         action=error_handler,
-        run_for={
-            "create",
-            "install",
-            "remove",
-            "uninstall",
-            "update",
-            "env_create",
-            "env_update",
-        },
+        run_for=BUILTIN_COMMANDS.union(ENV_COMMANDS, BUILD_COMMANDS),
     )
