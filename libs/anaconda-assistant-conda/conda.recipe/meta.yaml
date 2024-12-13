@@ -28,7 +28,7 @@ requirements:
     {% for dep in project['dependencies'] %}
     - {{ dep.lower() }}
     {% endfor %}
-    - conda
+    - conda >=24.1
 
 test:
   imports:
