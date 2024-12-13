@@ -28,7 +28,6 @@ requirements:
     {% for dep in project['dependencies'] %}
     - {{ dep.lower() }}
     {% endfor %}
-    - llm
 
 test:
   imports:
