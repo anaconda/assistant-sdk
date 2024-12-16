@@ -5,6 +5,7 @@ from typing import Generator, Any
 from conda import plugins, CondaError
 from conda.cli.conda_argparse import BUILTIN_COMMANDS
 from conda.exception_handler import ExceptionHandler
+from conda.exceptions import PackagesNotFoundError
 from rich.console import Console
 
 from .config import AssistantCondaConfig
@@ -32,11 +33,12 @@ BUILD_COMMANDS = {
     "skeleton",
 }
 
+ALL_COMMANDS = BUILTIN_COMMANDS.union(ENV_COMMANDS, BUILD_COMMANDS)
 
 console = Console()
 
 
-def error_handler(_: Any) -> None:
+def error_handler(command: str) -> None:
     is_a_tty = sys.stdout.isatty()
 
     config = AssistantCondaConfig()
@@ -54,6 +56,12 @@ def error_handler(_: Any) -> None:
     ) -> None:
         self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
         if exc_val.return_code == 0:
+            return
+
+        elif command == "search" and isinstance(exc_val, PackagesNotFoundError):
+            # When a package is not found it actually throws an error
+            # it is perhaps better to recommend the new assist search.
+            recommend_assist_search("search")
             return
 
         report = self.get_error_report(exc_val, exc_tb)
@@ -94,7 +102,5 @@ def conda_post_commands() -> Generator[plugins.CondaPostCommand, None, None]:
 @plugins.hookimpl
 def conda_pre_commands() -> Generator[plugins.CondaPreCommand, None, None]:
     yield plugins.CondaPreCommand(
-        name="error-handler",
-        action=error_handler,
-        run_for=BUILTIN_COMMANDS.union(ENV_COMMANDS, BUILD_COMMANDS),
+        name="error-handler", action=error_handler, run_for=ALL_COMMANDS
     )
