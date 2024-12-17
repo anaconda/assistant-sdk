@@ -33,5 +33,8 @@ def stream_response(system_message: str, prompt: str, is_a_tty: bool = True) -> 
 
             for chunk in response:
                 full_text += chunk
-                md = Markdown(full_text)
+                try:
+                    md = Markdown(full_text, hyperlinks=False)
+                except Exception:
+                    continue
                 live.update(md, refresh=True)
