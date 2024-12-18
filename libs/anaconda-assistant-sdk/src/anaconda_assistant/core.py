@@ -135,7 +135,7 @@ class ChatClient:
                 please set this configuration in {anaconda_config_path()} as follows:
 
                 [plugin.assistant]
-                accepted_terms = True
+                accepted_terms = true
                 """)
             raise UnspecifiedAcceptedTermsError(msg)
         elif not self.api_client._config.accepted_terms:
@@ -149,12 +149,12 @@ class ChatClient:
                 {anaconda_config_path()} as follows to enable data collection:
 
                 [plugin.assistant]
-                data_collection = True
+                data_collection = true
 
                 or to disable data collection:
 
                 [plugin.assistant]
-                data_collection = False
+                data_collection = false
                 """)
             raise UnspecifiedDataCollectionChoice(msg)
 
