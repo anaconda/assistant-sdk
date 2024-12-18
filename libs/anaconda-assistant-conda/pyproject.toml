@@ -111,10 +111,6 @@ python =
     3.12: py312
 
 [testenv]
-passenv =
-  ANACONDA_CLOUD_API_KEY
-  ANACONDA_CLOUD_DOMAIN
-  ANACONDA_CLOUD_CLIENT_ID
 deps =
   pytest
   ../anaconda-assistant-sdk
