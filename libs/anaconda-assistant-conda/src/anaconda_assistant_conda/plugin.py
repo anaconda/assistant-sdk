@@ -2,6 +2,7 @@ import sys
 import traceback
 from typing import Generator, Any
 
+from anaconda_assistant.config import AssistantConfig
 from conda import plugins, CondaError
 from conda.cli.conda_argparse import BUILTIN_COMMANDS
 from conda.exception_handler import ExceptionHandler
@@ -38,6 +39,11 @@ ALL_COMMANDS = BUILTIN_COMMANDS.union(ENV_COMMANDS, BUILD_COMMANDS)
 console = Console()
 
 
+ExceptionHandler._orig_print_conda_exception = (  # type: ignore
+    ExceptionHandler._print_conda_exception
+)
+
+
 def error_handler(command: str) -> None:
     is_a_tty = sys.stdout.isatty()
 
@@ -45,9 +51,9 @@ def error_handler(command: str) -> None:
     if not config.suggest_correction_on_error:
         return
 
-    ExceptionHandler._orig_print_conda_exception = (  # type: ignore
-        ExceptionHandler._print_conda_exception
-    )
+    assistant_config = AssistantConfig()
+    if assistant_config.accepted_terms is False:
+        return
 
     def assistant_exception_handler(
         self: ExceptionHandler,
