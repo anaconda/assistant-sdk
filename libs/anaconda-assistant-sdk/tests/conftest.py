@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
+from pytest import MonkeyPatch
 
 
 @pytest.fixture()
@@ -31,3 +31,12 @@ def is_not_none() -> Any:
             return other is not None
 
     return _NotNone()
+
+
+@pytest.fixture(autouse=True)
+def fake_config_toml(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
+    toml_path = tmp_path / "config.toml"
+    monkeypatch.setenv("ANACONDA_CONFIG_TOML", str(toml_path))
+
+    monkeypatch.delenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", raising=False)
+    monkeypatch.delenv("ANACONDA_ASSISTANT_DATA_COLLECTION", raising=False)

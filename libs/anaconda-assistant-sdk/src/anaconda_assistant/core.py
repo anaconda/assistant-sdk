@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from textwrap import dedent
 from typing import Any
 from typing import Generator
 from typing import Optional
@@ -12,8 +13,12 @@ from uuid import uuid4
 from requests import Response
 from requests.exceptions import HTTPError
 
+from anaconda_cli_base.config import anaconda_config_path
 from anaconda_cloud_auth.client import BaseClient as AuthClient
 from anaconda_assistant.api_client import APIClient
+from anaconda_assistant.exceptions import NotAcceptedTermsError
+from anaconda_assistant.exceptions import UnspecifiedAcceptedTermsError
+from anaconda_assistant.exceptions import UnspecifiedDataCollectionChoice
 
 TOKEN_COUNT = re.compile(
     r"(?P<message>.*)__TOKENS_(?P<used>[0-9]+)\/(?P<limit>[0-9]+)__", re.DOTALL
@@ -119,10 +124,45 @@ class ChatClient:
         )
         self.auth_client: AuthClient = AuthClient(api_key=api_key)
 
+        if self.api_client._config.accepted_terms is None:
+            msg = dedent(f"""\
+                You have not accepted the terms of service.
+                You must accept our terms of service
+                https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service
+                and Privacy Policy
+                https://legal.anaconda.com/policies/en/?name=privacy-policy
+                If you confirm that you are older than 13 years old and accept the terms
+                please set this configuration in {anaconda_config_path()} as follows:
+
+                [plugin.assistant]
+                accepted_terms = True
+                """)
+            raise UnspecifiedAcceptedTermsError(msg)
+        elif not self.api_client._config.accepted_terms:
+            raise NotAcceptedTermsError(
+                f"You have declined our Terms of Service and Privacy Policy in {anaconda_config_path()}"
+            )
+
+        if self.api_client._config.data_collection is None:
+            msg = dedent(f"""\
+                You have not declared to opt-in or opt-out of data collection. Please set this configuration in
+                {anaconda_config_path()} as follows to enable data collection:
+
+                [plugin.assistant]
+                data_collection = True
+
+                or to disable data collection:
+
+                [plugin.assistant]
+                data_collection = False
+                """)
+            raise UnspecifiedDataCollectionChoice(msg)
+
         self.id: str = str(uuid4())
 
         self.system_message = system_message
         self.example_messages = example_messages
+        self.skip_logging = not self.api_client._config.data_collection
 
     def completions(
         self,
@@ -134,6 +174,7 @@ class ChatClient:
         response_message_id = str(uuid4())
 
         body = {
+            "skip_logging": self.skip_logging,
             "session": {
                 "session_id": self.id,
                 "user_id": self.auth_client.email,

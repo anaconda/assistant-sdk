@@ -11,9 +11,42 @@ from anaconda_cloud_auth import login
 login()
 ```
 
- to launch a browser to login and save your API token to disk. For cases where you cannot utilize a browser to login you can grab your API and set the `ANACONDA_CLOUD_API_KEY=<api-key>` env var.
+to launch a browser to login and save your API token to disk. For cases where you cannot utilize a browser to login you can grab your API and set the `ANACONDA_CLOUD_API_KEY=<api-key>` env var.
 
 The Python clients and integrations provide `api_key` as a keyword argument.
+
+## Terms of use and data collection
+
+In order to use the Anaconda Assistant SDK and derived integrations the user must first agree to
+
+* Our [terms of service](https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service)
+* Our [privacy policy](https://legal.anaconda.com/policies/en/?name=privacy-policy)
+* Assert that they are more than 13 years old
+* Opt-in or Opt-out of Data Collection
+
+On Data Collection:
+If you opt-in you will enjoy personalized recommendations and contribute to smarter features.
+
+We prioritize your privacy:
+
+* Your data is never sold
+* Always secured
+* This setting only affects the data Anaconda stores
+* It does not affect the data that is sent to Open AI
+
+To agree to the terms of service and configure data collection edit the `~/.anaconda/config.toml` file
+
+```toml
+[plugin.assistant]
+accepted_terms = true
+data_collection = true
+```
+
+You may set `data_collection = false` if you chose to opt-out.
+
+If you set `accepted_terms = false` the Anaconda Assistant SDK and derived integrations will not function.
+
+If either or both of these values are unset in the `~/.anaconda/config.toml` file, an exception will be raised.
 
 ## Chat session
 
