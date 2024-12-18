@@ -134,15 +134,13 @@ class ChatClient:
                 If you confirm that you are older than 13 years old and accept the terms
                 please set this configuration in {anaconda_config_path()} as follows:
 
-                ```toml
                 [plugin.assistant]
                 accepted_terms = True
-                ```
                 """)
             raise UnspecifiedAcceptedTermsError(msg)
         elif not self.api_client._config.accepted_terms:
             raise NotAcceptedTermsError(
-                f"You have explicitly declined our Terms of Service in Privacy Policy in {anaconda_config_path()}"
+                f"You have declined our Terms of Service and Privacy Policy in {anaconda_config_path()}"
             )
 
         if self.api_client._config.data_collection is None:
@@ -150,16 +148,13 @@ class ChatClient:
                 You have not declared to opt-in or opt-out of data collection. Please set this configuration in
                 {anaconda_config_path()} as follows to enable data collection:
 
-                ```toml
                 [plugin.assistant]
                 data_collection = True
-                ```
+
                 or to disable data collection:
 
-                ```toml
                 [plugin.assistant]
                 data_collection = False
-                ```
                 """)
             raise UnspecifiedDataCollectionChoice(msg)
 
@@ -167,6 +162,7 @@ class ChatClient:
 
         self.system_message = system_message
         self.example_messages = example_messages
+        self.skip_logging = not self.api_client._config.data_collection
 
     def completions(
         self,
@@ -178,7 +174,7 @@ class ChatClient:
         response_message_id = str(uuid4())
 
         body = {
-            "skip_logging": self.api_client._config.data_collection,
+            "skip_logging": self.skip_logging,
             "session": {
                 "session_id": self.id,
                 "user_id": self.auth_client.email,
