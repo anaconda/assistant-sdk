@@ -4,15 +4,38 @@ from typing import Generator
 import json
 import pytest
 import responses
+from pytest import MonkeyPatch
 from pytest_mock import MockerFixture
 from requests.exceptions import StreamConsumedError
 
+from anaconda_assistant.exceptions import (
+    NotAcceptedTermsError,
+    UnspecifiedAcceptedTermsError,
+    UnspecifiedDataCollectionChoice,
+)
 from anaconda_assistant.core import ChatSession, ChatClient
 from anaconda_assistant.api_client import APIClient
 
 
+def test_unspecified_accepted_terms_error() -> None:
+    with pytest.raises(UnspecifiedAcceptedTermsError):
+        _ = ChatClient()
+
+
+def test_not_accepted_terms_error(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "false")
+    with pytest.raises(NotAcceptedTermsError):
+        _ = ChatClient()
+
+
+def test_unspecified_data_collection(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    with pytest.raises(UnspecifiedDataCollectionChoice):
+        _ = ChatClient()
+
+
 @pytest.fixture
-def mocked_api_client(mocker: MockerFixture) -> Generator[APIClient, None, None]:
+def mocked_api_domain(mocker: MockerFixture) -> Generator[str, None, None]:
     mocker.patch(
         "anaconda_cloud_auth.client.BaseClient.email",
         return_value="me@example.com",
@@ -31,25 +54,76 @@ def mocked_api_client(mocker: MockerFixture) -> Generator[APIClient, None, None]
                 "I assist you today?__TOKENS_42/424242__"
             ),
         )
-        yield api_client
+        yield "mocking-assistant"
+
+
+@pytest.fixture
+def mocked_api_client(
+    mocked_api_domain: str,
+) -> Generator[APIClient, None, None]:
+    api_client = APIClient(domain=mocked_api_domain)
+    yield api_client
 
 
 @pytest.fixture
 def mocked_chat_client(
-    mocked_api_client: APIClient,
+    mocked_api_domain: str,
 ) -> Generator[ChatClient, None, None]:
-    client = ChatClient(domain=mocked_api_client._config.domain)
+    client = ChatClient(domain=mocked_api_domain)
     yield client
 
 
 @pytest.fixture
 def mocked_chat_session(
-    mocked_api_client: APIClient,
+    mocked_api_domain: str,
 ) -> Generator[ChatSession, None, None]:
-    session = ChatSession(domain=mocked_api_client._config.domain)
+    session = ChatSession(domain=mocked_api_domain)
     yield session
 
 
+def test_chat_client_skip_logging(
+    monkeypatch: MonkeyPatch, mocked_api_domain: str
+) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "false")
+
+    client = ChatClient(domain=mocked_api_domain)
+    assert client.skip_logging is True
+
+    messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
+    res = client.completions(messages=messages)
+
+    assert res._response.request.body is not None
+    body = json.loads(res._response.request.body)
+
+    assert body.get("skip_logging") is True
+
+
+def test_chat_client_no_skip_logging(
+    monkeypatch: MonkeyPatch, mocked_api_domain: str
+) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
+
+    client = ChatClient(domain=mocked_api_domain)
+    assert client.skip_logging is False
+
+    messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
+    res = client.completions(messages=messages)
+
+    assert res._response.request.body is not None
+    body = json.loads(res._response.request.body)
+
+    assert body.get("skip_logging") is False
+
+
+@pytest.fixture
+def accepted_terms_and_data_collection(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
+
+
+@pytest.mark.usefixtures("accepted_terms_and_data_collection")
 def test_token_regex(mocked_chat_client: ChatClient) -> None:
     messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
     res = mocked_chat_client.completions(messages=messages)
@@ -63,6 +137,7 @@ def test_token_regex(mocked_chat_client: ChatClient) -> None:
     assert res.token_limit == 424242
 
 
+@pytest.mark.usefixtures("accepted_terms_and_data_collection")
 def test_consume_stream_cached_message(mocked_chat_client: ChatClient) -> None:
     messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
     res = mocked_chat_client.completions(messages=messages)
@@ -82,6 +157,7 @@ def test_consume_stream_cached_message(mocked_chat_client: ChatClient) -> None:
     assert res.token_limit == 424242
 
 
+@pytest.mark.usefixtures("accepted_terms_and_data_collection")
 def test_chat_client_system_message(mocked_api_client: APIClient) -> None:
     system_message = "You are a kitty"
 
@@ -101,6 +177,7 @@ def test_chat_client_system_message(mocked_api_client: APIClient) -> None:
     }
 
 
+@pytest.mark.usefixtures("accepted_terms_and_data_collection")
 def test_chat_session_history(
     mocked_chat_session: ChatSession, is_not_none: Any
 ) -> None:

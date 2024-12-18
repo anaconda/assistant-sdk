@@ -1,14 +1,10 @@
-class AnacondaAssistantError(Exception):
-    pass
+class AnacondaAssistantError(Exception): ...
 
 
-class NotAcceptedTermsError(AnacondaAssistantError):
-    pass
+class NotAcceptedTermsError(AnacondaAssistantError): ...
 
 
-class UnspecifiedAcceptedTermsError(AnacondaAssistantError):
-    pass
+class UnspecifiedAcceptedTermsError(AnacondaAssistantError): ...
 
 
-class UnspecifiedDataCollectionChoice(AnacondaAssistantError):
-    pass
+class UnspecifiedDataCollectionChoice(AnacondaAssistantError): ...
