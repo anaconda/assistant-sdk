@@ -29,9 +29,12 @@ def _set_config(table: str, key: str, value: Any) -> None:
 
     # save a backup of the config.toml just to be safe
     config_toml = anaconda_config_path()
-    copy(config_toml, config_toml.with_suffix(".backup.toml"))
-    with open(config_toml, "rb") as f:
-        config = tomlkit.load(f)
+    if config_toml.exists():
+        copy(config_toml, config_toml.with_suffix(".backup.toml"))
+        with open(config_toml, "rb") as f:
+            config = tomlkit.load(f)
+    else:
+        config = tomlkit.document()
 
     # Add table if it doesn't exist
     config_table = config
