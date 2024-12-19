@@ -2,6 +2,12 @@
 
 The Anaconda Assistant Python client
 
+## Installation
+
+```text
+conda install -c anaconda-cloud anaconda-assistant-sdk
+```
+
 ## How to authenticate
 
 To use the Python client or CLI you can use `anaconda login` CLI, Anaconda Navigator, or
