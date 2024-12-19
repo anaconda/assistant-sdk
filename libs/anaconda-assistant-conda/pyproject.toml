@@ -77,6 +77,10 @@ module = "*._version"
 ignore_missing_imports = true
 module = "rich_click.*"
 
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "conda.*"
+
 [tool.pytest.ini_options]
 addopts = [
   "--cov=anaconda_assistant_conda",
