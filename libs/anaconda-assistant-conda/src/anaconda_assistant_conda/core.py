@@ -52,7 +52,13 @@ def _set_config(table: str, key: str, value: Any) -> None:
 
 
 @register_error_handler(UnspecifiedDataCollectionChoice)
-def data_collection_choice(_: Type[UnspecifiedDataCollectionChoice]) -> int:
+def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
+    import anaconda_cloud_auth.cli
+
+    if not anaconda_cloud_auth.cli.sys.stdout.isatty():  # type: ignore
+        print(e.args[0])
+        return 1
+
     msg = dedent("""\
         You have not chosen to opt-in or opt-out of data collection.
         This does not affect the operation of Anaconda Assistant, but your choice is required to proceed.
@@ -74,7 +80,13 @@ def data_collection_choice(_: Type[UnspecifiedDataCollectionChoice]) -> int:
 
 
 @register_error_handler(UnspecifiedAcceptedTermsError)
-def accept_terms(_: Type[UnspecifiedAcceptedTermsError]) -> int:
+def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
+    import anaconda_cloud_auth.cli
+
+    if not anaconda_cloud_auth.cli.sys.stdout.isatty():  # type: ignore
+        print(e.args[0])
+        return 1
+
     msg = dedent("""\
         You have not accepted the terms of service.
         You must accept our terms of service

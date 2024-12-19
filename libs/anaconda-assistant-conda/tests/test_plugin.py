@@ -16,6 +16,8 @@ def test_error_handler_not_logged_in(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -38,6 +40,8 @@ def test_error_handler_not_logged_in_tty_do_login(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -70,6 +74,8 @@ def test_error_handler_not_logged_in_tty_do_not_login(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -98,6 +104,8 @@ def test_error_handler_not_logged_in_tty_do_not_login(
 def test_error_handler_send_error(
     mocked_assistant_domain: str, monkeypatch: MonkeyPatch, mocker: MockerFixture
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
@@ -132,6 +140,8 @@ def test_error_handler_search_condaerror(
     monkeypatch: MonkeyPatch,
     mocker: MockerFixture,
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
@@ -160,6 +170,8 @@ def test_error_handler_search_packgenotfounderror(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
