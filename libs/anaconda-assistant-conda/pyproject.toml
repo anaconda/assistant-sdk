@@ -114,20 +114,24 @@ python =
 [testenv]
 deps =
   pytest
-  ../anaconda-assistant-sdk
 extras = dev
 conda_channels =
     anaconda-cloud
     defaults
 conda_deps =
     conda
+    anaconda-assistant-sdk
 commands = pytest
 
 [testenv:mypy]
 deps =
     mypy
-    ../anaconda-assistant-sdk
 extras = dev
+conda_channels =
+    anaconda-cloud
+    defaults
+conda_deps =
+    anaconda-assistant-sdk
 commands = mypy
 """
 
