@@ -1,7 +1,6 @@
 import sys
 
 import typer
-from anaconda_cli_base.cli import ErrorHandledGroup
 from anaconda_cli_base.console import console
 from typing_extensions import Annotated
 
@@ -14,7 +13,6 @@ app = typer.Typer(
     add_help_option=True,
     no_args_is_help=True,
     add_completion=False,
-    cls=ErrorHandledGroup,
 )
 
 

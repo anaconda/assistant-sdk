@@ -11,6 +11,8 @@ from anaconda_assistant_conda.config import AssistantCondaConfig
 def test_assist_search_not_logged_in(
     mocked_assistant_domain: str, monkeypatch: MonkeyPatch
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -26,6 +28,8 @@ def test_assist_search_not_logged_in(
 def test_assist_search_not_logged_in_tty(
     mocked_assistant_domain: str, monkeypatch: MonkeyPatch, mocker: MockerFixture
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -47,6 +51,8 @@ def test_assist_search_not_logged_in_tty(
 def test_assist_search_system_message(
     mocked_assistant_domain: str, monkeypatch: MonkeyPatch, mocker: MockerFixture
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")

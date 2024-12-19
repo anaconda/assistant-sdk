@@ -6,10 +6,11 @@ requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
 dependencies = [
   "anaconda-cloud-auth >=0.7",
   "anaconda-cli-base >=0.4",
-  "anaconda-assistant-sdk",
+  "anaconda-assistant-sdk >=0.2",
   "rich",
   "requests",
-  "pydantic >=2"
+  "pydantic >=2",
+  "tomlkit"
 ]
 description = "The Anaconda Assistant conda plugin"
 dynamic = ["version"]
@@ -29,7 +30,8 @@ dev = [
   "pytest-mock",
   "responses",
   "tox",
-  "types-requests"
+  "types-requests",
+  "responses"
 ]
 publish = [
   "build",
@@ -75,6 +77,10 @@ module = "*._version"
 ignore_missing_imports = true
 module = "rich_click.*"
 
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "conda.*"
+
 [tool.pytest.ini_options]
 addopts = [
   "--cov=anaconda_assistant_conda",
@@ -110,26 +116,26 @@ python =
     3.12: py312
 
 [testenv]
-passenv =
-  ANACONDA_CLOUD_API_KEY
-  ANACONDA_CLOUD_DOMAIN
-  ANACONDA_CLOUD_CLIENT_ID
 deps =
   pytest
-  ../anaconda-assistant-sdk
 extras = dev
 conda_channels =
     anaconda-cloud
     defaults
 conda_deps =
     conda
+    anaconda-assistant-sdk
 commands = pytest
 
 [testenv:mypy]
 deps =
     mypy
-    ../anaconda-assistant-sdk
 extras = dev
+conda_channels =
+    anaconda-cloud
+    defaults
+conda_deps =
+    anaconda-assistant-sdk
 commands = mypy
 """
 

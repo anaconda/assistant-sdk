@@ -16,6 +16,8 @@ def test_error_handler_not_logged_in(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -31,7 +33,6 @@ def test_error_handler_not_logged_in(
     assert "AuthenticationMissingError: Login is required" in capsys.readouterr().out
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures("is_a_tty")
 def test_error_handler_not_logged_in_tty_do_login(
     mocked_assistant_domain: str,
@@ -39,6 +40,8 @@ def test_error_handler_not_logged_in_tty_do_login(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -64,7 +67,6 @@ def test_error_handler_not_logged_in_tty_do_login(
     login.assert_called_once()
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures("is_a_tty")
 def test_error_handler_not_logged_in_tty_do_not_login(
     mocked_assistant_domain: str,
@@ -72,6 +74,8 @@ def test_error_handler_not_logged_in_tty_do_not_login(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
@@ -97,10 +101,11 @@ def test_error_handler_not_logged_in_tty_do_not_login(
     login.assert_not_called()
 
 
-@pytest.mark.skip
 def test_error_handler_send_error(
     mocked_assistant_domain: str, monkeypatch: MonkeyPatch, mocker: MockerFixture
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
@@ -130,12 +135,13 @@ def test_error_handler_send_error(
     )
 
 
-@pytest.mark.skip
 def test_error_handler_search_condaerror(
     mocked_assistant_domain: str,
     monkeypatch: MonkeyPatch,
     mocker: MockerFixture,
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
@@ -165,6 +171,8 @@ def test_error_handler_search_packgenotfounderror(
     mocker: MockerFixture,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
