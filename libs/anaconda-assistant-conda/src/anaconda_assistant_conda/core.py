@@ -120,7 +120,10 @@ def try_except_repeat(
         exit_code = callback(e)
         if exit_code == -1:
             yield from try_except_repeat(
-                func=func, max_depth=max_depth - 1, *args, **kwargs
+                func=func,
+                max_depth=max_depth - 1,
+                *args,
+                **kwargs,  # type: ignore
             )
         else:
             return
