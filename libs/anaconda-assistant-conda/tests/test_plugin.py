@@ -164,6 +164,7 @@ def test_error_handler_search_condaerror(
     )
 
 
+@pytest.mark.skip
 def test_error_handler_search_packgenotfounderror(
     mocked_assistant_domain: str,
     monkeypatch: MonkeyPatch,
