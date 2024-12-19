@@ -30,7 +30,8 @@ dev = [
   "pytest-mock",
   "responses",
   "tox",
-  "types-requests"
+  "types-requests",
+  "responses"
 ]
 publish = [
   "build",
