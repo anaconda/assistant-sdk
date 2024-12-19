@@ -19,6 +19,13 @@ Conda version 24.1 or newer is required.
 conda install -n base -c anaconda-cloud anaconda-assistant-conda
 ```
 
+## Terms of use
+
+You will need to agree to our terms of use, privacy policy, and choose to opt-in or opt-out of data collection
+on first use of this plugin.
+
+See the [documentation from the anaconda-assistant-sdk](https://github.com/anaconda/assistant-sdk/tree/main/libs/anaconda-assistant-sdk#terms-of-use-and-data-collection) for more details.
+
 ## Authentication
 
 When you use any of the Anaconda AI Assistant features you will be prompted to login to your Anaconda.cloud
