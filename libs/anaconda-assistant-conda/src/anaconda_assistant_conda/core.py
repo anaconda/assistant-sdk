@@ -24,7 +24,7 @@ from rich.prompt import Confirm
 console = Console()
 
 
-def _set_config(table: str, key: str, value: Any) -> None:
+def set_config(table: str, key: str, value: Any) -> None:
     expanded = table.split(".")
 
     # save a backup of the config.toml just to be safe
@@ -47,6 +47,7 @@ def _set_config(table: str, key: str, value: Any) -> None:
     # we can edit the value here and then write the whole doc back
     config_table[key] = value  # type: ignore
 
+    config_toml.parent.mkdir(parents=True, exist_ok=True)
     with open(config_toml, "w") as f:
         tomlkit.dump(config, f)
 
@@ -74,7 +75,7 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
         [bold green]Would you like to opt-in to data collection?[/bold green]
         """)
     data_collection = Confirm.ask(msg)
-    _set_config("plugin.assistant", "data_collection", data_collection)
+    set_config("plugin.assistant", "data_collection", data_collection)
 
     return -1
 
@@ -100,7 +101,7 @@ def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
         [bold green]Are you more than 13 years old and accept the terms?[/bold green]
         """)
     accepted_terms = Confirm.ask(msg)
-    _set_config("plugin.assistant", "accepted_terms", accepted_terms)
+    set_config("plugin.assistant", "accepted_terms", accepted_terms)
 
     if not accepted_terms:
         return 1
