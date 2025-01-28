@@ -5,6 +5,7 @@ from typing import Any
 from typing import Callable
 from typing import Generator
 from typing import Type
+from typing import Optional
 from unittest.mock import patch
 
 import tomlkit
@@ -132,7 +133,7 @@ def stream_response(
     system_message: str,
     prompt: str,
     is_a_tty: bool = True,
-    console: Console | None = None,
+    console: Optional[Console] = None,
 ) -> None:
     if console is None:
         console = Console()
