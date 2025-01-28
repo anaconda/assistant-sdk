@@ -21,8 +21,6 @@ from rich.live import Live
 from rich.markdown import Markdown
 from rich.prompt import Confirm
 
-console = Console()
-
 
 def set_config(table: str, key: str, value: Any) -> None:
     expanded = table.split(".")
@@ -130,7 +128,15 @@ def try_except_repeat(
             return
 
 
-def stream_response(system_message: str, prompt: str, is_a_tty: bool = True) -> None:
+def stream_response(
+    system_message: str,
+    prompt: str,
+    is_a_tty: bool = True,
+    console: Console | None = None,
+) -> None:
+    if console is None:
+        console = Console()
+
     full_text = ""
     with Live(
         Markdown(full_text),

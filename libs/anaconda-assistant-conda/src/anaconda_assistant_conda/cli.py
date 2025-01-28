@@ -1,12 +1,13 @@
 import sys
 
 import typer
-from anaconda_cli_base.console import console
+from rich.console import Console
 from typing_extensions import Annotated
 
 from .config import AssistantCondaConfig
 from .core import stream_response
 
+console = Console()
 
 app = typer.Typer(
     help="The conda assistant, powered by Anaconda Assistant",
@@ -31,6 +32,12 @@ def search(
     config = AssistantCondaConfig()
     tty = sys.stdout.isatty()
     stream_response(
-        system_message=config.system_messages.search, prompt=query, is_a_tty=tty
+        system_message=config.system_messages.search,
+        prompt=query,
+        is_a_tty=tty,
+        console=console,
+    )
+    console.print(
+        "[red]Warning:[/red] Example code generation is currently in beta, please use caution."
     )
     raise SystemExit(0)
