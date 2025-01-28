@@ -5,6 +5,7 @@ from typing import Any
 from typing import Callable
 from typing import Generator
 from typing import Type
+from typing import Optional
 from unittest.mock import patch
 
 import tomlkit
@@ -20,8 +21,6 @@ from rich.console import Console
 from rich.live import Live
 from rich.markdown import Markdown
 from rich.prompt import Confirm
-
-console = Console()
 
 
 def set_config(table: str, key: str, value: Any) -> None:
@@ -130,7 +129,15 @@ def try_except_repeat(
             return
 
 
-def stream_response(system_message: str, prompt: str, is_a_tty: bool = True) -> None:
+def stream_response(
+    system_message: str,
+    prompt: str,
+    is_a_tty: bool = True,
+    console: Optional[Console] = None,
+) -> None:
+    if console is None:
+        console = Console()
+
     full_text = ""
     with Live(
         Markdown(full_text),
