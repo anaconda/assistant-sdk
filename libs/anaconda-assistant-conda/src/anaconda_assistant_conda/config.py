@@ -1,7 +1,12 @@
 from textwrap import dedent
+from typing import Any
+from warnings import warn
 
 from anaconda_cli_base.config import AnacondaBaseSettings
-from pydantic import BaseModel
+from langchain_core.language_models import BaseChatModel
+from pydantic import BaseModel, Field
+
+from anaconda_assistant_conda.exceptions import IncorrectModelClass
 
 DEFAULT_SEARCH_SYSTEM_MESSAGE = dedent("""\
 You are the Conda Assistant from Anaconda.
@@ -28,6 +33,32 @@ class SystemMessages(BaseModel):
     error: str = DEFAULT_ERROR_SYSTEM_MESSAGE
 
 
+class LLM(BaseModel):
+    driver: str
+    params: dict[str, Any] = Field(default_factory=dict)
+
+    def load(self) -> BaseChatModel:
+        if self.driver != DEFAULT_LLM.driver:
+            warn("Loading a custom LLM is an experimental feature. Use with caution.")
+        from importlib import import_module
+
+        mod, object = self.driver.rsplit(":", maxsplit=1)
+        module = import_module(mod)
+        driver = getattr(module, object)
+        if not issubclass(driver, BaseChatModel):
+            raise IncorrectModelClass(
+                f"{self.driver} is not a subclass of langchain BaseChatModel"
+            )
+        llm = driver(**self.params)
+        return llm
+
+
+DEFAULT_LLM = LLM(
+    driver="anaconda_assistant.integrations.langchain:AnacondaAssistant", params={}
+)
+
+
 class AssistantCondaConfig(AnacondaBaseSettings, plugin_name="assistant_conda"):
+    llm: LLM = DEFAULT_LLM
     suggest_correction_on_error: bool = True
     system_messages: SystemMessages = SystemMessages()

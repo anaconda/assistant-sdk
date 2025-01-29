@@ -12,7 +12,6 @@ import tomlkit
 from anaconda_cli_base.config import anaconda_config_path
 from anaconda_cli_base.exceptions import register_error_handler
 from anaconda_cli_base.exceptions import ERROR_HANDLERS
-from anaconda_assistant import ChatSession
 from anaconda_assistant.exceptions import (
     UnspecifiedAcceptedTermsError,
     UnspecifiedDataCollectionChoice,
@@ -21,6 +20,8 @@ from rich.console import Console
 from rich.live import Live
 from rich.markdown import Markdown
 from rich.prompt import Confirm
+
+from anaconda_assistant_conda.config import AssistantCondaConfig
 
 
 def set_config(table: str, key: str, value: Any) -> None:
@@ -149,9 +150,14 @@ def stream_response(
             mocked.stdout.isatty.return_value = is_a_tty
 
             def chat() -> Generator[str, None, None]:
-                session = ChatSession(system_message=system_message)
-                response = session.chat(message=prompt, stream=True)
-                yield from response
+                llm = AssistantCondaConfig().llm.load()
+                messages = [
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": prompt},
+                ]
+                response = llm.stream(messages)
+                for chunk in response:
+                    yield cast(str, chunk.content)
 
             response = cast(
                 Generator[str, None, None], try_except_repeat(chat, max_depth=5)
