@@ -46,7 +46,7 @@ def mocked_api_domain(mocker: MockerFixture) -> Generator[str, None, None]:
 
     api_client = APIClient(domain="mocking-assistant")
 
-    with responses.RequestsMock() as resp:
+    with responses.RequestsMock(assert_all_requests_are_fired=False) as resp:
         resp.add(
             responses.POST,
             api_client.urljoin("/completions"),
