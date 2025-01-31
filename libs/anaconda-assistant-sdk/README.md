@@ -67,15 +67,18 @@ chat = ChatSession()
 text = chat.completions("what are the the first 5 fibonacci numbers?", stream=False)
 print(text)
 
-text = chat.completions("make that the first 10 numbers", stream=False)
-print(text)
+text = chat.completions("make that the first 10 numbers", stream=True)
+for chunk in text:
+    print(chunk, end="")
 ```
 
 ## Chat client
 
 The ChatClient provides a low-level completions function that accepts a list of messages in the same format
 as OpenAI. The `completions()` method returns a ChatResponse object that allows streaming of the response similar to
-requests Response.
+requests Response with `.iter_content()`, `.iter_lines()`, and `.message`, which returns the whole message as a
+string. Once the who message has been access or consumed through an iterable it is retained in the `.message` object.
+Additionally, the response object stores `.tokens_used` and `.tokens_limit` integers.
 
 ```python
 from anaconda_assistant import ChatClient
@@ -86,7 +89,7 @@ messages = [
     {"role": "user", "content": "What is pi?"}
 ]
 
-response = chat.completions(messages=messages)
+response = client.completions(messages=messages)
 
 for chunk in response.iter_content():
     print(chunk, end="")
@@ -94,6 +97,14 @@ for chunk in response.iter_content():
 
 You can only consume the message with `.iter_content()` once, but the result is captured to the `.message` attribute
 while streaming.
+
+## Daily quotas
+
+Each Anaconda.cloud subscription plan enforces a limit on the number of requests (calls to `.completions()`). The
+limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached
+the `.completions()` function will throw a `DailyQuotaExceeded` exception.
+
+Users can upgrade their plans by visiting [https://anaconda.cloud/profile/subscriptions](https://anaconda.cloud/profile/subscriptions).
 
 ## Integrations
 

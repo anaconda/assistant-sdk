@@ -7,8 +7,10 @@ import responses
 from pytest import MonkeyPatch
 from pytest_mock import MockerFixture
 from requests.exceptions import StreamConsumedError
+import responses.matchers
 
 from anaconda_assistant.exceptions import (
+    DailyQuotaExceeded,
     NotAcceptedTermsError,
     UnspecifiedAcceptedTermsError,
     UnspecifiedDataCollectionChoice,
@@ -44,7 +46,27 @@ def mocked_api_domain(mocker: MockerFixture) -> Generator[str, None, None]:
 
     api_client = APIClient(domain="mocking-assistant")
 
-    with responses.RequestsMock() as resp:
+    with responses.RequestsMock(assert_all_requests_are_fired=False) as resp:
+        resp.add(
+            responses.POST,
+            api_client.urljoin("/completions"),
+            status=429,
+            body=json.dumps({"message": "Too many requests"}),
+            match=[
+                responses.matchers.json_params_matcher(
+                    {
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": "I've said too much",
+                                "message_id": "0",
+                            }
+                        ]
+                    },
+                    strict_match=False,
+                )
+            ],
+        )
         resp.add(
             responses.POST,
             api_client.urljoin("/completions"),
@@ -201,3 +223,10 @@ def test_chat_session_history(
 
     mocked_chat_session.reset()
     assert mocked_chat_session.messages == []
+
+
+@pytest.mark.usefixtures("accepted_terms_and_data_collection")
+def test_chat_client_429(mocked_chat_client: ChatClient) -> None:
+    messages = [{"role": "user", "content": "I've said too much", "message_id": "0"}]
+    with pytest.raises(DailyQuotaExceeded):
+        _ = mocked_chat_client.completions(messages=messages)
