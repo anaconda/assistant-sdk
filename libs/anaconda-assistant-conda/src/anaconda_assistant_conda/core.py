@@ -135,9 +135,13 @@ def stream_response(
     prompt: str,
     is_a_tty: bool = True,
     console: Optional[Console] = None,
+    config: Optional[AssistantCondaConfig] = None,
 ) -> None:
     if console is None:
         console = Console()
+
+    if config is None:
+        config = AssistantCondaConfig()
 
     full_text = ""
     with Live(
@@ -150,12 +154,25 @@ def stream_response(
             mocked.stdout.isatty.return_value = is_a_tty
 
             def chat() -> Generator[str, None, None]:
-                llm = AssistantCondaConfig().llm.load()
-                messages = [
-                    {"role": "system", "content": system_message},
-                    {"role": "user", "content": prompt},
-                ]
-                response = llm.stream(messages)
+                if not config.llm.is_default_llm:
+                    console.print(
+                        "[red]Warning:[/red] Loading a custom LLM is an experimental feature. Use with caution."
+                    )
+
+                model = config.llm.load()
+
+                if config.llm.combine_messages:
+                    # Some models do not correctly respect a system message
+                    # and we must provide a single message with all instructions.
+                    messages = [
+                        {"role": "user", "content": f"{system_message}\n{prompt}"},
+                    ]
+                else:
+                    messages = [
+                        {"role": "system", "content": system_message},
+                        {"role": "user", "content": prompt},
+                    ]
+                response = model.stream(messages)
                 for chunk in response:
                     yield cast(str, chunk.content)
 

@@ -1,6 +1,5 @@
 from textwrap import dedent
 from typing import Any
-from warnings import warn
 
 from anaconda_cli_base.config import AnacondaBaseSettings
 from langchain_core.language_models import BaseChatModel
@@ -12,7 +11,7 @@ DEFAULT_SEARCH_SYSTEM_MESSAGE = dedent("""\
 You are the Conda Assistant from Anaconda.
 Your job is to help find useful pip or conda packages that can achieve the outcome requested.
 Do not respond directly to the input.
-You will respond first with the name of the package and the command to install it.
+You will respond first with the name of the package and then on a new line the command to install it.
 You prefer to use conda and the defaults channel. Do not install from conda-forge unless absolutely necessary.
 You will provide a short description.
 You will provide a single example block of code.
@@ -36,10 +35,13 @@ class SystemMessages(BaseModel):
 class LLM(BaseModel):
     driver: str
     params: dict[str, Any] = Field(default_factory=dict)
+    combine_messages: bool = False
+
+    @property
+    def is_default_llm(self):
+        return self.driver == DEFAULT_LLM.driver
 
     def load(self) -> BaseChatModel:
-        if self.driver != DEFAULT_LLM.driver:
-            warn("Loading a custom LLM is an experimental feature. Use with caution.")
         from importlib import import_module
 
         mod, object = self.driver.rsplit(":", maxsplit=1)
