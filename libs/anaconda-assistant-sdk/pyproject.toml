@@ -20,7 +20,7 @@ anaconda = "anaconda_assistant.integrations.llm"
 
 [project.optional-dependencies]
 all = [
-  "anaconda-assistant-sdk[ell,langchain,llm,pandasai,panel]"
+  "anaconda-assistant-sdk[ell,langchain,llm,pandasai,panel,llama-index]"
 ]
 dev = [
   "mypy",
@@ -36,6 +36,9 @@ ell = [
 ]
 langchain = [
   "langchain >=0.3"
+]
+llama-index = [
+  "llama-index"
 ]
 llm = [
   "llm"
@@ -61,6 +64,7 @@ version-file = "src/anaconda_assistant/_version.py"
 [tool.hatch.build.targets.sdist]
 include = [
   "/src/anaconda_assistant",
+  "/src/llama_index",
   "/pyproject.toml",
   "/tests",
   "/Makefile",
@@ -68,7 +72,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/anaconda_assistant"]
+packages = ["src/anaconda_assistant", "src/llama_index"]
 
 [tool.hatch.version]
 source = "vcs"
