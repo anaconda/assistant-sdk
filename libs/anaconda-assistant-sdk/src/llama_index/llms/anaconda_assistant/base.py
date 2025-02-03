@@ -1,4 +1,4 @@
-from typing import Any, Optional, Sequence, List, cast
+from typing import Any, Dict, Optional, Sequence, List, cast
 
 from llama_index.core.llms.custom import CustomLLM
 from llama_index.core.base.llms.types import (
@@ -6,6 +6,7 @@ from llama_index.core.base.llms.types import (
     CompletionResponse,
     CompletionResponseGen,
     LLMMetadata,
+    MessageRole,
 )
 
 from llama_index.core.callbacks import CallbackManager
@@ -26,6 +27,10 @@ class AnacondaAssistant(CustomLLM):
     def __init__(
         self,
         system_prompt: Optional[str] = None,
+        example_messages: Optional[List[Dict[str, str]]] = None,
+        domain: Optional[str] = None,
+        api_key: Optional[str] = None,
+        api_version: Optional[str] = None,
         callback_manager: Optional[CallbackManager] = None,
     ) -> None:
         super().__init__(
@@ -33,7 +38,13 @@ class AnacondaAssistant(CustomLLM):
             callback_manager=callback_manager,
             messages_to_prompt=messages_to_prompt,
         )
-        self._model = ChatClient(system_message=self.system_prompt)
+        self._model = ChatClient(
+            system_message=self.system_prompt,
+            example_messages=example_messages,
+            domain=domain,
+            api_key=api_key,
+            api_version=api_version,
+        )
 
     @property
     def metadata(self) -> LLMMetadata:
@@ -41,6 +52,7 @@ class AnacondaAssistant(CustomLLM):
             model_name="anaconda-assistant",
             is_chat_model=True,
             is_function_calling_model=False,
+            system_role=MessageRole.SYSTEM,
         )
 
     @classmethod
