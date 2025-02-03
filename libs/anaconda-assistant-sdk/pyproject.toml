@@ -83,6 +83,7 @@ root = "../.."
 
 [tool.mypy]
 disallow_untyped_defs = true
+explicit_package_bases = true
 files = [
   "src/**/*.py",
   "tests/**/*.py"
@@ -92,6 +93,10 @@ python_version = "3.9"
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = "*._version"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "llama_index.core.*"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
