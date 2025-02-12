@@ -38,7 +38,7 @@ class LLM(BaseModel):
     combine_messages: bool = False
 
     @property
-    def is_default_llm(self):
+    def is_default_llm(self) -> bool:
         return self.driver == DEFAULT_LLM.driver
 
     def load(self) -> BaseChatModel:
