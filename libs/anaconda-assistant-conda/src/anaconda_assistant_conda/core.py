@@ -21,7 +21,7 @@ from rich.live import Live
 from rich.markdown import Markdown
 from rich.prompt import Confirm
 
-from anaconda_assistant_conda.config import AssistantCondaConfig
+from anaconda_assistant_conda.config import LLM
 
 
 def set_config(table: str, key: str, value: Any) -> None:
@@ -131,17 +131,14 @@ def try_except_repeat(
 
 
 def stream_response(
+    llm: LLM,
     system_message: str,
     prompt: str,
     is_a_tty: bool = True,
     console: Optional[Console] = None,
-    config: Optional[AssistantCondaConfig] = None,
 ) -> None:
     if console is None:
         console = Console()
-
-    if config is None:
-        config = AssistantCondaConfig()
 
     full_text = ""
     with Live(
@@ -154,14 +151,14 @@ def stream_response(
             mocked.stdout.isatty.return_value = is_a_tty
 
             def chat() -> Generator[str, None, None]:
-                if not config.llm.is_default_llm:
+                if not llm.is_default_llm:
                     console.print(
                         "[red]Warning:[/red] Loading a custom LLM is an experimental feature. Use with caution."
                     )
 
-                model = config.llm.load()
+                model = llm.load()
 
-                if config.llm.combine_messages:
+                if llm.combine_messages:
                     # Some models do not correctly respect a system message
                     # and we must provide a single message with all instructions.
                     messages = [
@@ -172,7 +169,7 @@ def stream_response(
                         {"role": "system", "content": system_message},
                         {"role": "user", "content": prompt},
                     ]
-                response = model.stream(messages)
+                response = model.stream(input=messages)
                 for chunk in response:
                     yield cast(str, chunk.content)
 
