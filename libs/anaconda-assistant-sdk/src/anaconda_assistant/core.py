@@ -19,6 +19,7 @@ from anaconda_assistant.api_client import APIClient
 from anaconda_assistant.exceptions import NotAcceptedTermsError
 from anaconda_assistant.exceptions import UnspecifiedAcceptedTermsError
 from anaconda_assistant.exceptions import UnspecifiedDataCollectionChoice
+from anaconda_assistant.exceptions import DailyQuotaExceeded
 
 TOKEN_COUNT = re.compile(
     r"(?P<message>.*)__TOKENS_(?P<used>[0-9]+)\/(?P<limit>[0-9]+)__", re.DOTALL
@@ -202,6 +203,13 @@ class ChatClient:
             if msg is None:
                 msg = response.text
             e.args = (f"{e.args[0]}. {msg}",)
+
+            if e.response.status_code == 429:
+                raise DailyQuotaExceeded(
+                    "You have reached your request limit. Please try again in 24 hours.\n"
+                    "Or visit https://anaconda.cloud/profile/subscriptions to upgrade your account"
+                )
+
             raise
 
         cp = ChatResponse(response)
