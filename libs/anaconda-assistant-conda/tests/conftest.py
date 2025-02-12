@@ -116,7 +116,7 @@ def mocked_assistant_domain(mocker: MockerFixture) -> Generator[str, None, None]
 
     api_client = APIClient(domain="mocking-assistant")
 
-    with responses.RequestsMock() as resp:
+    with responses.RequestsMock(assert_all_requests_are_fired=False) as resp:
 
         def api_key_required(request: requests.PreparedRequest) -> tuple:
             if "Authorization" not in request.headers:
