@@ -122,6 +122,33 @@ To direct your messages to Anaconda Assistant use the model name `anaconda-assis
 > llm -m anaconda-assistant 'what is pi?'
 ```
 
+### LlamaIndex
+
+To use the LlamaIndex integration you will need to install at least `llama-index-core`
+
+Required packages: `llama-index-core`
+
+The `AnacondaAssistant` class supports streaming and non-streaming completions and chat methods. A system
+prompt can be provided to `AnacondaAssistant` with the `system_prompt` keyword argument
+
+```python
+from anaconda_assistant.integrations.llama_index import AnacondaAssistant
+
+llm = AnacondaAssistant()
+
+# Completions example
+for c in llm.stream_complete('who are you?'):
+    print(c.delta, end='')
+
+# Chat example
+from llama_index.core.llms import ChatMessage
+response = model.chat(messages=[ChatMessage(content="Who are you?")])
+
+# custom system prompt
+prompted = AnacondaAssistant(system_prompt='you are a kitty, you will response with meow!')
+print(prompted.complete('what is pi?'))
+```
+
 ### LangChain
 
 A [LangChain integration](https://python.langchain.com/docs/introduction/) is provided that supports message streaming and non-streaming responses.

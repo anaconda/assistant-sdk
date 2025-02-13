@@ -20,7 +20,7 @@ anaconda = "anaconda_assistant.integrations.llm"
 
 [project.optional-dependencies]
 all = [
-  "anaconda-assistant-sdk[ell,langchain,llm,pandasai,panel]"
+  "anaconda-assistant-sdk[ell,langchain,llm,pandasai,panel,llama-index]"
 ]
 dev = [
   "mypy",
@@ -36,6 +36,9 @@ ell = [
 ]
 langchain = [
   "langchain-core >=0.3"
+]
+llama-index = [
+  "llama-index-core"
 ]
 llm = [
   "llm"
@@ -88,6 +91,10 @@ python_version = "3.9"
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = "*._version"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "llama_index.core.*"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
