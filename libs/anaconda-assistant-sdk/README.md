@@ -124,8 +124,7 @@ To direct your messages to Anaconda Assistant use the model name `anaconda-assis
 
 ### LlamaIndex
 
-LlamaIndex is support through a namespace package installed with `anaconda-assistant-sdk`. You will need at least
-the `llama-index-core` package installed to use the integration.
+To use the LlamaIndex integration you will need to install at least `llama-index-core`
 
 Required packages: `llama-index-core`
 
@@ -133,8 +132,7 @@ The `AnacondaAssistant` class supports streaming and non-streaming completions a
 prompt can be provided to `AnacondaAssistant` with the `system_prompt` keyword argument
 
 ```python
-from llama_index.core.llms import ChatMessage
-from llama_index.llms.anaconda_assistant import AnacondaAssistant
+from anaconda_assistant.integrations.llama_index import AnacondaAssistant
 
 llm = AnacondaAssistant()
 
@@ -143,6 +141,7 @@ for c in llm.stream_complete('who are you?'):
     print(c.delta, end='')
 
 # Chat example
+from llama_index.core.llms import ChatMessage
 response = model.chat(messages=[ChatMessage(content="Who are you?")])
 
 # custom system prompt
