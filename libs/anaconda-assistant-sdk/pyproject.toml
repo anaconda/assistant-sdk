@@ -38,7 +38,7 @@ langchain = [
   "langchain-core >=0.3"
 ]
 llama-index = [
-  "llama-index"
+  "llama-index-core"
 ]
 llm = [
   "llm"
@@ -64,7 +64,6 @@ version-file = "src/anaconda_assistant/_version.py"
 [tool.hatch.build.targets.sdist]
 include = [
   "/src/anaconda_assistant",
-  "/src/llama_index",
   "/pyproject.toml",
   "/tests",
   "/Makefile",
@@ -72,7 +71,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/anaconda_assistant", "src/llama_index"]
+packages = ["src/anaconda_assistant"]
 
 [tool.hatch.version]
 source = "vcs"
@@ -83,7 +82,6 @@ root = "../.."
 
 [tool.mypy]
 disallow_untyped_defs = true
-explicit_package_bases = true
 files = [
   "src/**/*.py",
   "tests/**/*.py"
