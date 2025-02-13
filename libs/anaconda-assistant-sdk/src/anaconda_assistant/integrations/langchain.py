@@ -6,13 +6,13 @@ from typing import Optional
 from typing import cast
 from uuid import uuid4
 
-from langchain.callbacks.manager import CallbackManagerForLLMRun
+from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.language_models import BaseChatModel
-from langchain.schema.messages import AIMessage, AIMessageChunk
-from langchain.schema.messages import BaseMessage
-from langchain.schema.messages import ChatMessage
-from langchain.schema.messages import HumanMessage
-from langchain.schema.messages import SystemMessage
+from langchain_core.messages import AIMessage, AIMessageChunk
+from langchain_core.messages import BaseMessage
+from langchain_core.messages import ChatMessage
+from langchain_core.messages import HumanMessage
+from langchain_core.messages import SystemMessage
 from langchain_core.outputs import ChatGenerationChunk, ChatResult
 from langchain_core.outputs import ChatGeneration
 

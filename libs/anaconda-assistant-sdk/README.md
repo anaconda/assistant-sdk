@@ -154,7 +154,7 @@ print(prompted.complete('what is pi?'))
 
 A [LangChain integration](https://python.langchain.com/docs/introduction/) is provided that supports message streaming and non-streaming responses.
 
-Required packages: `langchain >=0.3`
+Required packages: `langchain-core >=0.3`
 
 ```python
 from anaconda_assistant.langchain import AnacondaAssistant

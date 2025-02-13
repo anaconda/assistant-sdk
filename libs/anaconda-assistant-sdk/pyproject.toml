@@ -35,7 +35,7 @@ ell = [
   "ell-ai"
 ]
 langchain = [
-  "langchain >=0.3"
+  "langchain-core >=0.3"
 ]
 llama-index = [
   "llama-index"
