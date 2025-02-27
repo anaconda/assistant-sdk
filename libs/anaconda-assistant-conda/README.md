@@ -37,6 +37,13 @@ You can also login using the Anaconda CLI
 anaconda login
 ```
 
+## Daily quotas
+
+Each Anaconda.cloud subscription plan enforces a limit on the number of requests (package search or error correct).
+The limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached the plugin will display a message to wait for 24 hours.
+
+Users can upgrade their plans by visiting [https://anaconda.cloud/profile/subscriptions](https://anaconda.cloud/profile/subscriptions).
+
 ## Package search
 
 You can ask the Anaconda Assistant for help finding a conda package.
@@ -126,16 +133,19 @@ Make sure to check the compatibility of the packages you choose to install.
 
 Ensure you have `conda` installed.
 Then run:
+
 ```shell
 make setup
 ```
 
-## Run the unit tests
+### Run the unit tests
+
 ```shell
 make test
 ```
 
-## Run the unit tests across isolated environments with tox
+### Run the unit tests across isolated environments with tox
+
 ```shell
 make tox
 ```
