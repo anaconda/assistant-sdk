@@ -105,6 +105,14 @@ module = "pandasai.*"
 ignore_missing_imports = true
 module = "rich_click.*"
 
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "langchain.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "ell.*"
+
 [tool.pytest.ini_options]
 addopts = [
   "--cov=anaconda_assistant",
