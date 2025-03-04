@@ -107,7 +107,7 @@ module = "rich_click.*"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
-module = "langchain.*"
+module = "langchain_core.*"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
