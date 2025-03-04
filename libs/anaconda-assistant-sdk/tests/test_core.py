@@ -39,7 +39,7 @@ def test_unspecified_data_collection(monkeypatch: MonkeyPatch) -> None:
 @pytest.fixture
 def mocked_api_domain(mocker: MockerFixture) -> Generator[str, None, None]:
     mocker.patch(
-        "anaconda_cloud_auth.client.BaseClient.email",
+        "anaconda_auth.client.BaseClient.email",
         return_value="me@example.com",
         new_callable=mocker.PropertyMock,
     )

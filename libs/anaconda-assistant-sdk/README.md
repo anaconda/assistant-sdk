@@ -13,11 +13,11 @@ conda install -c anaconda-cloud anaconda-assistant-sdk
 To use the Python client or CLI you can use `anaconda login` CLI, Anaconda Navigator, or
 
 ```python
-from anaconda_cloud_auth import login
+from anaconda_auth import login
 login()
 ```
 
-to launch a browser to login and save your API token to disk. For cases where you cannot utilize a browser to login you can grab your API and set the `ANACONDA_CLOUD_API_KEY=<api-key>` env var.
+to launch a browser to login and save your API token to disk. For cases where you cannot utilize a browser to login you can grab your API and set the `ANACONDA_AUTH_API_KEY=<api-key>` env var.
 
 The Python clients and integrations provide `api_key` as a keyword argument.
 

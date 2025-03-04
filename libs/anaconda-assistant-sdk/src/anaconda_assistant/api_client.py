@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any, Union
 
-from anaconda_cloud_auth.client import BaseClient
+from anaconda_auth.client import BaseClient
 
 from anaconda_assistant import __version__ as version
 from anaconda_assistant.config import AssistantConfig
@@ -31,8 +31,6 @@ class APIClient(BaseClient):
         kwargs: Dict[str, Any] = {}
         if domain is not None:
             kwargs["domain"] = domain
-        if api_key is not None:
-            kwargs["api_key"] = api_key
         if ssl_verify is not None:
             kwargs["ssl_verify"] = ssl_verify
         if extra_headers is not None:
