@@ -14,7 +14,7 @@ from requests import Response
 from requests.exceptions import HTTPError
 
 from anaconda_cli_base.config import anaconda_config_path
-from anaconda_cloud_auth.client import BaseClient as AuthClient
+from anaconda_auth.client import BaseClient as AuthClient
 from anaconda_assistant.api_client import APIClient
 from anaconda_assistant.exceptions import NotAcceptedTermsError
 from anaconda_assistant.exceptions import UnspecifiedAcceptedTermsError

@@ -4,8 +4,8 @@ requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
 
 [project]
 dependencies = [
-  "anaconda-cloud-auth>=0.6",
-  "anaconda-cli-base>=0.4",
+  "anaconda-auth>=0.8",
+  "anaconda-cli-base>=0.5",
   "pydantic"
 ]
 description = "The Anaconda Assistant Python client"
@@ -19,9 +19,6 @@ requires-python = ">=3.9"
 anaconda = "anaconda_assistant.integrations.llm"
 
 [project.optional-dependencies]
-all = [
-  "anaconda-assistant-sdk[ell,langchain,llm,pandasai,panel,llama-index]"
-]
 dev = [
   "mypy",
   "pytest",
@@ -41,10 +38,10 @@ llama-index = [
   "llama-index-core"
 ]
 llm = [
-  "llm"
+  "llm>=0.22"
 ]
 pandasai = [
-  "pandasai"
+  "pandasai>=2.4"
 ]
 panel = [
   "panel"
