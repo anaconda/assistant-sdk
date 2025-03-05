@@ -89,13 +89,9 @@ def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
 
     msg = dedent("""\
         You have not accepted the terms of service.
-        You must accept our terms of service
+        You must accept our terms of service and Privacy Policy here
 
-          https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service
-
-        and Privacy Policy
-
-          https://legal.anaconda.com/policies/en/?name=privacy-policy
+          https://anaconda.com/legal
 
         [bold green]Are you more than 13 years old and accept the terms?[/bold green]
         """)

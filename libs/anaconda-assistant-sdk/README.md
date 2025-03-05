@@ -25,8 +25,7 @@ The Python clients and integrations provide `api_key` as a keyword argument.
 
 In order to use the Anaconda Assistant SDK and derived integrations the user must first agree to
 
-* Our [terms of service](https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service)
-* Our [privacy policy](https://legal.anaconda.com/policies/en/?name=privacy-policy)
+* Our [terms of service and privacy policy](https://anaconda.com/legal)
 * Assert that they are more than 13 years old
 * Opt-in or Opt-out of Data Collection
 
