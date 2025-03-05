@@ -97,7 +97,7 @@ def test_error_handler_not_logged_in_tty_do_not_login(
 
     stdout = capsys.readouterr().out
     assert "AuthenticationMissingError: Login is required" in stdout
-    assert "anaconda_auth_API_KEY env var" in stdout
+    assert "ANACONDA_AUTH_API_KEY env var" in stdout
     login.assert_not_called()
 
 
