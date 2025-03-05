@@ -128,10 +128,8 @@ class ChatClient:
         if self.api_client._config.accepted_terms is None:
             msg = dedent(f"""\
                 You have not accepted the terms of service.
-                You must accept our terms of service
-                https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service
-                and Privacy Policy
-                https://legal.anaconda.com/policies/en/?name=privacy-policy
+                You must accept our terms of service and Privacy Policy
+                https://anaconda.com/legal
                 If you confirm that you are older than 13 years old and accept the terms
                 please set this configuration in {anaconda_config_path()} as follows:
 
