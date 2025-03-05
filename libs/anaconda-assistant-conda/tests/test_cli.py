@@ -14,8 +14,8 @@ def test_assist_search_not_logged_in(
     monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
-    monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
-    monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
+    monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
+    monkeypatch.delenv("ANACONDA_AUTH_API_KEY", raising=False)
 
     runner = CliRunner()
     result = runner.invoke(app, args=("search", "..."))
@@ -31,10 +31,10 @@ def test_assist_search_not_logged_in_tty(
     monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
-    monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
-    monkeypatch.delenv("ANACONDA_CLOUD_API_KEY", raising=False)
+    monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
+    monkeypatch.delenv("ANACONDA_AUTH_API_KEY", raising=False)
 
-    login = mocker.patch("anaconda_cloud_auth.cli.login")
+    login = mocker.patch("anaconda_auth.cli.login")
 
     runner = CliRunner()
     result = runner.invoke(app, args=("search", "..."), input="n")
@@ -54,8 +54,8 @@ def test_assist_search_system_message(
     monkeypatch.setenv("ANACONDA_ASSISTANT_ACCEPTED_TERMS", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
-    monkeypatch.setenv("ANACONDA_CLOUD_DOMAIN", mocked_assistant_domain)
-    monkeypatch.setenv("ANACONDA_CLOUD_API_KEY", "api-key")
+    monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
+    monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
 
     import anaconda_assistant_conda.cli
 
