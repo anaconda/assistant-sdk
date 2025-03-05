@@ -53,9 +53,9 @@ def set_config(table: str, key: str, value: Any) -> None:
 
 @register_error_handler(UnspecifiedDataCollectionChoice)
 def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
-    import anaconda_cloud_auth.cli
+    import anaconda_auth.cli
 
-    if not anaconda_cloud_auth.cli.sys.stdout.isatty():  # type: ignore
+    if not anaconda_auth.cli.sys.stdout.isatty():  # type: ignore
         print(e.args[0])
         return 1
 
@@ -81,9 +81,9 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
 
 @register_error_handler(UnspecifiedAcceptedTermsError)
 def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
-    import anaconda_cloud_auth.cli
+    import anaconda_auth.cli
 
-    if not anaconda_cloud_auth.cli.sys.stdout.isatty():  # type: ignore
+    if not anaconda_auth.cli.sys.stdout.isatty():  # type: ignore
         print(e.args[0])
         return 1
 
