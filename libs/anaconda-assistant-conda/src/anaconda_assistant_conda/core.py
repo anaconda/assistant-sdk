@@ -145,7 +145,7 @@ def stream_response(
         vertical_overflow="visible",
         console=console,
     ) as live:
-        with patch("anaconda_cloud_auth.cli.sys") as mocked:
+        with patch("anaconda_auth.cli.sys") as mocked:
             mocked.stdout.isatty.return_value = is_a_tty
 
             def chat() -> Generator[str, None, None]:
