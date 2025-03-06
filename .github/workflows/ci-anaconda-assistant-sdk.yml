@@ -195,4 +195,4 @@ jobs:
       run: hatch publish
       env:
         HATCH_INDEX_USER: __token__
-        HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
+        HATCH_INDEX_AUTH: ${{ secrets.PYPI_SDK_TOKEN }}
