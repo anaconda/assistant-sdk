@@ -172,3 +172,27 @@ jobs:
           "The Anaconda Assistant Python SDK" \
           $LABEL \
           --force
+
+  publish-to-pypi:
+    name: Publish to PyPI
+    # Only publish to PyPI if a tagged release
+    if: startsWith(github.event.ref, 'refs/tags/anaconda-assistant-sdk-v')
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Setup Python
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5
+    - name: Download the build artifacts
+      uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+      with:
+        name: anaconda-assistant-sdk-wheel-${{ github.sha }}
+        path: ./dist
+    - name: Install build dependencies
+      run: pip install hatch
+    - name: Upload to PyPI
+      run: hatch publish
+      env:
+        HATCH_INDEX_USER: __token__
+        HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
