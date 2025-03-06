@@ -194,6 +194,7 @@ class ChatClient:
             }
 
         response = self.api_client.post("/completions", json=body, stream=True)
+        response.encoding = "utf-8"
         try:
             response.raise_for_status()
         except HTTPError as e:
