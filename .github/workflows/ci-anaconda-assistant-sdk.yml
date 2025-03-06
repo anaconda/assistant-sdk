@@ -90,7 +90,7 @@ jobs:
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: anaconda-assistant-sdk-wheel-${{ github.sha }}
-          path: libs/anaconda-assistant-sdk/dist/*.whl
+          path: libs/anaconda-assistant-sdk/dist/*
           if-no-files-found: error
           retention-days: 7
 
@@ -188,7 +188,7 @@ jobs:
       uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
       with:
         name: anaconda-assistant-sdk-wheel-${{ github.sha }}
-        path: ./dist
+        path: list/anaconda-assistant-sdk/dist
     - name: Install build dependencies
       run: pip install hatch
     - name: Upload to PyPI
