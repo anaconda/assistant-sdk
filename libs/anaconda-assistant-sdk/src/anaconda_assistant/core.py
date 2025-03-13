@@ -198,8 +198,11 @@ class ChatClient:
         try:
             response.raise_for_status()
         except HTTPError as e:
-            msg = response.json().get("message")
-            if msg is None:
+            try:
+                msg = response.json().get("message")
+                if msg is None:
+                    msg = response.text
+            except json.JSONDecodeError:
                 msg = response.text
             e.args = (f"{e.args[0]}. {msg}",)
 
