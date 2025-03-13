@@ -203,7 +203,7 @@ class ChatClient:
                 if msg is None:
                     msg = response.text
             except json.JSONDecodeError:
-                msg = response.text
+                msg = response.reason
             e.args = (f"{e.args[0]}. {msg}",)
 
             if e.response.status_code == 429:
