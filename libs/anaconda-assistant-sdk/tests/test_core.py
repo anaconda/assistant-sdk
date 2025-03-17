@@ -184,7 +184,7 @@ def test_chat_client_system_message(mocked_api_client: APIClient) -> None:
     system_message = "You are a kitty"
 
     client = ChatClient(
-        system_message=system_message, domain=mocked_api_client._config.domain
+        system_message=system_message, domain=mocked_api_client.config.domain
     )
 
     messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
