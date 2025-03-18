@@ -1,6 +1,7 @@
 import os
-from typing import Any
-from typing import Generator
+from asyncio import sleep
+from typing import Any, Optional
+from typing import AsyncGenerator
 
 from anaconda_assistant.core import ChatSession
 
@@ -8,17 +9,18 @@ HERE = os.path.dirname(__file__)
 
 
 class AnacondaAssistantCallbackHandler:
-    def __init__(
-        self,
-        session: ChatSession,
-    ) -> None:
-        self.session = session
+    def __init__(self, session: Optional[ChatSession] = None) -> None:
+        if session is None:
+            self.session = ChatSession()
+        else:
+            self.session = session
         self.assistant_avatar = os.path.join(HERE, "Anaconda_Logo.png")
         self.assistant_name = "Anaconda Assistant"
 
-    def __call__(self, content: str, *_: Any) -> Generator[Any, None, None]:
+    async def __call__(self, contents: str, *_: Any) -> AsyncGenerator[dict, None]:
+        await sleep(0.1)
         full_text = ""
-        for chunk in self.session.chat(content, stream=True):
+        for chunk in self.session.chat(contents, stream=True):
             full_text += chunk
             yield {
                 "user": self.assistant_name,
