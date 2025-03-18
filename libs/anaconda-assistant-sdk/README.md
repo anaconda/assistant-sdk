@@ -99,7 +99,7 @@ while streaming.
 
 ## Daily quotas
 
-Each Anaconda.cloud subscription plan enforces a limit on the number of requests (calls to `.completions()`). The
+Each Anaconda subscription plan enforces a limit on the number of requests (calls to `.completions()`). The
 limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached
 the `.completions()` function will throw a `DailyQuotaExceeded` exception.
 
