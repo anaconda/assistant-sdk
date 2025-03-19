@@ -1,5 +1,12 @@
 # anaconda-assistant-conda
 
+> [!WARNING]
+> The domain for the Anaconda Assistant API has changed. Please upgrade to version 0.4 or greater by April 15, 2025.
+
+```text
+conda upgrade anaconda-assistant-conda
+```
+
 The Anaconda AI Assistant conda plugin brings AI assistance to your conda workflows.
 You will need an account on Anaconda.cloud. Visit the [sign-up](https://anaconda.cloud/sign-up) page
 to create an account.
