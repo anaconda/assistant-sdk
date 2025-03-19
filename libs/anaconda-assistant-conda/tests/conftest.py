@@ -131,4 +131,4 @@ def mocked_assistant_domain(mocker: MockerFixture) -> Generator[str, None, None]
             api_client.urljoin("/completions"),
             callback=api_key_required,
         )
-        yield api_client._config.domain
+        yield api_client.config.domain
