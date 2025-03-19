@@ -1,9 +1,5 @@
 # anaconda-assistant
 
-> [!WARNING]
-> The domain for the Anaconda Assistant API has changed. Please upgrade to version 0.4 or greater by April 15, 2025.
-> `conda upgrade anaconda-assistant-sdk`
-
 The Anaconda Assistant Python client
 
 ## Installation
