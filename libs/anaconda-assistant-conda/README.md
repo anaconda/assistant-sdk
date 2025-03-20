@@ -1,5 +1,12 @@
 # anaconda-assistant-conda
 
+
+[![Anaconda](https://img.shields.io/conda/v/anaconda/anaconda-assistant-conda?style=for-the-badge&logo=anaconda&color=blue&label=anaconda)](https://anaconda.org/anaconda/anaconda-assistant-conda)
+[![PyPI](https://img.shields.io/pypi/v/anaconda-assistant-conda?style=for-the-badge&logo=pypi&color=blue)](https://pypi.org/project/anaconda-assistant-conda/)
+[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/anaconda-assistant-conda?style=for-the-badge&logo=conda-forge&color=blue)](https://anaconda.org/conda-forge/anaconda-assistant-conda)
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/anaconda/assistant-sdk/ci-anaconda-assistant-conda.yml?style=for-the-badge&label=tests&logo=github)
+
 The Anaconda AI Assistant conda plugin brings AI assistance to your conda workflows.
 You will need an account on Anaconda.cloud. Visit the [sign-up](https://anaconda.cloud/sign-up) page
 to create an account.
@@ -16,7 +23,7 @@ This package is a [conda plugin](https://docs.conda.io/projects/conda/en/latest/
 Conda version 24.1 or newer is required.
 
 ```text
-conda install -n base -c anaconda-cloud anaconda-assistant-conda
+conda install -n base anaconda-assistant-conda
 ```
 
 ## Terms of use
