@@ -62,3 +62,17 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+
+  status-check:
+    # Always run this job!
+    if: always()
+    needs:
+      # Require every other job in this workflow
+      - docs
+      - pages
+    runs-on: ubuntu-latest
+    steps:
+      # Use the GitHub Action rather than our dummy step
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
