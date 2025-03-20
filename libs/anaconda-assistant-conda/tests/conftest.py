@@ -52,6 +52,11 @@ def is_not_none() -> Any:
     return _NotNone()
 
 
+@pytest.fixture(autouse=True)
+def disable_config_toml(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ANACONDA_CONFIG_TOML", str(tmp_path / "empty-config.toml"))
+
+
 class CLIInvoker(Protocol):
     def __call__(
         self,
@@ -111,7 +116,7 @@ def mocked_assistant_domain(mocker: MockerFixture) -> Generator[str, None, None]
 
     api_client = APIClient(domain="mocking-assistant")
 
-    with responses.RequestsMock() as resp:
+    with responses.RequestsMock(assert_all_requests_are_fired=False) as resp:
 
         def api_key_required(request: requests.PreparedRequest) -> tuple:
             if "Authorization" not in request.headers:

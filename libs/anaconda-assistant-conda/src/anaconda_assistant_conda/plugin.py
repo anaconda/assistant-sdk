@@ -75,7 +75,12 @@ def error_handler(command: str) -> None:
         console.print("[bold green]Hello from Anaconda Assistant![/green bold]")
         console.print("I'm going to help you diagnose and correct this error.")
         prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
-        stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
+        stream_response(
+            llm=config.llm,
+            system_message=config.system_messages.error,
+            prompt=prompt,
+            is_a_tty=is_a_tty,
+        )
 
     ExceptionHandler._print_conda_exception = assistant_exception_handler  # type: ignore
 

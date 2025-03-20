@@ -12,7 +12,6 @@ import tomlkit
 from anaconda_cli_base.config import anaconda_config_path
 from anaconda_cli_base.exceptions import register_error_handler
 from anaconda_cli_base.exceptions import ERROR_HANDLERS
-from anaconda_assistant import ChatSession
 from anaconda_assistant.exceptions import (
     UnspecifiedAcceptedTermsError,
     UnspecifiedDataCollectionChoice,
@@ -21,6 +20,8 @@ from rich.console import Console
 from rich.live import Live
 from rich.markdown import Markdown
 from rich.prompt import Confirm
+
+from anaconda_assistant_conda.config import LLM
 
 
 def set_config(table: str, key: str, value: Any) -> None:
@@ -126,6 +127,7 @@ def try_except_repeat(
 
 
 def stream_response(
+    llm: LLM,
     system_message: str,
     prompt: str,
     is_a_tty: bool = True,
@@ -145,9 +147,27 @@ def stream_response(
             mocked.stdout.isatty.return_value = is_a_tty
 
             def chat() -> Generator[str, None, None]:
-                session = ChatSession(system_message=system_message)
-                response = session.chat(message=prompt, stream=True)
-                yield from response
+                if not llm.is_default_llm:
+                    console.print(
+                        "[red]Warning:[/red] Loading a custom LLM is an experimental feature. Use with caution."
+                    )
+
+                model = llm.load()
+
+                if llm.combine_messages:
+                    # Some models do not correctly respect a system message
+                    # and we must provide a single message with all instructions.
+                    messages = [
+                        {"role": "user", "content": f"{system_message}\n{prompt}"},
+                    ]
+                else:
+                    messages = [
+                        {"role": "system", "content": system_message},
+                        {"role": "user", "content": prompt},
+                    ]
+                response = model.stream(input=messages)
+                for chunk in response:
+                    yield cast(str, chunk.content)
 
             response = cast(
                 Generator[str, None, None], try_except_repeat(chat, max_depth=5)

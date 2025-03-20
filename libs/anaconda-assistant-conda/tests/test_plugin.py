@@ -110,10 +110,9 @@ def test_error_handler_send_error(
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
 
-    import anaconda_assistant_conda.core
+    import langchain_core.language_models
 
-    chat = mocker.spy(anaconda_assistant_conda.core.ChatSession, "chat")
-    ChatSession = mocker.spy(anaconda_assistant_conda.core, "ChatSession")
+    chat = mocker.spy(langchain_core.language_models.BaseChatModel, "stream")
 
     def mocked_command() -> None:
         raise CondaError("mocked-command failed")
@@ -124,15 +123,14 @@ def test_error_handler_send_error(
     exc(mocked_command)
 
     config = AssistantCondaConfig()
-    assert (
-        ChatSession.call_args.kwargs.get("system_message", "")
-        == config.system_messages.error
-    )
-
-    assert (
-        chat.call_args.kwargs.get("message", "")
-        == "COMMAND:\nconda command will-fail\nMESSAGE:\nCondaError: mocked-command failed"
-    )
+    messages = [
+        {"role": "system", "content": config.system_messages.error},
+        {
+            "role": "user",
+            "content": "COMMAND:\nconda command will-fail\nMESSAGE:\nCondaError: mocked-command failed",
+        },
+    ]
+    assert chat.call_args.kwargs.get("input", []) == messages
 
 
 def test_error_handler_search_condaerror(
@@ -146,9 +144,9 @@ def test_error_handler_search_condaerror(
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
 
-    import anaconda_assistant_conda.core
+    import langchain_core.language_models
 
-    chat = mocker.spy(anaconda_assistant_conda.core.ChatSession, "chat")
+    chat = mocker.spy(langchain_core.language_models.BaseChatModel, "stream")
 
     def mocked_search() -> None:
         raise CondaError("search failed")
@@ -158,13 +156,18 @@ def test_error_handler_search_condaerror(
     error_handler("search")
     exc(mocked_search)
 
-    assert (
-        chat.call_args.kwargs.get("message", "")
-        == "COMMAND:\nconda search will-fail\nMESSAGE:\nCondaError: search failed"
-    )
+    config = AssistantCondaConfig()
+    messages = [
+        {"role": "system", "content": config.system_messages.error},
+        {
+            "role": "user",
+            "content": "COMMAND:\nconda search will-fail\nMESSAGE:\nCondaError: search failed",
+        },
+    ]
+
+    assert chat.call_args.kwargs.get("input", []) == messages
 
 
-@pytest.mark.skip
 def test_error_handler_search_packgenotfounderror(
     mocked_assistant_domain: str,
     monkeypatch: MonkeyPatch,
@@ -177,9 +180,9 @@ def test_error_handler_search_packgenotfounderror(
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
 
-    import anaconda_assistant_conda.core
+    import langchain_core.language_models
 
-    chat = mocker.spy(anaconda_assistant_conda.core.ChatSession, "chat")
+    chat = mocker.spy(langchain_core.language_models.BaseChatModel, "stream")
 
     def mocked_search() -> None:
         raise PackagesNotFoundError(packages=["will-fail"])
