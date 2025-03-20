@@ -105,7 +105,7 @@ while streaming.
 
 ## Daily quotas
 
-Each Anaconda.cloud subscription plan enforces a limit on the number of requests (calls to `.completions()`). The
+Each Anaconda subscription plan enforces a limit on the number of requests (calls to `.completions()`). The
 limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached
 the `.completions()` function will throw a `DailyQuotaExceeded` exception.
 
@@ -158,10 +158,10 @@ print(prompted.complete('what is pi?'))
 
 A [LangChain integration](https://python.langchain.com/docs/introduction/) is provided that supports message streaming and non-streaming responses.
 
-Required packages: `langchain-core >=0.3`
+Required packages: `langchain-core >=0.3` and `langchain >=0.3`
 
 ```python
-from anaconda_assistant.langchain import AnacondaAssistant
+from anaconda_assistant.integrations.langchain import AnacondaAssistant
 from langchain.prompts import ChatPromptTemplate
 
 model = AnacondaAssistant()
@@ -176,7 +176,7 @@ print(message.content)
 
 You can use Anaconda Assistant as a model in the [ell](https://github.com/MadcowD/ell) prompt engineering framework.
 
-Required packages: `ell-ai`
+Required packages: `ell-ai[sqlite]` or `ell-ai[postgres]`
 
 ```python
 import ell
@@ -198,7 +198,7 @@ To use Anaconda Assistant with [PandasAI](https://github.com/Sinaptik-AI/pandas-
 Required packages: `pandasai`
 
 ```python
-from anaconda_assistant.pandasai import AnacondaAssistant
+from anaconda_assistant.integrations.pandasai import AnacondaAssistant
 from pandasai import SmartDataframe
 
 ai = AnacondaAssistant()
@@ -215,16 +215,17 @@ Required packages: `panel`
 ```python
 import panel as pn
 
-from anaconda_assistant import ChatSession
+from anaconda_auth import BaseClient
 from anaconda_assistant.integrations.panel import AnacondaAssistantCallbackHandler
 
-assistant = ChatSession()
-callback = AnacondaAssistantCallbackHandler(assistant)
+callback = AnacondaAssistantCallbackHandler()
+auth_client = BaseClient()
 
 chat = pn.chat.ChatInterface(
     callback=callback,
-    user=assistant.auth_client.name,
-    avatar=assistant.auth_client.avatar,
+    user=auth_client.name,
+    avatar=auth_client.avatar,
+    placeholder_threshold=0.05
 )
 ```
 
