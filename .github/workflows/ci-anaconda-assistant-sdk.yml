@@ -96,8 +96,7 @@ jobs:
 
   # This check job runs to ensure all tests and builds  have passed, such that we can use it as a "wildcard"
   # for branch protection to ensure all tests pass before a PR can be merged.
-  check:
-    name: Check all tests passed
+  status-check:
     if: always()
     needs: [test, build-conda-package, build-wheel]
     runs-on: ubuntu-latest
