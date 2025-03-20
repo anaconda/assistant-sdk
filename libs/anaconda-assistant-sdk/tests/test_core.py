@@ -9,6 +9,7 @@ from pytest_mock import MockerFixture
 from requests.exceptions import StreamConsumedError
 import responses.matchers
 
+from anaconda_assistant import __version__ as version
 from anaconda_assistant.exceptions import (
     DailyQuotaExceeded,
     NotAcceptedTermsError,
@@ -39,7 +40,7 @@ def test_unspecified_data_collection(monkeypatch: MonkeyPatch) -> None:
 @pytest.fixture
 def mocked_api_domain(mocker: MockerFixture) -> Generator[str, None, None]:
     mocker.patch(
-        "anaconda_cloud_auth.client.BaseClient.email",
+        "anaconda_auth.client.BaseClient.email",
         return_value="me@example.com",
         new_callable=mocker.PropertyMock,
     )
@@ -184,7 +185,7 @@ def test_chat_client_system_message(mocked_api_client: APIClient) -> None:
     system_message = "You are a kitty"
 
     client = ChatClient(
-        system_message=system_message, domain=mocked_api_client._config.domain
+        system_message=system_message, domain=mocked_api_client.config.domain
     )
 
     messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
@@ -197,6 +198,16 @@ def test_chat_client_system_message(mocked_api_client: APIClient) -> None:
         "role": "system",
         "content": system_message,
     }
+
+
+@pytest.mark.usefixtures("accepted_terms_and_data_collection")
+def test_chat_client_client_version(mocked_api_client: APIClient) -> None:
+    client = ChatClient(domain=mocked_api_client.config.domain)
+
+    messages = [{"role": "user", "content": "Who are you?", "message_id": "0"}]
+    res = client.completions(messages=messages)
+
+    assert res._response.request.headers["X-Client-Version"] == version
 
 
 @pytest.mark.usefixtures("accepted_terms_and_data_collection")

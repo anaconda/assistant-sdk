@@ -14,7 +14,7 @@ from requests import Response
 from requests.exceptions import HTTPError
 
 from anaconda_cli_base.config import anaconda_config_path
-from anaconda_cloud_auth.client import BaseClient as AuthClient
+from anaconda_auth.client import BaseClient as AuthClient
 from anaconda_assistant.api_client import APIClient
 from anaconda_assistant.exceptions import NotAcceptedTermsError
 from anaconda_assistant.exceptions import UnspecifiedAcceptedTermsError
@@ -128,10 +128,8 @@ class ChatClient:
         if self.api_client._config.accepted_terms is None:
             msg = dedent(f"""\
                 You have not accepted the terms of service.
-                You must accept our terms of service
-                https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service
-                and Privacy Policy
-                https://legal.anaconda.com/policies/en/?name=privacy-policy
+                You must accept our terms of service and Privacy Policy
+                https://anaconda.com/legal
                 If you confirm that you are older than 13 years old and accept the terms
                 please set this configuration in {anaconda_config_path()} as follows:
 
@@ -196,12 +194,16 @@ class ChatClient:
             }
 
         response = self.api_client.post("/completions", json=body, stream=True)
+        response.encoding = "utf-8"
         try:
             response.raise_for_status()
         except HTTPError as e:
-            msg = response.json().get("message")
-            if msg is None:
-                msg = response.text
+            try:
+                msg = response.json().get("message")
+                if msg is None:
+                    msg = response.text
+            except json.JSONDecodeError:
+                msg = response.reason
             e.args = (f"{e.args[0]}. {msg}",)
 
             if e.response.status_code == 429:

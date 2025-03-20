@@ -13,11 +13,11 @@ conda install -c anaconda-cloud anaconda-assistant-sdk
 To use the Python client or CLI you can use `anaconda login` CLI, Anaconda Navigator, or
 
 ```python
-from anaconda_cloud_auth import login
+from anaconda_auth import login
 login()
 ```
 
-to launch a browser to login and save your API token to disk. For cases where you cannot utilize a browser to login you can grab your API and set the `ANACONDA_CLOUD_API_KEY=<api-key>` env var.
+to launch a browser to login and save your API token to disk. For cases where you cannot utilize a browser to login you can grab your API and set the `ANACONDA_AUTH_API_KEY=<api-key>` env var.
 
 The Python clients and integrations provide `api_key` as a keyword argument.
 
@@ -25,8 +25,7 @@ The Python clients and integrations provide `api_key` as a keyword argument.
 
 In order to use the Anaconda Assistant SDK and derived integrations the user must first agree to
 
-* Our [terms of service](https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service)
-* Our [privacy policy](https://legal.anaconda.com/policies/en/?name=privacy-policy)
+* Our [terms of service and privacy policy](https://anaconda.com/legal)
 * Assert that they are more than 13 years old
 * Opt-in or Opt-out of Data Collection
 
@@ -100,7 +99,7 @@ while streaming.
 
 ## Daily quotas
 
-Each Anaconda.cloud subscription plan enforces a limit on the number of requests (calls to `.completions()`). The
+Each Anaconda subscription plan enforces a limit on the number of requests (calls to `.completions()`). The
 limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached
 the `.completions()` function will throw a `DailyQuotaExceeded` exception.
 
@@ -122,14 +121,41 @@ To direct your messages to Anaconda Assistant use the model name `anaconda-assis
 > llm -m anaconda-assistant 'what is pi?'
 ```
 
+### LlamaIndex
+
+To use the LlamaIndex integration you will need to install at least `llama-index-core`
+
+Required packages: `llama-index-core`
+
+The `AnacondaAssistant` class supports streaming and non-streaming completions and chat methods. A system
+prompt can be provided to `AnacondaAssistant` with the `system_prompt` keyword argument
+
+```python
+from anaconda_assistant.integrations.llama_index import AnacondaAssistant
+
+llm = AnacondaAssistant()
+
+# Completions example
+for c in llm.stream_complete('who are you?'):
+    print(c.delta, end='')
+
+# Chat example
+from llama_index.core.llms import ChatMessage
+response = model.chat(messages=[ChatMessage(content="Who are you?")])
+
+# custom system prompt
+prompted = AnacondaAssistant(system_prompt='you are a kitty, you will response with meow!')
+print(prompted.complete('what is pi?'))
+```
+
 ### LangChain
 
 A [LangChain integration](https://python.langchain.com/docs/introduction/) is provided that supports message streaming and non-streaming responses.
 
-Required packages: `langchain-core >=0.3`
+Required packages: `langchain-core >=0.3` and `langchain >=0.3`
 
 ```python
-from anaconda_assistant.langchain import AnacondaAssistant
+from anaconda_assistant.integrations.langchain import AnacondaAssistant
 from langchain.prompts import ChatPromptTemplate
 
 model = AnacondaAssistant()
@@ -144,7 +170,7 @@ print(message.content)
 
 You can use Anaconda Assistant as a model in the [ell](https://github.com/MadcowD/ell) prompt engineering framework.
 
-Required packages: `ell-ai`
+Required packages: `ell-ai[sqlite]` or `ell-ai[postgres]`
 
 ```python
 import ell
@@ -166,7 +192,7 @@ To use Anaconda Assistant with [PandasAI](https://github.com/Sinaptik-AI/pandas-
 Required packages: `pandasai`
 
 ```python
-from anaconda_assistant.pandasai import AnacondaAssistant
+from anaconda_assistant.integrations.pandasai import AnacondaAssistant
 from pandasai import SmartDataframe
 
 ai = AnacondaAssistant()
@@ -183,16 +209,17 @@ Required packages: `panel`
 ```python
 import panel as pn
 
-from anaconda_assistant import ChatSession
+from anaconda_auth import BaseClient
 from anaconda_assistant.integrations.panel import AnacondaAssistantCallbackHandler
 
-assistant = ChatSession()
-callback = AnacondaAssistantCallbackHandler(assistant)
+callback = AnacondaAssistantCallbackHandler()
+auth_client = BaseClient()
 
 chat = pn.chat.ChatInterface(
     callback=callback,
-    user=assistant.auth_client.name,
-    avatar=assistant.auth_client.avatar,
+    user=auth_client.name,
+    avatar=auth_client.avatar,
+    placeholder_threshold=0.05
 )
 ```
 

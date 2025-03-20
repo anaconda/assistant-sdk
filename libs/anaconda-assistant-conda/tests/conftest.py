@@ -82,7 +82,7 @@ def invoke_cli() -> CLIInvoker:
 
 @pytest.fixture
 def is_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
-    mocked1 = mocker.patch("anaconda_cloud_auth.cli.sys")
+    mocked1 = mocker.patch("anaconda_auth.cli.sys")
     mocked1.stdout.isatty.return_value = True
 
     mocked2 = mocker.patch("anaconda_assistant_conda.plugin.sys")
@@ -95,7 +95,7 @@ def is_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
 
 @pytest.fixture
 def is_not_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
-    mocked1 = mocker.patch("anaconda_cloud_auth.cli.sys")
+    mocked1 = mocker.patch("anaconda_auth.cli.sys")
     mocked1.stdout.isatty.return_value = False
 
     mocked2 = mocker.patch("anaconda_assistant_conda.plugin.sys")
@@ -109,7 +109,7 @@ def is_not_a_tty(mocker: MockerFixture) -> Generator[None, None, None]:
 @pytest.fixture
 def mocked_assistant_domain(mocker: MockerFixture) -> Generator[str, None, None]:
     mocker.patch(
-        "anaconda_cloud_auth.client.BaseClient.email",
+        "anaconda_auth.client.BaseClient.email",
         return_value="me@example.com",
         new_callable=mocker.PropertyMock,
     )
@@ -136,4 +136,4 @@ def mocked_assistant_domain(mocker: MockerFixture) -> Generator[str, None, None]
             api_client.urljoin("/completions"),
             callback=api_key_required,
         )
-        yield api_client._config.domain
+        yield api_client.config.domain

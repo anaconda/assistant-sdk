@@ -54,9 +54,9 @@ def set_config(table: str, key: str, value: Any) -> None:
 
 @register_error_handler(UnspecifiedDataCollectionChoice)
 def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
-    import anaconda_cloud_auth.cli
+    import anaconda_auth.cli
 
-    if not anaconda_cloud_auth.cli.sys.stdout.isatty():  # type: ignore
+    if not anaconda_auth.cli.sys.stdout.isatty():  # type: ignore
         print(e.args[0])
         return 1
 
@@ -82,21 +82,17 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
 
 @register_error_handler(UnspecifiedAcceptedTermsError)
 def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
-    import anaconda_cloud_auth.cli
+    import anaconda_auth.cli
 
-    if not anaconda_cloud_auth.cli.sys.stdout.isatty():  # type: ignore
+    if not anaconda_auth.cli.sys.stdout.isatty():  # type: ignore
         print(e.args[0])
         return 1
 
     msg = dedent("""\
         You have not accepted the terms of service.
-        You must accept our terms of service
+        You must accept our terms of service and Privacy Policy here
 
-          https://legal.anaconda.com/policies/en/?name=terms-of-service#anaconda-terms-of-service
-
-        and Privacy Policy
-
-          https://legal.anaconda.com/policies/en/?name=privacy-policy
+          https://anaconda.com/legal
 
         [bold green]Are you more than 13 years old and accept the terms?[/bold green]
         """)
@@ -147,7 +143,7 @@ def stream_response(
         vertical_overflow="visible",
         console=console,
     ) as live:
-        with patch("anaconda_cloud_auth.cli.sys") as mocked:
+        with patch("anaconda_auth.cli.sys") as mocked:
             mocked.stdout.isatty.return_value = is_a_tty
 
             def chat() -> Generator[str, None, None]:
