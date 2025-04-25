@@ -179,11 +179,16 @@ class ChatClient:
                 "You cannot request both server-side and client-side tools at this time"
             )
 
+        try:
+            user_id = self.auth_client.email
+        except:  # noqa: E722
+            user_id = "me@anaconda.com"
+
         body = {
             "skip_logging": self.skip_logging,
             "session": {
                 "session_id": self.id,
-                "user_id": self.auth_client.email,
+                "user_id": user_id,
                 "iteration_id": 1,
             },
             "chat_context": {

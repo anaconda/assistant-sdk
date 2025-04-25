@@ -33,6 +33,9 @@ class APIClient(BaseClient):
 
         self._config = AssistantConfig(**kwargs)
 
+        if "localhost" in self.config.domain:
+            self._base_uri = self._base_uri.replace("https", "http")
+
         self.headers["X-Client-Source"] = self._config.client_source
         self.headers["X-Client-Version"] = version
 
