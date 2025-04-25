@@ -167,10 +167,17 @@ class ChatClient:
         self,
         messages: List[Dict[str, Union[str, List[str]]]],
         variables: Optional[Dict[str, Any]] = None,
+        tools: Optional[List[Dict[str, Any]]] = None,
+        tool_choice: Optional[str] = None,
     ) -> ChatResponse:
         """Return completions from the Anaconda Assistant as a ChatResponse type"""
 
         response_message_id = str(uuid4())
+
+        if tools and any("remote_tools" in msg for msg in messages):
+            raise ValueError(
+                "You cannot request both server-side and client-side tools at this time"
+            )
 
         body = {
             "skip_logging": self.skip_logging,
@@ -182,10 +189,17 @@ class ChatClient:
             "chat_context": {
                 "type": "custom-prompt",
                 "variables": {} if variables is None else variables,
+                "tools": [] if tools is None else tools,
+                "tool_choice": tool_choice,
             },
             "messages": messages,
             "response_message_id": response_message_id,
         }
+
+        if tools:
+            body["chat_context"]["tools"] = tools
+        if tool_choice:
+            body["chat_context"]["tool_choice"] = tool_choice
 
         if self.system_message:
             body["custom_prompt"] = {
