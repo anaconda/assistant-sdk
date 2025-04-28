@@ -181,8 +181,11 @@ class ChatClient:
 
         try:
             user_id = self.auth_client.email
-        except:  # noqa: E722
-            user_id = "me@anaconda.com"
+        except Exception as e:  # noqa: E722
+            if "localhost" in self.api_client.config.domain:
+                user_id = "me@anaconda.com"
+            else:
+                raise e
 
         body = {
             "skip_logging": self.skip_logging,
