@@ -169,6 +169,7 @@ class ChatClient:
         variables: Optional[Dict[str, Any]] = None,
         tools: Optional[List[Dict[str, Any]]] = None,
         tool_choice: Optional[str] = None,
+        remote_tools: Optional[List[str]] = None,
     ) -> ChatResponse:
         """Return completions from the Anaconda Assistant as a ChatResponse type"""
 
@@ -199,6 +200,7 @@ class ChatClient:
                 "variables": {} if variables is None else variables,
                 "tools": [] if tools is None else tools,
                 "tool_choice": tool_choice,
+                "remote_tools": remote_tools,
             },
             "messages": messages,
             "response_message_id": response_message_id,
@@ -307,7 +309,6 @@ class ChatSession:
     def chat(
         self,
         message: str,
-        remote_tools: Optional[List[str]] = None,
         stream: bool = False,
     ) -> Union[str, Generator[str, None, None]]:
         """Chat with the Assistant appending your current message to the stack"""
@@ -316,11 +317,9 @@ class ChatSession:
             "content": message,
             "message_id": str(uuid4()),
         }
-        if remote_tools:
-            this_message["remote_tools"] = remote_tools
 
         messages = self.messages + [this_message]
-        response = self.client.completions(messages)  # , remote_tools=remote_tools)
+        response = self.client.completions(messages, remote_tools=self.remote_tools)
 
         self.messages.append(this_message)
 
