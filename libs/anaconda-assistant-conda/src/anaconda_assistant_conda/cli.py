@@ -4,6 +4,7 @@ import typer
 from rich.console import Console
 from typing_extensions import Annotated
 
+from .debug_config import debug_config
 from .config import AssistantCondaConfig
 from .core import stream_response
 
@@ -46,3 +47,8 @@ def search(
         "[red]Warning:[/red] Example code generation is currently in beta, please use caution."
     )
     raise SystemExit(0)
+
+
+@app.command(name="config")
+def config() -> None:
+    debug_config()

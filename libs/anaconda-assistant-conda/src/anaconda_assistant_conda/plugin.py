@@ -8,12 +8,12 @@ from conda.cli.conda_argparse import BUILTIN_COMMANDS
 from conda.exception_handler import ExceptionHandler
 from conda.exceptions import PackagesNotFoundError
 from rich.console import Console
-from rich.padding import Padding
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Confirm
 
 from .cli import app
 from .config import AssistantCondaConfig
-from .core import stream_response, set_config, get_config
+from .core import stream_response, get_config
+from .debug_config import debug_config, config_command_styled
 
 ENV_COMMANDS = {
     "env_config",
@@ -62,7 +62,6 @@ def error_handler(command: str) -> None:
         exc_val: CondaError,
         exc_tb: traceback.TracebackException,
     ) -> None:
-        config_command_styled = "[reverse]conda assist configure[/reverse]"
 
         # conda is in the middle of executing something, and user types ctrl-c, we don't want to try and "fix"
         # the error since it's not really an error
@@ -89,39 +88,10 @@ def error_handler(command: str) -> None:
 
             # If we don't have a config option, we ask the user
             if debug_mode == None:
-                help_option = Prompt.ask(
-                    "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
-                    "\n"
-                    "Assistant is an AI-powered debugging tool for conda errors. Learn more here: \n"
-                    "https://anaconda.github.io/assistant-sdk/conda\n"
-                    "\n"
-                    "[bold]Choose how you want the Assistant to help you:[/bold]\n"
-                    "1. Automated - Assistant will automatically provide solutions to errors as they occur.\n"
-                    "2. Ask first - Assistant will ask if you want help when you encounter errors.\n"
-                    "3. Disable - Assistant will not provide help with conda errors.\n"
-                    "\n"
-                    "[bold]Enter your choice[/bold]",
-                    choices=["1", "2", "3"],
-                )
-                if help_option == "1":
-                    debug_mode = "automatic"
-                    set_config("plugin.assistant", "debug_error_mode", "automatic")
-                elif help_option == "2":
-                    debug_mode = "ask"
-                    set_config("plugin.assistant", "debug_error_mode", "ask")
-                elif help_option == "3":
-                    debug_mode = "off"
-                    set_config("plugin.assistant", "debug_error_mode", "off")
-
+                debug_mode = debug_config()
             if debug_mode == "automatic":
-                console.print(
-                    f"\n✅ Assistant will automatically provide solutions. To change your selection, run {config_command_styled}\n"
-                )
                 stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
             elif debug_mode == "ask":
-                console.print(
-                    f"\n✅ Assistant will ask if you want help when you encounter errors. To change your selection, run {config_command_styled}\n"
-                )
                 should_debug = Confirm.ask(
                     "[bold]Debug with Anaconda Assistant?[/bold]",
                 )
@@ -134,10 +104,6 @@ def error_handler(command: str) -> None:
                         "\nOK, goodbye! 👋\n"
                         f"To change default behavior, run {config_command_styled}\n"
                     )
-            elif debug_mode == "off":
-                console.print(
-                    f"\n✅ Assistant will not provide help with conda errors. To change your selection, run {config_command_styled}\n"
-                )
         # If we're in the conda debug flow, ctrl-c is caught so we don't show stack trace
         except KeyboardInterrupt:
             console.print(
