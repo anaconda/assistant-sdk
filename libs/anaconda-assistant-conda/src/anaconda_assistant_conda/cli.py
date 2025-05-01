@@ -49,6 +49,6 @@ def search(
     raise SystemExit(0)
 
 
-@app.command(name="config")
-def config() -> None:
+@app.command(name="configure")
+def configure() -> None:
     debug_config()
