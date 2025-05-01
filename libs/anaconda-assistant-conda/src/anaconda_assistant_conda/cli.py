@@ -9,8 +9,13 @@ from .core import stream_response
 
 console = Console()
 
+helptext = """
+The conda assistant, powered by Anaconda Assistant.
+See https://anaconda.github.io/assistant-sdk/ for more information.
+"""
+
 app = typer.Typer(
-    help="The conda assistant, powered by Anaconda Assistant",
+    help=helptext,
     add_help_option=True,
     no_args_is_help=True,
     add_completion=False,
