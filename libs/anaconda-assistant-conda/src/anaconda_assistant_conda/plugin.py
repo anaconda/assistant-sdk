@@ -13,7 +13,7 @@ from rich.prompt import Confirm, Prompt
 
 from .cli import app
 from .config import AssistantCondaConfig
-from .core import stream_response
+from .core import stream_response, set_config, get_config
 
 ENV_COMMANDS = {
     "env_config",
@@ -85,35 +85,48 @@ def error_handler(command: str) -> None:
             report = self.get_error_report(exc_val, exc_tb)
             prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
 
-            help_option = Prompt.ask(
-                "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
-                "\n"
-                "Assistant is an AI-powered debugging tool for conda errors. Learn more here: \n"
-                "https://anaconda.github.io/assistant-sdk/conda\n"
-                "\n"
-                "[bold]Choose how you want the Assistant to help you:[/bold]\n"
-                "1. Automated - Assistant will automatically provide solutions to errors as they occur.\n"
-                "2. Ask first - Assistant will ask if you want help when you encounter errors.\n"
-                "3. Disable - Assistant will not provide help with conda errors.\n"
-                "\n"
-                "[bold]Enter your choice[/bold]",
-                choices=["1", "2", "3"],
-                console=Console(no_color=True),
-            )
+            debug_mode = get_config("plugin.assistant", "debug_error_mode")
 
-            if help_option == "1":
+            # If we don't have a config option, we ask the user
+            if debug_mode == None:
+                help_option = Prompt.ask(
+                    "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
+                    "\n"
+                    "Assistant is an AI-powered debugging tool for conda errors. Learn more here: \n"
+                    "https://anaconda.github.io/assistant-sdk/conda\n"
+                    "\n"
+                    "[bold]Choose how you want the Assistant to help you:[/bold]\n"
+                    "1. Automated - Assistant will automatically provide solutions to errors as they occur.\n"
+                    "2. Ask first - Assistant will ask if you want help when you encounter errors.\n"
+                    "3. Disable - Assistant will not provide help with conda errors.\n"
+                    "\n"
+                    "[bold]Enter your choice[/bold]",
+                    choices=["1", "2", "3"],
+                    console=Console(no_color=True),
+                )
+                if help_option == "1":
+                    debug_mode = "automatic"
+                    set_config("plugin.assistant", "debug_error_mode", "automatic")
+                elif help_option == "2":
+                    debug_mode = "ask"
+                    set_config("plugin.assistant", "debug_error_mode", "ask")
+                elif help_option == "3":
+                    debug_mode = "off"
+                    set_config("plugin.assistant", "debug_error_mode", "off")
+
+            if debug_mode == "automatic":
                 console.print(
                     f"\n✅ Assistant will automatically provide solutions. To change your selection, run {config_command_styled}\n"
                 )
                 stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
-            elif help_option == "2":
+            elif debug_mode == "ask":
                 console.print(
                     f"\n✅ Assistant will ask if you want help when you encounter errors. To change your selection, run {config_command_styled}\n"
                 )
                 should_debug = Confirm.ask(
                     "[bold]Debug with Anaconda Assistant?[/bold]",
                 )
-                if should_debug == "Y":
+                if should_debug == True:
                     stream_response(
                         config.system_messages.error, prompt, is_a_tty=is_a_tty
                     )
@@ -122,7 +135,7 @@ def error_handler(command: str) -> None:
                         "\nOK, goodbye! 👋\n"
                         f"To change default behavior, run {config_command_styled}\n"
                     )
-            elif help_option == "3":
+            elif debug_mode == "off":
                 console.print(
                     f"\n✅ Assistant will not provide help with conda errors. To change your selection, run {config_command_styled}\n"
                 )
