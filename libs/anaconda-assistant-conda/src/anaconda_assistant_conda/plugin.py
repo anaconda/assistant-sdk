@@ -70,7 +70,7 @@ def error_handler(command: str) -> None:
             console.print(
                 "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
             )
-            sys.exit(0)
+            sys.exit(1)
         try:
             self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
             if exc_val.return_code == 0:
