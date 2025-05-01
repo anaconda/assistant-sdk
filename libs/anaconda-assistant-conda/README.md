@@ -144,6 +144,8 @@ To run test commands, you don't want to run `conda assist` since it'll pick up t
 ./env/bin/conda assist search "A package to read csv files"
 ```
 
+For a video demo, run `source activate-demo.sh`
+
 ### Run the unit tests
 
 ```shell
