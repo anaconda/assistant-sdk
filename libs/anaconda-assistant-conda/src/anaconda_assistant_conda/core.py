@@ -17,6 +17,7 @@ from anaconda_assistant.exceptions import (
     UnspecifiedAcceptedTermsError,
     UnspecifiedDataCollectionChoice,
 )
+from anaconda_assistant_conda.config import AssistantCondaConfig
 from rich.console import Console
 from rich.live import Live
 from rich.markdown import Markdown
@@ -145,7 +146,10 @@ def stream_response(
             mocked.stdout.isatty.return_value = is_a_tty
 
             def chat() -> Generator[str, None, None]:
-                session = ChatSession(system_message=system_message)
+                config = AssistantCondaConfig()
+                session = ChatSession(
+                    system_message=system_message, remote_tools=config.remote_tools
+                )
                 response = session.chat(message=prompt, stream=True)
                 yield from response
 

@@ -165,27 +165,51 @@ class ChatClient:
 
     def completions(
         self,
-        messages: List[Dict[str, str]],
+        messages: List[Dict[str, Union[str, List[str]]]],
         variables: Optional[Dict[str, Any]] = None,
+        tools: Optional[List[Dict[str, Any]]] = None,
+        tool_choice: Optional[str] = None,
+        remote_tools: Optional[List[str]] = None,
     ) -> ChatResponse:
         """Return completions from the Anaconda Assistant as a ChatResponse type"""
 
         response_message_id = str(uuid4())
 
+        if tools and any("remote_tools" in msg for msg in messages):
+            raise ValueError(
+                "You cannot request both server-side and client-side tools at this time"
+            )
+
+        try:
+            user_id = self.auth_client.email
+        except Exception as e:  # noqa: E722
+            if "localhost" in self.api_client.config.domain:
+                user_id = "me@anaconda.com"
+            else:
+                raise e
+
         body = {
             "skip_logging": self.skip_logging,
             "session": {
                 "session_id": self.id,
-                "user_id": self.auth_client.email,
+                "user_id": user_id,
                 "iteration_id": 1,
             },
             "chat_context": {
                 "type": "custom-prompt",
                 "variables": {} if variables is None else variables,
+                "tools": [] if tools is None else tools,
+                "tool_choice": tool_choice,
+                "remote_tools": remote_tools,
             },
             "messages": messages,
             "response_message_id": response_message_id,
         }
+
+        if tools:
+            body["chat_context"]["tools"] = tools
+        if tool_choice:
+            body["chat_context"]["tool_choice"] = tool_choice
 
         if self.system_message:
             body["custom_prompt"] = {
@@ -231,6 +255,7 @@ class ChatSession:
     def __init__(
         self,
         system_message: Optional[str] = None,
+        remote_tools: Optional[List[str]] = None,
         domain: Optional[str] = None,
         api_key: Optional[str] = None,
         api_version: Optional[str] = None,
@@ -241,6 +266,7 @@ class ChatSession:
             api_key=api_key,
             api_version=api_version,
         )
+        self.remote_tools = remote_tools
         self.messages: list = []
         self.usage: dict = {"tokens_used": 0, "token_limit": 0}
 
@@ -281,13 +307,19 @@ class ChatSession:
         return response.message
 
     def chat(
-        self, message: str, stream: bool = False
+        self,
+        message: str,
+        stream: bool = False,
     ) -> Union[str, Generator[str, None, None]]:
         """Chat with the Assistant appending your current message to the stack"""
-        this_message = {"role": "user", "content": message, "message_id": str(uuid4())}
+        this_message: Dict[str, Union[List[str], str]] = {
+            "role": "user",
+            "content": message,
+            "message_id": str(uuid4()),
+        }
 
         messages = self.messages + [this_message]
-        response = self.client.completions(messages)
+        response = self.client.completions(messages, remote_tools=self.remote_tools)
 
         self.messages.append(this_message)
 

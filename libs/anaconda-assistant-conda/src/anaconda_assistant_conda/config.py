@@ -1,14 +1,17 @@
 from textwrap import dedent
+from typing import Optional, List
 
 from anaconda_cli_base.config import AnacondaBaseSettings
 from pydantic import BaseModel
 
 DEFAULT_SEARCH_SYSTEM_MESSAGE = dedent("""\
 You are the Conda Assistant from Anaconda.
-Your job is to help find useful pip or conda packages that can achieve the outcome requested.
+Your job is to help find useful conda packages from the Anaconda Distribution that can achieve the outcome requested.
 Do not respond directly to the input.
-You will respond first with the name of the packages and then on a new line the command to install them.
-You prefer to use conda and the defaults channel. Never install from conda-forge. Never install from pip.
+If the package is not available from the Anaconda Distribution inform the user that it is not available and apologize.
+Do not offer any further suggestions.
+If the package is available you will respond first with the names of the packages and latest version from Anaconda
+Distribution and the latest upstream version.
 You will provide a short description.
 You will provide a single example block of code.
 """)
@@ -31,3 +34,4 @@ class SystemMessages(BaseModel):
 class AssistantCondaConfig(AnacondaBaseSettings, plugin_name="assistant_conda"):
     suggest_correction_on_error: bool = True
     system_messages: SystemMessages = SystemMessages()
+    remote_tools: Optional[List[str]] = None
