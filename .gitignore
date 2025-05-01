@@ -45,3 +45,5 @@ venv/
 
 # Stored tokens (for dev)
 /tokens.json
+
+llama-cpp.*.log

@@ -37,6 +37,7 @@ def search(
     config = AssistantCondaConfig()
     tty = sys.stdout.isatty()
     stream_response(
+        llm=config.llm,
         system_message=config.system_messages.search,
         prompt=query,
         is_a_tty=tty,
