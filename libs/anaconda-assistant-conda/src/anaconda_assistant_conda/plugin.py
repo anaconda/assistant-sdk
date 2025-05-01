@@ -102,7 +102,6 @@ def error_handler(command: str) -> None:
                     "\n"
                     "[bold]Enter your choice[/bold]",
                     choices=["1", "2", "3"],
-                    console=Console(no_color=True),
                 )
                 if help_option == "1":
                     debug_mode = "automatic"
