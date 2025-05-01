@@ -1,17 +1,19 @@
 import sys
 import traceback
-from typing import Generator, Any
+from typing import Any, Generator
 
 from anaconda_assistant.config import AssistantConfig
-from conda import plugins, CondaError
+from conda import CondaError, plugins
 from conda.cli.conda_argparse import BUILTIN_COMMANDS
 from conda.exception_handler import ExceptionHandler
 from conda.exceptions import PackagesNotFoundError
 from rich.console import Console
+from rich.padding import Padding
+from rich.prompt import Confirm, Prompt
 
+from .cli import app
 from .config import AssistantCondaConfig
 from .core import stream_response
-from .cli import app
 
 ENV_COMMANDS = {
     "env_config",
@@ -60,22 +62,75 @@ def error_handler(command: str) -> None:
         exc_val: CondaError,
         exc_tb: traceback.TracebackException,
     ) -> None:
-        self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
-        if exc_val.return_code == 0:
-            return
+        config_command_styled = "[reverse]conda assist configure[/reverse]"
 
-        elif command == "search" and isinstance(exc_val, PackagesNotFoundError):
-            # When a package is not found it actually throws an error
-            # it is perhaps better to recommend the new assist search.
-            recommend_assist_search("search")
-            return
+        # conda is in the middle of executing something, and user types ctrl-c, we don't want to try and "fix"
+        # the error since it's not really an error
+        if str(exc_val) == "KeyboardInterrupt":
+            console.print(
+                "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
+            )
+            sys.exit(0)
+        try:
+            self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
+            if exc_val.return_code == 0:
+                return
 
-        report = self.get_error_report(exc_val, exc_tb)
+            elif command == "search" and isinstance(exc_val, PackagesNotFoundError):
+                # When a package is not found it actually throws an error
+                # it is perhaps better to recommend the new assist search.
+                recommend_assist_search("search")
+                return
 
-        console.print("[bold green]Hello from Anaconda Assistant![/green bold]")
-        console.print("I'm going to help you diagnose and correct this error.")
-        prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
-        stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
+            report = self.get_error_report(exc_val, exc_tb)
+            prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
+
+            help_option = Prompt.ask(
+                "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
+                "\n"
+                "Assistant is an AI-powered debugging tool for conda errors. Learn more here: \n"
+                "https://anaconda.github.io/assistant-sdk/conda\n"
+                "\n"
+                "[bold]Choose how you want the Assistant to help you:[/bold]\n"
+                "1. Automated - Assistant will automatically provide solutions to errors as they occur.\n"
+                "2. Ask first - Assistant will ask if you want help when you encounter errors.\n"
+                "3. Disable - Assistant will not provide help with conda errors.\n"
+                "\n"
+                "[bold]Enter your choice[/bold]",
+                choices=["1", "2", "3"],
+                console=Console(no_color=True),
+            )
+
+            if help_option == "1":
+                console.print(
+                    f"\n✅ Assistant will automatically provide solutions. To change your selection, run {config_command_styled}\n"
+                )
+                stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
+            elif help_option == "2":
+                console.print(
+                    f"\n✅ Assistant will ask if you want help when you encounter errors. To change your selection, run {config_command_styled}\n"
+                )
+                should_debug = Confirm.ask(
+                    "[bold]Debug with Anaconda Assistant?[/bold]",
+                )
+                if should_debug == "Y":
+                    stream_response(
+                        config.system_messages.error, prompt, is_a_tty=is_a_tty
+                    )
+                else:
+                    console.print(
+                        "\nOK, goodbye! 👋\n"
+                        f"To change default behavior, run {config_command_styled}\n"
+                    )
+            elif help_option == "3":
+                console.print(
+                    f"\n✅ Assistant will not provide help with conda errors. To change your selection, run {config_command_styled}\n"
+                )
+        except KeyboardInterrupt:
+            console.print(
+                "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
+            )
+            sys.exit(1)
 
     ExceptionHandler._print_conda_exception = assistant_exception_handler  # type: ignore
 
