@@ -126,6 +126,7 @@ def error_handler(command: str) -> None:
                 console.print(
                     f"\n✅ Assistant will not provide help with conda errors. To change your selection, run {config_command_styled}\n"
                 )
+        # If we're in the conda debug flow, ctrl-c is caught so we don't show stack trace
         except KeyboardInterrupt:
             console.print(
                 "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
