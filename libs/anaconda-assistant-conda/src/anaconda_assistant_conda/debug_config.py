@@ -10,7 +10,7 @@ config_command_styled = "[reverse]conda assist configure[/reverse]"
 
 
 def debug_config():
-    """Ask Anaconda Assistant to find a conda package based on requested capabilities"""
+    """Configure eagerness of AI assistance when running conda commands"""
 
     debug_mode = get_config("plugin.assistant", "debug_error_mode")
 
