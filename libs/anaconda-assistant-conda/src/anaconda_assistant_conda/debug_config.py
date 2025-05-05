@@ -14,8 +14,6 @@ def debug_config():
 
     debug_mode = get_config("plugin.assistant", "debug_error_mode")
 
-    console.print(debug_mode)
-
     help_option = Prompt.ask(
         "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
         "\n"
