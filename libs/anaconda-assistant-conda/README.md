@@ -39,35 +39,10 @@ anaconda login
 
 ## Daily quotas
 
-Each Anaconda.cloud subscription plan enforces a limit on the number of requests (package search or error correct).
+Each Anaconda.cloud subscription plan enforces a limit on the number of requests.
 The limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached the plugin will display a message to wait for 24 hours.
 
 Users can upgrade their plans by visiting [https://anaconda.cloud/profile/subscriptions](https://anaconda.cloud/profile/subscriptions).
-
-## Package search
-
-You can ask the Anaconda Assistant for help finding a conda package.
-Here you can use natural language to describe what you're looking for.
-The assistant will recommend a package you can install and provide a short example of its use.
-
-```text
-> conda assist search "A package to read csv files"
-Hello from Anaconda Assistant!
-Package: pandas
-Command to install: conda install pandas
-Description: Pandas is a powerful data manipulation and analysis library for Python, which provides data structures like
-DataFrames to easily read, write, and manipulate CSV files.
-
-Example code:
-
- import pandas as pd
-
- # Read a CSV file
- data = pd.read_csv('file.csv')
-
- # Display the first few rows of the DataFrame
- print(data.head())
-```
 
 ## Error messages
 
@@ -141,8 +116,8 @@ make setup
 To run test commands, you don't want to run `conda assist` since it'll pick up the version of conda on your system. You want the conda install for this repo so you can run the plugin. To do this, you run:
 
 ```shell
-./env/bin/conda assist search "A package to read csv files"
-```
+./env/bin/conda assist ...
+```s
 
 ### Run the unit tests
 

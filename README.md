@@ -12,5 +12,4 @@ Additional plugin or integration packages are also in this repo.
     * See the [README](https://github.com/anaconda/assistant-sdk/blob/main/libs/anaconda-assistant-sdk/README.md) for more details
 * [anaconda-assistant-conda](https://github.com/anaconda/assistant-sdk/tree/main/libs/anaconda-assistant-conda)
     * A [conda](https://github.com/conda/conda) plugin that provides AI assistance to conda workflows.
-    * A natural-language search tool to find a package that can achieve a task
     * Error summarization and suggestions for corrections for all conda commands.
