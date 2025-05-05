@@ -164,7 +164,6 @@ def test_error_handler_search_condaerror(
     )
 
 
-@pytest.mark.skip
 def test_error_handler_search_packgenotfounderror(
     mocked_assistant_domain: str,
     monkeypatch: MonkeyPatch,
@@ -189,7 +188,9 @@ def test_error_handler_search_packgenotfounderror(
     error_handler("search")
     exc(mocked_search)
 
-    chat.assert_not_called()
-
+    assert (
+        chat.call_args.kwargs.get("message", "")
+        == "COMMAND:\nconda search will-fail\nMESSAGE:\nPackagesNotFoundError: The following packages are missing from the target environment:\n  - will-fail\n"
+    )
     stderr = capsys.readouterr().err
-    assert "conda assist search" in stderr
+    assert "conda assist search" not in stderr

@@ -75,12 +75,6 @@ def error_handler(command: str) -> None:
             if exc_val.return_code == 0:
                 return
 
-            elif command == "search" and isinstance(exc_val, PackagesNotFoundError):
-                # When a package is not found it actually throws an error
-                # it is perhaps better to recommend the new assist search.
-                recommend_assist_search("search")
-                return
-
             report = self.get_error_report(exc_val, exc_tb)
             prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
 
@@ -120,22 +114,6 @@ def conda_subcommands() -> Generator[plugins.CondaSubcommand, None, None]:
         name="assist",
         summary="Anaconda Assistant integration",
         action=lambda args: app(args=args),
-    )
-
-
-def recommend_assist_search(_: Any) -> None:
-    console = Console(stderr=True)
-    console.print("[bold green]Hello from Anaconda Assistant![/bold green]")
-    console.print("If you're not finding what you're looking for try")
-    console.print('  conda assist search "A package that can ..."')
-
-
-@plugins.hookimpl
-def conda_post_commands() -> Generator[plugins.CondaPostCommand, None, None]:
-    yield plugins.CondaPostCommand(
-        name="assist-search-recommendation",
-        action=recommend_assist_search,
-        run_for={"search"},
     )
 
 
