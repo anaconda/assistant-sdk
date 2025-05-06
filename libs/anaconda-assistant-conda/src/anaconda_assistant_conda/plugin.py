@@ -76,6 +76,11 @@ def error_handler(command: str) -> None:
                 return
 
             report = self.get_error_report(exc_val, exc_tb)
+
+            # Remove the path from the command to only show 'conda'
+            splitted = report["command"].split()
+            if splitted[0].endswith("conda"):
+                report["command"] = "conda " + " ".join(splitted[1:])
             prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
 
             debug_mode = get_config("plugin.assistant", "debug_error_mode")
