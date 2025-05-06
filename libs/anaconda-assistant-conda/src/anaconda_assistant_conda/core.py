@@ -51,6 +51,27 @@ def set_config(table: str, key: str, value: Any) -> None:
         tomlkit.dump(config, f)
 
 
+def get_config(table: str, key: str) -> Optional[Any]:
+    expanded = table.split(".")
+
+    config_toml = anaconda_config_path()
+    if not config_toml.exists():
+        return None
+
+    with open(config_toml, "rb") as f:
+        config = tomlkit.load(f)
+
+    # Traverse the table hierarchy
+    config_table = config
+    for table_key in expanded:
+        if table_key not in config_table:  # type: ignore
+            return None
+        config_table = config_table[table_key]  # type: ignore
+
+    # Return the value if the key exists
+    return config_table.get(key)  # type: ignore
+
+
 @register_error_handler(UnspecifiedDataCollectionChoice)
 def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
     import anaconda_auth.cli
