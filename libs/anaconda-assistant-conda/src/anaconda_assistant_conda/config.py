@@ -4,6 +4,7 @@ from anaconda_cli_base.config import AnacondaBaseSettings
 from pydantic import BaseModel
 from typing import Literal, Optional
 
+DebugErrorMode = Optional[Literal["automatic", "ask", "off"]]
 
 DEFAULT_ERROR_SYSTEM_MESSAGE = dedent(
     """\
@@ -23,5 +24,5 @@ class SystemMessages(BaseModel):
 
 
 class AssistantCondaConfig(AnacondaBaseSettings, plugin_name="assistant_conda"):
-    debug_error_mode: Optional[Literal["automatic", "ask", "off"]] = None
+    debug_error_mode: DebugErrorMode = None
     system_messages: SystemMessages = SystemMessages()
