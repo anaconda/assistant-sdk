@@ -14,6 +14,7 @@ from .cli import app
 from .config import AssistantCondaConfig
 from .core import stream_response, get_config
 from .debug_config import debug_config, config_command_styled
+from .get_clean_error_report_command import get_clean_error_report_command
 
 ENV_COMMANDS = {
     "env_config",
@@ -77,11 +78,15 @@ def error_handler(command: str) -> None:
 
             report = self.get_error_report(exc_val, exc_tb)
 
-            # Remove the path from the command to only show 'conda'
-            splitted = report["command"].split()
-            if splitted[0].endswith("conda"):
-                report["command"] = "conda " + " ".join(splitted[1:])
-            prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
+            # print("\n-----exc_val-----\n")
+            # print(exc_val)
+            # print("\n-----exc_tb-----\n")
+            # print(exc_tb)
+            # print("\n-----report-----\n")
+            # print(report)
+
+            command = get_clean_error_report_command(report)
+            prompt = f"COMMAND:\n{command}\nMESSAGE:\n{report['error']} <INSTRUCTIONS>Make sure to quote packages with versions like so `conda create -n myenv \"anaconda-cloud-auth=0.7\" \"pydantic>=2.7.0\"`<INSTRUCTIONS>"
 
             debug_mode = get_config("plugin.assistant", "debug_error_mode")
 

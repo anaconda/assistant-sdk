@@ -194,3 +194,9 @@ def test_error_handler_search_packgenotfounderror(
     )
     stderr = capsys.readouterr().err
     assert "conda assist search" not in stderr
+
+
+def test_dummy_failure() -> None:
+    pytest.set_trace()
+    print("test👋👋👋👋")
+    assert False, "This test is designed to always fail."

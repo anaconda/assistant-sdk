@@ -52,7 +52,7 @@ When any conda CLI command produces an error message the Assistant will intercep
 the problem and suggest corrections.
 
 ```text
-> conda create -n dt --dry-run anaconda-cloud-auth=0.7 pydantic=1
+> conda create -n myenv --dry-run anaconda-cloud-auth=0.7 pydantic=1
 Channels:
  - defaults
  - ai-staging
@@ -88,17 +88,17 @@ Here are three ways you can correct the error:
  1 Update the pydantic version: Change the command to specify a compatible version of pydantic that meets the requirements of
    anaconda-cli-base. For example:
 
-    ./env/bin/conda create -n dt --dry-run anaconda-cloud-auth=0.7 pydantic=2.7.0
+    conda create -n myenv --dry-run anaconda-cloud-auth=0.7 pydantic=2.7.0
 
  2 Remove anaconda-cloud-auth: If you do not specifically need anaconda-cloud-auth, you can try creating the environment
    without it:
 
-    ./env/bin/conda create -n dt --dry-run pydantic=2.7.0
+    conda create -n myenv --dry-run pydantic=2.7.0
 
  3 Use a different version of anaconda-cloud-auth: If you need anaconda-cloud-auth, consider using a different version that
    does not have the same dependency issues. You can check for available versions and try a lower version:
 
-    ./env/bin/conda create -n dt --dry-run anaconda-cloud-auth=0.6 pydantic=2.7.0
+    conda create -n myenv --dry-run anaconda-cloud-auth=0.6 pydantic=2.7.0
 
 
 Make sure to check the compatibility of the packages you choose to install.
@@ -115,7 +115,7 @@ make setup
 
 To run test commands, you don't want to run `conda assist` since it'll pick up the version of conda on your system. You want the conda install for this repo so you can run the plugin. To do this, you run:
 
-```shell
+````shell
 ./env/bin/conda assist ...
 ```s
 
@@ -123,7 +123,7 @@ To run test commands, you don't want to run `conda assist` since it'll pick up t
 
 ```shell
 make test
-```
+````
 
 ### Run the unit tests across isolated environments with tox
 

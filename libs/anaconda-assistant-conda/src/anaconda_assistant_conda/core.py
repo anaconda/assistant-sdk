@@ -17,10 +17,13 @@ from anaconda_assistant.exceptions import (
     UnspecifiedAcceptedTermsError,
     UnspecifiedDataCollectionChoice,
 )
-from rich.console import Console
+from rich.console import Console, Group
 from rich.live import Live
 from rich.markdown import Markdown
 from rich.prompt import Confirm
+from .no_padding_code_block import override_markdown_formatting
+
+override_markdown_formatting(Markdown)
 
 
 def set_config(table: str, key: str, value: Any) -> None:
@@ -80,7 +83,8 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
         print(e.args[0])
         return 1
 
-    msg = dedent("""\
+    msg = dedent(
+        """\
         You have not chosen to opt-in or opt-out of data collection.
         This does not affect the operation of Anaconda Assistant, but your choice is required to proceed.
 
@@ -93,7 +97,8 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
           * It does not affect the data that is sent to Open AI
 
         [bold green]Would you like to opt-in to data collection?[/bold green]
-        """)
+        """
+    )
     data_collection = Confirm.ask(msg)
     set_config("plugin.assistant", "data_collection", data_collection)
 
@@ -108,14 +113,16 @@ def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
         print(e.args[0])
         return 1
 
-    msg = dedent("""\
+    msg = dedent(
+        """\
         You have not accepted the terms of service.
         You must accept our terms of service and Privacy Policy here
 
           https://anaconda.com/legal
 
         [bold green]Are you more than 13 years old and accept the terms?[/bold green]
-        """)
+        """
+    )
     accepted_terms = Confirm.ask(msg)
     set_config("plugin.assistant", "accepted_terms", accepted_terms)
 
@@ -155,12 +162,15 @@ def stream_response(
     if console is None:
         console = Console()
 
+    status = console.status("", spinner="simpleDotsScrolling", spinner_style="dim")
+
     full_text = ""
     with Live(
-        Markdown(full_text),
-        auto_refresh=False,
+        Group(status, Markdown(full_text)),
         vertical_overflow="visible",
         console=console,
+        auto_refresh=False,
+        refresh_per_second=8,
     ) as live:
         with patch("anaconda_auth.cli.sys") as mocked:
             mocked.stdout.isatty.return_value = is_a_tty
