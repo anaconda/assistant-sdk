@@ -2,9 +2,11 @@ import sys
 from rich.prompt import Prompt
 from rich.console import Console
 
-from .core import get_config, set_config
+from .core import set_config
+from .config import AssistantCondaConfig
 
 console = Console()
+conf = AssistantCondaConfig()
 
 config_command_styled = "[reverse]conda assist configure[/reverse]"
 
@@ -12,7 +14,7 @@ config_command_styled = "[reverse]conda assist configure[/reverse]"
 def debug_config():
     """Configure eagerness of AI assistance when running conda commands"""
 
-    debug_mode = get_config("plugin.assistant", "debug_error_mode")
+    debug_mode = conf.debug_error_mode
 
     help_option = Prompt.ask(
         "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"

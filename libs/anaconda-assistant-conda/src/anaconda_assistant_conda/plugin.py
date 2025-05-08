@@ -12,7 +12,7 @@ from rich.prompt import Confirm
 
 from .cli import app
 from .config import AssistantCondaConfig
-from .core import stream_response, get_config
+from .core import stream_response
 from .debug_config import debug_config, config_command_styled
 from .get_clean_error_report_command import get_clean_error_report_command
 
@@ -40,6 +40,7 @@ BUILD_COMMANDS = {
 ALL_COMMANDS = BUILTIN_COMMANDS.union(ENV_COMMANDS, BUILD_COMMANDS)
 
 console = Console()
+config = AssistantCondaConfig()
 
 
 ExceptionHandler._orig_print_conda_exception = (  # type: ignore
@@ -50,8 +51,7 @@ ExceptionHandler._orig_print_conda_exception = (  # type: ignore
 def error_handler(command: str) -> None:
     is_a_tty = sys.stdout.isatty()
 
-    config = AssistantCondaConfig()
-    if not config.suggest_correction_on_error:
+    if not config.debug_error_mode:
         return
 
     assistant_config = AssistantConfig()
@@ -86,9 +86,9 @@ def error_handler(command: str) -> None:
             # print(report)
 
             command = get_clean_error_report_command(report)
-            prompt = f"COMMAND:\n{command}\nMESSAGE:\n{report['error']} <INSTRUCTIONS>Make sure to quote packages with versions like so `conda create -n myenv \"anaconda-cloud-auth=0.7\" \"pydantic>=2.7.0\"`<INSTRUCTIONS>"
+            prompt = f"COMMAND:\n{command}\nMESSAGE:\n{report['error']}"
 
-            debug_mode = get_config("plugin.assistant", "debug_error_mode")
+            debug_mode = config.debug_error_mode
 
             # If we don't have a config option, we ask the user
             if debug_mode == None:
