@@ -19,11 +19,8 @@ from anaconda_assistant.exceptions import (
 )
 from rich.console import Console, Group
 from rich.live import Live
-from rich.markdown import Markdown
 from rich.prompt import Confirm
-from .no_padding_code_block import override_markdown_formatting
-
-override_markdown_formatting(Markdown)
+from .rich_customizations.md import MyMarkdown
 
 
 def set_config(table: str, key: str, value: Any) -> None:
@@ -145,7 +142,7 @@ def stream_response(
 
     full_text = ""
     with Live(
-        Group(status, Markdown(full_text)),
+        Group(status, MyMarkdown(full_text)),
         vertical_overflow="visible",
         console=console,
         auto_refresh=False,
@@ -166,7 +163,7 @@ def stream_response(
             for chunk in response:
                 full_text += chunk
                 try:
-                    md = Markdown(full_text, hyperlinks=False)
+                    md = MyMarkdown(full_text, hyperlinks=False)
                 except Exception:
                     continue
                 live.update(md, refresh=True)

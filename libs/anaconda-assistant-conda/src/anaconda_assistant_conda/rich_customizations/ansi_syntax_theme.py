@@ -1,5 +1,5 @@
 from rich.markdown import CodeBlock
-from rich.syntax import Syntax, ANSISyntaxTheme
+from rich.syntax import ANSISyntaxTheme
 from rich.style import Style
 
 from typing import Dict, Tuple
@@ -16,8 +16,13 @@ from pygments.token import (
     Whitespace,
 )
 
+# Note, can use either the `ansi_theme` or `ANSISyntaxThemeCustom()` for setting theme in `Syntax` constructor
+
 TokenType = Tuple[str, ...]
 
+"""
+Borrowed from the rich algol theme
+"""
 style_map: Dict[TokenType, Style] = {
     Token: Style(color="cyan"),
     Whitespace: Style(),
@@ -47,9 +52,7 @@ style_map: Dict[TokenType, Style] = {
     Error: Style(color="red", underline=True),
 }
 
-# print(CUSTOM)
-
-theme = ANSISyntaxTheme(style_map=style_map)
+ansi_theme = ANSISyntaxTheme(style_map=style_map)
 
 
 class ANSISyntaxThemeCustom(ANSISyntaxTheme):

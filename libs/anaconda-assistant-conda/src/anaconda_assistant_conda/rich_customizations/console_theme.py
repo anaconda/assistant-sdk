@@ -1,7 +1,7 @@
 from rich.style import Style
 from rich.theme import Theme
 
-custom_theme = Theme(
+console_theme = Theme(
     {
         "prompt.choices": "bold green italic",  # Style for the choices
         "prompt.default": "italic yellow",  # Style for the default value

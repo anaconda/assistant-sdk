@@ -1,8 +1,8 @@
-from rich.markdown import CodeBlock
+from rich.markdown import Markdown, CodeBlock
 from rich.prompt import Confirm
 from rich.syntax import Syntax
 
-from .ansi_theme import ANSISyntaxThemeCustom, theme
+from .ansi_syntax_theme import ANSISyntaxThemeCustom
 
 
 # Subclass CodeBlock to override the default padding
@@ -36,7 +36,13 @@ class NoPaddingCodeBlock(CodeBlock):
         yield syntax
 
 
-def override_markdown_formatting(Markdown):
-    # Override the default CodeBlock with your custom one
-    Markdown.elements["fence"] = NoPaddingCodeBlock
-    Markdown.elements["code_block"] = NoPaddingCodeBlock
+class MyMarkdown(Markdown):
+    """Custom Markdown class to override default Markdown elements."""
+
+    elements = Markdown.elements.copy()
+    elements.update(
+        {
+            "fence": NoPaddingCodeBlock,
+            "code_block": NoPaddingCodeBlock,
+        }
+    )

@@ -31,6 +31,7 @@ def debug_config():
         choices=["1", "2", "3"],
     )
 
+    # In the future, we might have "always" or "on" when we want to disable debug
     if help_option == "1":
         debug_mode = "automatic"
     elif help_option == "2":
