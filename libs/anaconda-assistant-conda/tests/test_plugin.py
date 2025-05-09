@@ -21,6 +21,9 @@ def test_error_handler_not_logged_in(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_AUTH_API_KEY", raising=False)
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DEBUG_ERROR_MODE", "off")
+
+    pytest.set_trace()
 
     def mocked_command() -> None:
         raise CondaError("mocked-command failed")
@@ -78,7 +81,7 @@ def test_error_handler_not_logged_in_tty_do_not_login(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
-    monkeypatch.delenv("ANACONDA_AUTH_API_KEY", raising=False)
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DEBUG_ERROR_MODE", "off")
 
     def set_api_key() -> None:
         monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
@@ -196,7 +199,7 @@ def test_error_handler_search_packgenotfounderror(
     assert "conda assist search" not in stderr
 
 
-def test_dummy_failure() -> None:
-    pytest.set_trace()
-    print("test👋👋👋👋")
-    assert False, "This test is designed to always fail."
+# def test_dummy_failure() -> None:
+#     pytest.set_trace()
+#     print("test👋👋👋👋")
+#     assert False, "This test is designed to always fail."
