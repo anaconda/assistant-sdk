@@ -1,6 +1,7 @@
 import sys
 import traceback
 from typing import Any, Generator
+import pytest
 
 from anaconda_assistant.config import AssistantConfig
 from conda import CondaError, plugins
@@ -40,8 +41,6 @@ BUILD_COMMANDS = {
 ALL_COMMANDS = BUILTIN_COMMANDS.union(ENV_COMMANDS, BUILD_COMMANDS)
 
 console = Console()
-config = AssistantCondaConfig()
-
 
 ExceptionHandler._orig_print_conda_exception = (  # type: ignore
     ExceptionHandler._print_conda_exception
@@ -51,7 +50,8 @@ ExceptionHandler._orig_print_conda_exception = (  # type: ignore
 def error_handler(command: str) -> None:
     is_a_tty = sys.stdout.isatty()
 
-    if not config.debug_error_mode:
+    config = AssistantCondaConfig()
+    if config.debug_error_mode == "off":
         return
 
     assistant_config = AssistantConfig()
