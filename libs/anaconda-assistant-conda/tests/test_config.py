@@ -24,7 +24,7 @@ def test_env_patched_2(monkeypatch: MonkeyPatch) -> None:
 
 def test_conda_assistant_env_default() -> None:
     config = AssistantCondaConfig()
-    assert config.debug_error_mode == None
+    assert config.debug_error_mode == "none"
 
 
 def test_conda_assistant_env_patched(monkeypatch: MonkeyPatch) -> None:
