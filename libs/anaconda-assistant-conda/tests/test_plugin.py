@@ -21,7 +21,7 @@ def test_error_handler_not_logged_in(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_AUTH_API_KEY", raising=False)
-    monkeypatch.setenv("ANACONDA_ASSISTANT_DEBUG_ERROR_MODE", "off")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_CONDA_DEBUG_ERROR_MODE", "automatic")
 
     def mocked_command() -> None:
         raise CondaError("mocked-command failed")
@@ -46,6 +46,7 @@ def test_error_handler_not_logged_in_tty_do_login(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.delenv("ANACONDA_AUTH_API_KEY", raising=False)
+    monkeypatch.setenv("ANACONDA_ASSISTANT_CONDA_DEBUG_ERROR_MODE", "automatic")
 
     def set_api_key() -> None:
         monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
@@ -79,7 +80,7 @@ def test_error_handler_not_logged_in_tty_do_not_login(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DATA_COLLECTION", "true")
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
-    monkeypatch.setenv("ANACONDA_ASSISTANT_DEBUG_ERROR_MODE", "off")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_CONDA_DEBUG_ERROR_MODE", "automatic")
 
     def set_api_key() -> None:
         monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
@@ -110,6 +111,7 @@ def test_error_handler_send_error(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_CONDA_DEBUG_ERROR_MODE", "automatic")
 
     import anaconda_assistant_conda.core
 
@@ -146,6 +148,7 @@ def test_error_handler_search_condaerror(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_CONDA_DEBUG_ERROR_MODE", "automatic")
 
     import anaconda_assistant_conda.core
 
@@ -176,6 +179,7 @@ def test_error_handler_search_packgenotfounderror(
     monkeypatch.setenv("ANACONDA_ASSISTANT_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_DOMAIN", mocked_assistant_domain)
     monkeypatch.setenv("ANACONDA_AUTH_API_KEY", "api-key")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_CONDA_DEBUG_ERROR_MODE", "automatic")
 
     import anaconda_assistant_conda.core
 
