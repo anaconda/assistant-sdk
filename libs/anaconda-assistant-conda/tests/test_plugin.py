@@ -23,8 +23,6 @@ def test_error_handler_not_logged_in(
     monkeypatch.delenv("ANACONDA_AUTH_API_KEY", raising=False)
     monkeypatch.setenv("ANACONDA_ASSISTANT_DEBUG_ERROR_MODE", "off")
 
-    pytest.set_trace()
-
     def mocked_command() -> None:
         raise CondaError("mocked-command failed")
 
