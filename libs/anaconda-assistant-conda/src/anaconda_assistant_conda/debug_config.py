@@ -2,8 +2,12 @@ import sys
 from rich.prompt import Prompt
 from rich.console import Console
 
-from .core import set_config
-from .config import AssistantCondaConfig, DebugErrorMode
+from .config import (
+    AssistantCondaConfig,
+    DebugErrorMode,
+    set_debug_error_mode,
+    get_debug_error_mode,
+)
 
 console = Console()
 

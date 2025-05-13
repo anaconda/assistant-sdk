@@ -3,6 +3,7 @@ from textwrap import dedent
 from anaconda_cli_base.config import AnacondaBaseSettings
 from pydantic import BaseModel
 from typing import Literal, Optional
+from .core import set_config
 
 # Adding `"none"`` rather than `None` because otherwise getting config via env var gets confused:
 # https://anaconda.github.io/anaconda-cli-base/#config-file
