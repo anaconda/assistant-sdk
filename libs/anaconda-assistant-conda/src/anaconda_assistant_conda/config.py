@@ -28,3 +28,19 @@ class SystemMessages(BaseModel):
 class AssistantCondaConfig(AnacondaBaseSettings, plugin_name="assistant"):
     debug_error_mode: DebugErrorMode = "none"
     system_messages: SystemMessages = SystemMessages()
+
+
+# NOTE: in the future, we'll want to make sure `set` and `get` API is mirrored for all keys, likely with a better API
+# than `set_debug_error_mode()` and `get_debug_error_mode()`
+
+
+def set_debug_error_mode(
+    mode: DebugErrorMode,
+) -> None:
+    """Set the debug error mode in the config."""
+    set_config("plugin.assistant", "debug_error_mode", mode)
+
+
+def get_debug_error_mode() -> DebugErrorMode:
+    """Get the debug error mode from the config."""
+    return AssistantCondaConfig().debug_error_mode

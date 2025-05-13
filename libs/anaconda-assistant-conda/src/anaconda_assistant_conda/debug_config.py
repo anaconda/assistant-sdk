@@ -6,7 +6,6 @@ from .core import set_config
 from .config import AssistantCondaConfig, DebugErrorMode
 
 console = Console()
-conf = AssistantCondaConfig()
 
 config_command_styled = "[reverse]conda assist configure[/reverse]"
 
@@ -14,7 +13,7 @@ config_command_styled = "[reverse]conda assist configure[/reverse]"
 def debug_config() -> DebugErrorMode:
     """Configure eagerness of AI assistance when running conda commands"""
 
-    debug_mode = conf.debug_error_mode
+    mode = get_debug_error_mode()
 
     help_option = Prompt.ask(
         "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
@@ -33,27 +32,27 @@ def debug_config() -> DebugErrorMode:
 
     # In the future, we might have "always" or "on" when we want to disable debug
     if help_option == "1":
-        debug_mode = "automatic"
+        mode = "automatic"
     elif help_option == "2":
-        debug_mode = "ask"
+        mode = "ask"
     elif help_option == "3":
-        debug_mode = "off"
+        mode = "off"
 
-    set_config("plugin.assistant", "debug_error_mode", debug_mode)
+    set_debug_error_mode(mode)
 
-    if debug_mode == "automatic":
+    if mode == "automatic":
         console.print(
             f"\n✅ Assistant will automatically provide solutions. To change your selection, run {config_command_styled}\n"
         )
-        return debug_mode
-    elif debug_mode == "ask":
+        return mode
+    elif mode == "ask":
         console.print(
             f"\n✅ Assistant will ask if you want help when you encounter errors. To change your selection, run {config_command_styled}\n"
         )
-        return debug_mode
-    elif debug_mode == "off":
+        return mode
+    elif mode == "off":
         console.print(
             f"\n✅ Assistant will not provide help with conda errors. To change your selection, run {config_command_styled}\n"
         )
-        return debug_mode
+        return mode
     return "none"
