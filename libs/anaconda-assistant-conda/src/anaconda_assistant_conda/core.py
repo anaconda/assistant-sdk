@@ -147,7 +147,6 @@ def stream_response(
         Group(status, MyMarkdown(full_text)),
         vertical_overflow="visible",
         console=console,
-        auto_refresh=False,
         refresh_per_second=8,
     ) as live:
         with patch("anaconda_auth.cli.sys") as mocked:
