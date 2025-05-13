@@ -23,7 +23,7 @@ def debug_config() -> DebugErrorMode:
         "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
         "\n"
         "Assistant is an AI-powered debugging tool for conda errors. Learn more here: \n"
-        "https://anaconda.github.io/assistant-sdk/conda\n"
+        "https://anaconda.com/docs/tools/working-with-conda/cli-assistant\n"
         "\n"
         "[bold]Choose how you want the Assistant to help you:[/bold]\n"
         "1. Automated - Assistant will automatically provide solutions to errors as they occur.\n"
