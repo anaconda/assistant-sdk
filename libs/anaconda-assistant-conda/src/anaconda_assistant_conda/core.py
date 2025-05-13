@@ -142,6 +142,7 @@ def stream_response(
 
     full_text = ""
     with Live(
+        # Using `Group` so that status update works
         Group(status, MyMarkdown(full_text)),
         vertical_overflow="visible",
         console=console,
