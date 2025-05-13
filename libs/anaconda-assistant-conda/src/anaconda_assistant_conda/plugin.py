@@ -77,14 +77,6 @@ def error_handler(command: str) -> None:
                 return
 
             report = self.get_error_report(exc_val, exc_tb)
-
-            # print("\n-----exc_val-----\n")
-            # print(exc_val)
-            # print("\n-----exc_tb-----\n")
-            # print(exc_tb)
-            # print("\n-----report-----\n")
-            # print(report)
-
             command = get_clean_error_report_command(report)
             prompt = f"COMMAND:\n{command}\nMESSAGE:\n{report['error']}"
 

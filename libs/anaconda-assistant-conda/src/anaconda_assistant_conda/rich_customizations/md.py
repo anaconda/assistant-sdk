@@ -14,15 +14,8 @@ class NoPaddingCodeBlock(CodeBlock):
 
         lines = original_code.split("\n")
 
-        # Get the length of the longest line
-        longest_line_length = max(len(line) for line in lines)
-
         # Add a space to the beginning of each line
         code = "\n".join("  " + line for line in lines)
-
-        dashes = "-" * longest_line_length
-
-        # code = "  " + dashes + "\n" + code + "\n  " + dashes
 
         syntax = Syntax(
             code,

@@ -138,6 +138,7 @@ def stream_response(
     if console is None:
         console = Console()
 
+    # Show spinner while waiting for the response
     status = console.status("", spinner="simpleDotsScrolling", spinner_style="dim")
 
     full_text = ""

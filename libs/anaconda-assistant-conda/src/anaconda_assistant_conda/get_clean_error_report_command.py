@@ -1,8 +1,11 @@
 def get_clean_error_report_command(report: dict) -> str:
     prefix = report["conda_info"]["conda_prefix"]
 
-    # TODO
-    # - convert `report["command"]` from relative to fully qualified path if starts with `./`
+    # NOTE:
+    # We might want to use `report["conda_info"]["conda_prefix"]` along with `report["command"]` to
+    # be a little more robust about removing the path from the command. Othwerise, it's possible the
+    # naive soluton below could fail if the command is not in the form of
+    # `prefix/conda <command>`.
 
     command = report["command"]
     new_command = ""
