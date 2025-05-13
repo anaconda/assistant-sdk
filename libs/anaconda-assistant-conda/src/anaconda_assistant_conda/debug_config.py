@@ -6,7 +6,6 @@ from .config import (
     AssistantCondaConfig,
     DebugErrorMode,
     set_debug_error_mode,
-    get_debug_error_mode,
 )
 
 console = Console()
@@ -17,7 +16,7 @@ config_command_styled = "[reverse]conda assist configure[/reverse]"
 def debug_config() -> DebugErrorMode:
     """Configure eagerness of AI assistance when running conda commands"""
 
-    mode = get_debug_error_mode()
+    mode: DebugErrorMode = None
 
     help_option = Prompt.ask(
         "\n[bold]Would you like [green]Anaconda Assistant[/green] to help resolve your errors?[/bold]\n"
