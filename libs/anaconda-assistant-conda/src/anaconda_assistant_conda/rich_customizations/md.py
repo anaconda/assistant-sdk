@@ -9,7 +9,7 @@ from .ansi_syntax_theme import ANSISyntaxThemeCustom
 # Override default class:
 # https://github.com/Textualize/rich/blob/6396050ad77d0de796107336aeeb5eeb7d030893/rich/markdown.py#L167
 class NoPaddingCodeBlock(CodeBlock):
-    def __rich_console__(self, console, options):
+    def __rich_console__(self, console, options):  # type: ignore
         original_code = str(self.text).rstrip()
 
         lines = original_code.split("\n")

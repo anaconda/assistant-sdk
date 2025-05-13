@@ -3,7 +3,7 @@ from rich.syntax import ANSISyntaxTheme
 from rich.style import Style
 
 from typing import Dict, Tuple
-from pygments.token import (
+from pygments.token import (  # type: ignore
     Comment,
     Error,
     Generic,

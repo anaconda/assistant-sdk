@@ -1,4 +1,4 @@
-def get_clean_error_report_command(report: dict[str, str]) -> str:
+def get_clean_error_report_command(report: dict) -> str:
     prefix = report["conda_info"]["conda_prefix"]
 
     # TODO
@@ -6,9 +6,6 @@ def get_clean_error_report_command(report: dict[str, str]) -> str:
 
     command = report["command"]
     new_command = ""
-
-    # print("conda_prefix\n", prefix)
-    # print("command\n", prefix)
 
     # Remove the path from the command to only show 'conda'
     splitted = command.split()

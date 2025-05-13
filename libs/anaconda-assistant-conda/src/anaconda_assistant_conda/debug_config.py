@@ -3,7 +3,7 @@ from rich.prompt import Prompt
 from rich.console import Console
 
 from .core import set_config
-from .config import AssistantCondaConfig
+from .config import AssistantCondaConfig, DebugErrorMode
 
 console = Console()
 conf = AssistantCondaConfig()
@@ -11,7 +11,7 @@ conf = AssistantCondaConfig()
 config_command_styled = "[reverse]conda assist configure[/reverse]"
 
 
-def debug_config():
+def debug_config() -> DebugErrorMode:
     """Configure eagerness of AI assistance when running conda commands"""
 
     debug_mode = conf.debug_error_mode
@@ -56,3 +56,4 @@ def debug_config():
             f"\n✅ Assistant will not provide help with conda errors. To change your selection, run {config_command_styled}\n"
         )
         return debug_mode
+    return "none"
