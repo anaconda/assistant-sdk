@@ -131,3 +131,12 @@ def mocked_assistant_domain(mocker: MockerFixture) -> Generator[str, None, None]
             callback=api_key_required,
         )
         yield api_client.config.domain
+
+
+@pytest.fixture
+def mock_anaconda_config_toml(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> Generator[None, None, None]:
+    anaconda_config_toml = tmp_path / ".anaconda" / "config.toml"
+    monkeypatch.setenv("ANACONDA_CONFIG_TOML", str(anaconda_config_toml))
+    yield

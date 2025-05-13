@@ -121,13 +121,6 @@ To run test commands, you don't want to run `conda assist` since it'll pick up t
 
 ### Run the unit tests
 
-Make sure to delete this setting below `[plugin.assistant]` in `~/.anaconda/config.toml`:
-
-```toml
-[plugin.assistant]
-debug_error_mode = "ask"
-```
-
 ```shell
 make test
 ```
