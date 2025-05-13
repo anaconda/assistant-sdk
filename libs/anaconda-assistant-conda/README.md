@@ -115,15 +115,15 @@ make setup
 
 To run test commands, you don't want to run `conda assist` since it'll pick up the version of conda on your system. You want the conda install for this repo so you can run the plugin. To do this, you run:
 
-````shell
+```shell
 ./env/bin/conda assist ...
-```s
+```
 
 ### Run the unit tests
 
 ```shell
 make test
-````
+```
 
 ### Run the unit tests across isolated environments with tox
 
