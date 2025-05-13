@@ -17,6 +17,7 @@ from .core import stream_response
 from .debug_config import debug_config, config_command_styled
 from .get_clean_error_report_command import get_clean_error_report_command
 
+
 ENV_COMMANDS = {
     "env_config",
     "env_create",
@@ -46,6 +47,10 @@ ExceptionHandler._orig_print_conda_exception = (  # type: ignore
     ExceptionHandler._print_conda_exception
 )
 
+interrupt_message_styled = (
+    "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
+)
+
 
 def error_handler(command: str) -> None:
     is_a_tty = sys.stdout.isatty()
@@ -67,9 +72,7 @@ def error_handler(command: str) -> None:
         # conda is in the middle of executing something, and user types ctrl-c, we don't want to try and "fix"
         # the error since it's not really an error
         if str(exc_val) == "KeyboardInterrupt":
-            console.print(
-                "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
-            )
+            console.print(interrupt_message_styled)
             sys.exit(1)
         try:
             self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
@@ -102,9 +105,7 @@ def error_handler(command: str) -> None:
                     )
         # If we're in the conda debug flow, ctrl-c is caught so we don't show stack trace
         except KeyboardInterrupt:
-            console.print(
-                "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
-            )
+            console.print(interrupt_message_styled)
             sys.exit(1)
 
     ExceptionHandler._print_conda_exception = assistant_exception_handler  # type: ignore
