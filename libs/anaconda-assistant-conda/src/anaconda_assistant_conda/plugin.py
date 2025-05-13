@@ -91,11 +91,13 @@ def error_handler(command: str) -> None:
         exc_tb: traceback.TracebackException,
     ) -> None:
 
-        # conda is in the middle of executing something, and user types ctrl-c, we don't want to try and "fix"
-        # the error since it's not really an error
+        # If conda is in the middle of executing something, and user types ctrl-c, we don't want to try and "fix"
+        # the error since it's not really an error, so we just re-throw.
+        # This also prevents stack trace from being printed.
         if str(exc_val) == "KeyboardInterrupt":
             console.print(interrupt_message_styled)
             sys.exit(1)
+
         try:
             self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
             if exc_val.return_code == 0:
@@ -109,7 +111,8 @@ def error_handler(command: str) -> None:
 
             create_message(config.debug_error_mode, prompt, is_a_tty, error)
 
-        # If we're in the conda debug flow, ctrl-c is caught so we don't show stack trace
+        # If we're in the conda debug flow, ctrl-c is caught so we don't show stack trace.
+        # This also prevents stack trace from being printed.
         except KeyboardInterrupt:
             console.print(interrupt_message_styled)
             sys.exit(1)
