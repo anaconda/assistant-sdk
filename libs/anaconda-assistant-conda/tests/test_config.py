@@ -28,6 +28,6 @@ def test_conda_assistant_env_default() -> None:
 
 
 def test_conda_assistant_env_patched(monkeypatch: MonkeyPatch) -> None:
-    monkeypatch.setenv("ANACONDA_ASSISTANT_CONDA_DEBUG_ERROR_MODE", "ask")
+    monkeypatch.setenv("ANACONDA_ASSISTANT_DEBUG_ERROR_MODE", "ask")
     config = AssistantCondaConfig()
     assert config.debug_error_mode == "ask"

@@ -39,7 +39,7 @@ def debug_config() -> DebugErrorMode:
     elif help_option == "3":
         debug_mode = "off"
 
-    set_config("plugin.assistant_conda", "debug_error_mode", debug_mode)
+    set_config("plugin.assistant", "debug_error_mode", debug_mode)
 
     if debug_mode == "automatic":
         console.print(

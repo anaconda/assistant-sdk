@@ -25,6 +25,6 @@ class SystemMessages(BaseModel):
     error: str = DEFAULT_ERROR_SYSTEM_MESSAGE
 
 
-class AssistantCondaConfig(AnacondaBaseSettings, plugin_name="assistant_conda"):
+class AssistantCondaConfig(AnacondaBaseSettings, plugin_name="assistant"):
     debug_error_mode: DebugErrorMode = "none"
     system_messages: SystemMessages = SystemMessages()
