@@ -59,4 +59,4 @@ def debug_config() -> DebugErrorMode:
             f"\n✅ Assistant will not provide help with conda errors. To change your selection, run {config_command_styled}\n"
         )
         return mode
-    return "none"
+    return None

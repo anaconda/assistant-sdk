@@ -55,7 +55,7 @@ def create_message(
     error: str = "",
 ) -> None:
     # If we don't have a config option, we ask the user
-    if debug_mode == "none":
+    if debug_mode == None:
         debug_mode = debug_config()
     if debug_mode == "automatic":
         stream_response(error, prompt, is_a_tty=is_a_tty)

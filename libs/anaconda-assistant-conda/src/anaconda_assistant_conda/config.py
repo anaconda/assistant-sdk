@@ -5,9 +5,7 @@ from pydantic import BaseModel
 from typing import Literal, Optional
 from .core import set_config
 
-# Adding `"none"`` rather than `None` because otherwise getting config via env var gets confused:
-# https://anaconda.github.io/anaconda-cli-base/#config-file
-DebugErrorMode = Literal["automatic", "ask", "off", "none"]
+DebugErrorMode = Optional[Literal["automatic", "ask", "off"]]
 
 DEFAULT_ERROR_SYSTEM_MESSAGE = dedent(
     """\
@@ -27,7 +25,7 @@ class SystemMessages(BaseModel):
 
 
 class AssistantCondaConfig(AnacondaBaseSettings, plugin_name="assistant"):
-    debug_error_mode: DebugErrorMode = "none"
+    debug_error_mode: DebugErrorMode = None
     system_messages: SystemMessages = SystemMessages()
 
 
