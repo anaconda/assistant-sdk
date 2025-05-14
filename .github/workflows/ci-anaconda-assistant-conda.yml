@@ -43,7 +43,7 @@ jobs:
           TOKEN: ${{ secrets.ANACONDA_ORG_DOWNLOAD_TOKEN }}
         shell: bash -el {0}
         run: |
-          conda install pip tox-conda -y
+          conda install pip conda-forge::tox-conda -y
           pip config set global.extra-index-url "https://pypi.anaconda.org/t/$TOKEN/anaconda-cloud/label/dev/simple"
           pip install tox-gh-actions
       - name: Test with tox
