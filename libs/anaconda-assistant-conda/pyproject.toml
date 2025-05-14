@@ -10,7 +10,8 @@ dependencies = [
   "rich",
   "requests",
   "pydantic >=2",
-  "tomlkit"
+  "tomli",
+  "tomli_w"
 ]
 description = "The Anaconda Assistant conda plugin"
 dynamic = ["version"]

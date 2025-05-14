@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import tomlkit
+import tomli
 from pytest import MonkeyPatch
 from anaconda_assistant_conda.core import set_config
 from anaconda_cli_base.config import anaconda_config_path
@@ -20,7 +20,7 @@ def test_set_config_missing_anaconda_directory(
     assert anaconda_config_path().exists()
 
     with config_toml.open("rb") as f:
-        data = tomlkit.load(f)
+        data = tomli.load(f)
         assert data["test_table"]["foo"] == "bar"  # type: ignore
 
 
@@ -39,7 +39,7 @@ def test_set_config_missing_anaconda_config_toml(
     assert anaconda_config_path().exists()
 
     with config_toml.open("rb") as f:
-        data = tomlkit.load(f)
+        data = tomli.load(f)
         assert data["test_table"]["foo"] == "bar"  # type: ignore
 
 
@@ -59,7 +59,7 @@ def test_set_config_empty_anaconda_config_toml(
     assert anaconda_config_path().exists()
 
     with config_toml.open("rb") as f:
-        data = tomlkit.load(f)
+        data = tomli.load(f)
         assert data["test_table"]["foo"] == "bar"  # type: ignore
 
 
@@ -71,7 +71,7 @@ def test_set_config_override_anaconda_config_toml(
     config_toml.write_text('[test_table]\nfoo = "baz"')
 
     with config_toml.open("rb") as f:
-        data = tomlkit.load(f)
+        data = tomli.load(f)
         assert data["test_table"]["foo"] == "baz"  # type: ignore
 
     monkeypatch.setenv("ANACONDA_CONFIG_TOML", str(config_toml))
@@ -83,5 +83,5 @@ def test_set_config_override_anaconda_config_toml(
     assert anaconda_config_path().exists()
 
     with config_toml.open("rb") as f:
-        data = tomlkit.load(f)
+        data = tomli.load(f)
         assert data["test_table"]["foo"] == "bar"  # type: ignore

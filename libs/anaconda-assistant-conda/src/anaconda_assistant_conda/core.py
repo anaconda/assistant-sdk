@@ -8,7 +8,8 @@ from typing import Type
 from typing import Optional
 from unittest.mock import patch
 
-import tomlkit
+import tomli
+import tomli_w
 from anaconda_cli_base.config import anaconda_config_path
 from anaconda_cli_base.exceptions import register_error_handler
 from anaconda_cli_base.exceptions import ERROR_HANDLERS
@@ -31,24 +32,24 @@ def set_config(table: str, key: str, value: Any) -> None:
     if config_toml.exists():
         copy(config_toml, config_toml.with_suffix(".backup.toml"))
         with open(config_toml, "rb") as f:
-            config = tomlkit.load(f)
+            config = tomli.load(f)
     else:
-        config = tomlkit.document()
+        config = {}
 
     # Add table if it doesn't exist
     config_table = config
     for table_key in expanded:
-        if table_key not in config_table:  # type: ignore
-            config_table[table_key] = tomlkit.table()  # type: ignore
-        config_table = config_table[table_key]  # type: ignore
+        if table_key not in config_table:
+            config_table[table_key] = {}
+        config_table = config_table[table_key]
 
-    # config_table is still referenced in the config doc
-    # we can edit the value here and then write the whole doc back
-    config_table[key] = value  # type: ignore
+    # config_table is still referenced in the config dict
+    # we can edit the value here and then write the whole dict back
+    config_table[key] = value
 
     config_toml.parent.mkdir(parents=True, exist_ok=True)
-    with open(config_toml, "w", newline="\n") as f:
-        tomlkit.dump(config, f)
+    with open(config_toml, "wb") as f:
+        tomli_w.dump(config, f)
 
 
 @register_error_handler(UnspecifiedDataCollectionChoice)
