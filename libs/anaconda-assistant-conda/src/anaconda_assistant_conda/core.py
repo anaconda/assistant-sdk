@@ -47,7 +47,7 @@ def set_config(table: str, key: str, value: Any) -> None:
     config_table[key] = value  # type: ignore
 
     config_toml.parent.mkdir(parents=True, exist_ok=True)
-    with open(config_toml, "w") as f:
+    with open(config_toml, "w", newline="\n") as f:
         tomlkit.dump(config, f)
 
 
