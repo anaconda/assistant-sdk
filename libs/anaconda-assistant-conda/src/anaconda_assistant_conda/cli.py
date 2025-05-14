@@ -6,7 +6,6 @@ from typing_extensions import Annotated
 
 from .debug_config import debug_config
 from .config import AssistantCondaConfig
-from .core import stream_response
 
 console = Console()
 
