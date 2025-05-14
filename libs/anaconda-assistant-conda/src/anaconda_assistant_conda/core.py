@@ -30,7 +30,7 @@ def set_config(table: str, key: str, value: Any) -> None:
     config_toml = anaconda_config_path()
     if config_toml.exists():
         copy(config_toml, config_toml.with_suffix(".backup.toml"))
-        with open(config_toml, "rb") as f:
+        with open(config_toml, "r", encoding="utf-8") as f:
             config = tomlkit.load(f)
     else:
         config = tomlkit.document()
@@ -47,7 +47,7 @@ def set_config(table: str, key: str, value: Any) -> None:
     config_table[key] = value  # type: ignore
 
     config_toml.parent.mkdir(parents=True, exist_ok=True)
-    with open(config_toml, "w") as f:
+    with open(config_toml, "w", encoding="utf-8", newline="\n") as f:
         tomlkit.dump(config, f)
 
 
