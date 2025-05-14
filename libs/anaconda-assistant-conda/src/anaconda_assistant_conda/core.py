@@ -138,16 +138,12 @@ def stream_response(
     if console is None:
         console = Console()
 
-    # Show spinner while waiting for the response
-    status = console.status("", spinner="simpleDotsScrolling", spinner_style="dim")
-
     full_text = ""
     with Live(
-        # Using `Group` so that status update works
-        Group(status, MyMarkdown(full_text)),
+        MyMarkdown(full_text),
         vertical_overflow="visible",
         console=console,
-        refresh_per_second=8,
+        auto_refresh=False,
     ) as live:
         with patch("anaconda_auth.cli.sys") as mocked:
             mocked.stdout.isatty.return_value = is_a_tty
