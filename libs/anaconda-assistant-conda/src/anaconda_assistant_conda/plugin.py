@@ -1,17 +1,22 @@
 import sys
 import traceback
-from typing import Generator, Any
+from typing import Any, Generator
+import pytest
 
 from anaconda_assistant.config import AssistantConfig
-from conda import plugins, CondaError
+from conda import CondaError, plugins
 from conda.cli.conda_argparse import BUILTIN_COMMANDS
 from conda.exception_handler import ExceptionHandler
 from conda.exceptions import PackagesNotFoundError
 from rich.console import Console
+from rich.prompt import Confirm
 
-from .config import AssistantCondaConfig
-from .core import stream_response
 from .cli import app
+from .config import AssistantCondaConfig, DebugErrorMode
+from .core import stream_response
+from .debug_config import debug_config, config_command_styled
+from .get_clean_error_report_command import get_clean_error_report_command
+
 
 ENV_COMMANDS = {
     "env_config",
@@ -38,17 +43,42 @@ ALL_COMMANDS = BUILTIN_COMMANDS.union(ENV_COMMANDS, BUILD_COMMANDS)
 
 console = Console()
 
-
 ExceptionHandler._orig_print_conda_exception = (  # type: ignore
     ExceptionHandler._print_conda_exception
 )
 
 
+def create_message(
+    debug_mode: DebugErrorMode,
+    prompt: str,
+    is_a_tty: bool = True,
+    error: str = "",
+) -> None:
+    # If we don't have a config option, we ask the user
+    if debug_mode == None:
+        debug_mode = debug_config()
+    if debug_mode == "automatic":
+        stream_response(error, prompt, is_a_tty=is_a_tty)
+    elif debug_mode == "ask":
+        should_debug = Confirm.ask(
+            "[bold]Debug with Anaconda Assistant?[/bold]",
+        )
+        if should_debug:
+            stream_response(error, prompt, is_a_tty=is_a_tty)
+        else:
+            console.print(
+                "\nOK, goodbye! 👋\n"
+                f"To change default behavior, run {config_command_styled}\n"
+            )
+
+
 def error_handler(command: str) -> None:
-    is_a_tty = sys.stdout.isatty()
+    interrupt_message_styled = (
+        "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
+    )
 
     config = AssistantCondaConfig()
-    if not config.suggest_correction_on_error:
+    if config.debug_error_mode == "off":
         return
 
     assistant_config = AssistantConfig()
@@ -60,16 +90,32 @@ def error_handler(command: str) -> None:
         exc_val: CondaError,
         exc_tb: traceback.TracebackException,
     ) -> None:
-        self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
-        if exc_val.return_code == 0:
-            return
 
-        report = self.get_error_report(exc_val, exc_tb)
+        # If conda is in the middle of executing something, and user types ctrl-c, we don't want to try and "fix"
+        # the error since it's not really an error, so we just re-throw.
+        # This also prevents stack trace from being printed.
+        if str(exc_val) == "KeyboardInterrupt":
+            console.print(interrupt_message_styled)
+            sys.exit(1)
 
-        console.print("[bold green]Hello from Anaconda Assistant![/green bold]")
-        console.print("I'm going to help you diagnose and correct this error.")
-        prompt = f"COMMAND:\n{report['command']}\nMESSAGE:\n{report['error']}"
-        stream_response(config.system_messages.error, prompt, is_a_tty=is_a_tty)
+        try:
+            self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
+            if exc_val.return_code == 0:
+                return
+
+            report = self.get_error_report(exc_val, exc_tb)
+            command = get_clean_error_report_command(report)
+            prompt = f"COMMAND:\n{command}\nMESSAGE:\n{report['error']}"
+            is_a_tty = sys.stdout.isatty()
+            error = config.system_messages.error
+
+            create_message(config.debug_error_mode, prompt, is_a_tty, error)
+
+        # If we're in the conda debug flow, ctrl-c is caught so we don't show stack trace.
+        # This also prevents stack trace from being printed.
+        except KeyboardInterrupt:
+            console.print(interrupt_message_styled)
+            sys.exit(1)
 
     ExceptionHandler._print_conda_exception = assistant_exception_handler  # type: ignore
 
