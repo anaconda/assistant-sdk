@@ -138,7 +138,7 @@ target-version = "py39"
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py39,py310,py311,py312,mypy
+envlist = py39,py310,py311,py312,py313,mypy
 isolated_build = True
 
 [gh-actions]
@@ -147,6 +147,7 @@ python =
     3.10: py310, mypy
     3.11: py311
     3.12: py312
+    3.13: py313
 
 [testenv]
 deps = pytest
