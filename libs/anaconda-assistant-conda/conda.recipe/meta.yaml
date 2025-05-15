@@ -33,6 +33,9 @@ requirements:
 test:
   imports:
     - anaconda_assistant_conda
+    - anaconda_assistant_conda.plugin
+    - anaconda_assistant_conda.config
+    - anaconda_assistant_conda.debug_config
   commands:
     - python -c "from anaconda_assistant_conda import __version__; assert __version__ == \"{{ version }}\""
 about:

@@ -1,7 +1,6 @@
 import sys
 import traceback
 from typing import Any, Generator
-import pytest
 
 from anaconda_assistant.config import AssistantConfig
 from conda import CondaError, plugins
