@@ -28,6 +28,6 @@ def _() -> None:
     pass
 
 
-@app.command(name="configure")
-def configure() -> None:
+@app.command(name="config")
+def config() -> None:
     debug_config()
