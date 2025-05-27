@@ -4,7 +4,7 @@ import typer
 from rich.console import Console
 from typing_extensions import Annotated
 
-from .debug_config import debug_config
+from .prompt_debug_config import debug_config
 from .config import AssistantCondaConfig
 from .core import stream_response
 
