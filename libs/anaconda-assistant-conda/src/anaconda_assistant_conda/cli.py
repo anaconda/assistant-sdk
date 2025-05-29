@@ -34,7 +34,7 @@ def config() -> None:
 
 
 @app.command(name="configure")
-def config() -> None:
+def configure() -> None:
     console.print(
         "[yellow]Warning: The 'configure' command is deprecated and will be removed in a future version. Please use `conda assist config`.[/yellow]"
     )
