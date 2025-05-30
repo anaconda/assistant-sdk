@@ -27,6 +27,14 @@ def _() -> None:
     pass
 
 
+@app.command(name="config")
+def config() -> None:
+    debug_config()
+
+
 @app.command(name="configure")
 def configure() -> None:
+    console.print(
+        "[yellow]Warning: The 'configure' command is deprecated and will be removed in a future version. Please use `conda assist config`.[/yellow]"
+    )
     debug_config()
