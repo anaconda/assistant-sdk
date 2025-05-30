@@ -4,7 +4,7 @@ import typer
 from rich.console import Console
 from typing_extensions import Annotated
 
-from .prompt_debug_config import debug_config
+from .prompt_debug_config import prompt_debug_config
 from .config import AssistantCondaConfig
 from .core import stream_response
 
@@ -30,4 +30,4 @@ def _() -> None:
 
 @app.command(name="configure")
 def configure() -> None:
-    debug_config()
+    prompt_debug_config()

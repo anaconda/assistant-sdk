@@ -13,7 +13,7 @@ console = Console()
 config_command_styled = "[reverse]conda assist configure[/reverse]"
 
 
-def debug_config() -> DebugErrorMode:
+def prompt_debug_config() -> DebugErrorMode:
     """Configure eagerness of AI assistance when running conda commands"""
 
     mode: DebugErrorMode = None

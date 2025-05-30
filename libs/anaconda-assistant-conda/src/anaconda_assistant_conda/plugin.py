@@ -13,7 +13,7 @@ from rich.prompt import Confirm
 from .cli import app
 from .config import AssistantCondaConfig, DebugErrorMode
 from .core import stream_response
-from .prompt_debug_config import debug_config, config_command_styled
+from .prompt_debug_config import prompt_debug_config, config_command_styled
 from .get_clean_error_report_command import get_clean_error_report_command
 
 
@@ -55,7 +55,7 @@ def create_message(
 ) -> None:
     # If we don't have a config option, we ask the user
     if debug_mode == None:
-        debug_mode = debug_config()
+        debug_mode = prompt_debug_config()
     if debug_mode == "automatic":
         stream_response(error, prompt, is_a_tty=is_a_tty)
     elif debug_mode == "ask":
