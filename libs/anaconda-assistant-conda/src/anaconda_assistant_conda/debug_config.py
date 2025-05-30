@@ -10,7 +10,7 @@ from .config import (
 
 console = Console()
 
-config_command_styled = "[reverse]conda assist configure[/reverse]"
+config_command_styled = "[reverse]conda assist config[/reverse]"
 
 
 def debug_config() -> DebugErrorMode:
