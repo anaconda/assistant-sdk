@@ -4,7 +4,7 @@ import typer
 from rich.console import Console
 from typing_extensions import Annotated
 
-from .debug_config import debug_config
+from .prompt_debug_config import prompt_debug_config
 from .config import AssistantCondaConfig
 
 console = Console()
@@ -29,7 +29,7 @@ def _() -> None:
 
 @app.command(name="config")
 def config() -> None:
-    debug_config()
+    prompt_debug_config()
 
 
 @app.command(name="configure")
@@ -37,4 +37,4 @@ def configure() -> None:
     console.print(
         "[yellow]Warning: The 'configure' command is deprecated and will be removed in a future version. Please use `conda assist config`.[/yellow]"
     )
-    debug_config()
+    prompt_debug_config()

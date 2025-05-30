@@ -13,7 +13,7 @@ from rich.prompt import Confirm
 from .cli import app
 from .config import AssistantCondaConfig, DebugErrorMode
 from .core import stream_response
-from .debug_config import debug_config, config_command_styled
+from .prompt_debug_config import prompt_debug_config, config_command_styled
 from .get_clean_error_report_command import get_clean_error_report_command
 
 
@@ -55,7 +55,7 @@ def create_message(
 ) -> None:
     # If we don't have a config option, we ask the user
     if debug_mode is None:
-        debug_mode = debug_config()
+        debug_mode = prompt_debug_config()
     elif debug_mode == "automatic":
         stream_response(error, prompt, is_a_tty=is_a_tty)
     elif debug_mode == "ask":
@@ -76,14 +76,6 @@ def error_handler(command: str) -> None:
         "\n\n[bold red]Operation canceled by user (Ctrl-C).[/bold red]\n"
     )
 
-    config = AssistantCondaConfig()
-    if config.debug_error_mode == "off":
-        return
-
-    assistant_config = AssistantConfig()
-    if assistant_config.accepted_terms is False:
-        return
-
     def assistant_exception_handler(
         self: ExceptionHandler,
         exc_val: CondaError,
@@ -101,6 +93,40 @@ def error_handler(command: str) -> None:
             self._orig_print_conda_exception(exc_val, exc_tb)  # type: ignore
             if exc_val.return_code == 0:
                 return
+
+            try:
+                config = AssistantCondaConfig()
+                if config.debug_error_mode == "off":
+                    return
+
+                # If the user has not accepted the terms, we prompt them to do so.
+                # This would tend to happen if the user manually modified the config file.
+                assistant_config = AssistantConfig()
+                if assistant_config.accepted_terms is False:
+                    from .prompt_accept_terms import prompt_accept_terms
+
+                    if not sys.stdout.isatty():
+                        console.print(
+                            "\nYou must accept the terms to use Anaconda Assistant.\n"
+                        )
+                        return
+                    accepted = prompt_accept_terms()
+                    if accepted:
+                        console.print(
+                            "\nThank you! Run the previous command again to see your change reflected.\n"
+                        )
+                    else:
+                        console.print(
+                            "\n[bold red]You must accept the terms to use Anaconda Assistant.[/bold red]\n"
+                        )
+                    return
+            except Exception as e:
+                from anaconda_cli_base.config import anaconda_config_path
+
+                print("Anaconda Assistant is not configured correctly. ")
+                print(f"Error in {anaconda_config_path()}")
+                print(repr(e))
+                sys.exit(1)
 
             report = self.get_error_report(exc_val, exc_tb)
             command = get_clean_error_report_command(report)
