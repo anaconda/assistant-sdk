@@ -18,10 +18,6 @@ coverage.xml
 .pytest_cache/
 .tox/
 
-# Documentation
-docs/_build/
-docs/.cache/
-
 # Jupyter Notebook
 .ipynb_checkpoints
 
