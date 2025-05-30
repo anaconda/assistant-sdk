@@ -85,13 +85,13 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
 @register_error_handler(UnspecifiedAcceptedTermsError)
 def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
     import anaconda_auth.cli
-    from .prompt_accept_terms import accept_terms
+    from .prompt_accept_terms import prompt_accept_terms
 
     if not anaconda_auth.cli.sys.stdout.isatty():  # type: ignore
         print(e.args[0])
         return 1
 
-    accepted_terms = accept_terms()
+    accepted_terms = prompt_accept_terms()
 
     if not accepted_terms:
         return 1

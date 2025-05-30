@@ -3,7 +3,7 @@ from textwrap import dedent
 from .core import set_config
 
 
-def accept_terms() -> int:
+def prompt_accept_terms() -> int:
     msg = dedent(
         """\
         You have not accepted the terms of service.

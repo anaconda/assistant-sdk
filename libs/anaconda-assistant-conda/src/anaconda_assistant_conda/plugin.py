@@ -103,14 +103,14 @@ def error_handler(command: str) -> None:
                 # This would tend to happen if the user manually modified the config file.
                 assistant_config = AssistantConfig()
                 if assistant_config.accepted_terms is False:
-                    from .prompt_accept_terms import accept_terms
+                    from .prompt_accept_terms import prompt_accept_terms
 
                     if not sys.stdout.isatty():
                         console.print(
                             "\nYou must accept the terms to use Anaconda Assistant.\n"
                         )
                         return
-                    accepted = accept_terms()
+                    accepted = prompt_accept_terms()
                     if accepted:
                         console.print(
                             "\nThank you! Run the previous command again to see your change reflected.\n"
