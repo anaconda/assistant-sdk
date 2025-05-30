@@ -54,9 +54,9 @@ def create_message(
     error: str = "",
 ) -> None:
     # If we don't have a config option, we ask the user
-    if debug_mode == None:
+    if debug_mode is None:
         debug_mode = prompt_debug_config()
-    if debug_mode == "automatic":
+    elif debug_mode == "automatic":
         stream_response(error, prompt, is_a_tty=is_a_tty)
     elif debug_mode == "ask":
         should_debug = Confirm.ask(

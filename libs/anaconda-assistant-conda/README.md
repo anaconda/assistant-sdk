@@ -119,6 +119,12 @@ To run test commands, you don't want to run `conda assist` since it'll pick up t
 ./env/bin/conda assist ...
 ```
 
+On Windows, you'll do:
+
+```shell
+.\env\Scripts\conda assist ...
+```
+
 ### Run the unit tests
 
 ```shell
