@@ -29,7 +29,7 @@ def _() -> None:
 
 @app.command(name="config")
 def config() -> None:
-    debug_config()
+    prompt_debug_config()
 
 
 @app.command(name="configure")
