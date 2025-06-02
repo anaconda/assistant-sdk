@@ -12,7 +12,7 @@ def prompt_accept_terms() -> int:
           https://anaconda.com/legal
 
         [bold green]Are you more than 13 years old and accept the terms?[/bold green]"""
-    )
+    ).rstrip()
     accepted_terms = Confirm.ask(msg)
     set_config("plugin.assistant", "accepted_terms", accepted_terms)
     return accepted_terms

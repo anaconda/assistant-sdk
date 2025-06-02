@@ -75,7 +75,7 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
 
         [bold green]Would you like to opt-in to data collection?[/bold green]
         """
-    )
+    ).rstrip()
     data_collection = Confirm.ask(msg)
     set_config("plugin.assistant", "data_collection", data_collection)
 
