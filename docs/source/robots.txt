@@ -1,3 +1,0 @@
-User-agent: *
-
-Sitemap: https://anaconda.github.io/conda-anaconda-telemetry/sitemap.xml
