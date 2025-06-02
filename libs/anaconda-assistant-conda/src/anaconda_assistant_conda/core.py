@@ -85,23 +85,13 @@ def data_collection_choice(e: Type[UnspecifiedDataCollectionChoice]) -> int:
 @register_error_handler(UnspecifiedAcceptedTermsError)
 def accept_terms(e: Type[UnspecifiedAcceptedTermsError]) -> int:
     import anaconda_auth.cli
+    from .prompt_accept_terms import prompt_accept_terms
 
     if not anaconda_auth.cli.sys.stdout.isatty():  # type: ignore
         print(e.args[0])
         return 1
 
-    msg = dedent(
-        """\
-        You have not accepted the terms of service.
-        You must accept our terms of service and Privacy Policy here
-
-          https://anaconda.com/legal
-
-        [bold green]Are you more than 13 years old and accept the terms?[/bold green]
-        """
-    )
-    accepted_terms = Confirm.ask(msg)
-    set_config("plugin.assistant", "accepted_terms", accepted_terms)
+    accepted_terms = prompt_accept_terms()
 
     if not accepted_terms:
         return 1
