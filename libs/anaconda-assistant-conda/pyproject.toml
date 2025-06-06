@@ -138,7 +138,7 @@ conda_channels =
     defaults
 conda_deps =
     anaconda-assistant-sdk
-commands = mypy
+commands = mypy src/anaconda_assistant_conda
 """
 
 [tool.vendoring]
@@ -152,3 +152,6 @@ setuptools = "pkg_resources"
 
 [tool.vendoring.license.fallback-urls]
 pkce = "https://github.com/RomeoDespres/pkce/raw/master/LICENSE"
+
+[project.scripts]
+mcp = "anaconda_assistant_conda.mcp.cli:main"
