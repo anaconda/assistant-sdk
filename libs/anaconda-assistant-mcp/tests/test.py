@@ -1,6 +1,6 @@
 from typing import Any
 import pytest
-from anaconda_assistant_conda.core import add
+from anaconda_assistant_mcp.core import add
 
 
 @pytest.fixture

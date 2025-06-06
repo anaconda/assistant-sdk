@@ -21,7 +21,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 
 [project.entry-points.conda]
-anaconda-assistant = "anaconda_assistant_conda.plugin"
+anaconda-assistant = "anaconda_assistant_mcp.plugin"
 
 [project.optional-dependencies]
 dev = [
@@ -44,11 +44,11 @@ publish = [
 universal = true
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/anaconda_assistant_conda/_version.py"
+version-file = "src/anaconda_assistant_mcp/_version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-  "/src/anaconda_assistant_conda",
+  "/src/anaconda_assistant_mcp",
   "/pyproject.toml",
   "/tests",
   "/Makefile",
@@ -84,7 +84,7 @@ module = "conda.*"
 
 [tool.pytest.ini_options]
 addopts = [
-  "--cov=anaconda_assistant_conda",
+  "--cov=anaconda_assistant_mcp",
   "--color=yes",
   "--cov-append",
   "--cov-branch",
@@ -142,10 +142,10 @@ commands = mypy
 """
 
 [tool.vendoring]
-destination = "src/anaconda_assistant_conda/_vendor/"
-namespace = "anaconda_assistant_conda._vendor"
+destination = "src/anaconda_assistant_mcp/_vendor/"
+namespace = "anaconda_assistant_mcp._vendor"
 protected-files = ["__init__.py", "requirements.txt"]
-requirements = "src/anaconda_assistant_conda/_vendor/requirements.txt"
+requirements = "src/anaconda_assistant_mcp/_vendor/requirements.txt"
 
 [tool.vendoring.license.directories]
 setuptools = "pkg_resources"
