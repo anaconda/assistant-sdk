@@ -1,0 +1,154 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
+
+[project]
+dependencies = [
+  "anaconda-cli-base >=0.5",
+  "anaconda-assistant-sdk >=0.4",
+  "anaconda-auth >=0.8",
+  "rich",
+  "requests",
+  "pydantic >=2",
+  "tomli",
+  "tomli-w"
+]
+description = "The Anaconda Assistant conda plugin"
+dynamic = ["version"]
+license = {text = "BSD-3-Clause"}
+name = "anaconda-assistant-conda"
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.entry-points.conda]
+anaconda-assistant = "anaconda_assistant_conda.plugin"
+
+[project.optional-dependencies]
+dev = [
+  "mypy",
+  "pytest",
+  "pytest-cov",
+  "pytest-mock",
+  "responses",
+  "tox",
+  "types-requests",
+  "responses"
+]
+publish = [
+  "build",
+  "twine",
+  "wheel"
+]
+
+[tool.distutils.bdist_wheel]
+universal = true
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/anaconda_assistant_conda/_version.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src/anaconda_assistant_conda",
+  "/pyproject.toml",
+  "/tests",
+  "/Makefile",
+  "/environment-dev.yml"
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+git_describe_command = "git describe --dirty --tags --long --match 'anaconda-assistant-conda-*'"
+root = "../.."
+
+[tool.mypy]
+disallow_untyped_defs = true
+files = [
+  "src/**/*.py",
+  "tests/**/*.py"
+]
+python_version = "3.9"
+
+[[tool.mypy.overrides]]
+ignore_errors = true
+module = "*._version"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "rich_click.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "conda.*"
+
+[tool.pytest.ini_options]
+addopts = [
+  "--cov=anaconda_assistant_conda",
+  "--color=yes",
+  "--cov-append",
+  "--cov-branch",
+  "--cov-report=html",
+  "--cov-report=html:./cov_html",
+  "--cov-report=term-missing",
+  "--cov-report=xml",
+  "--durations=5",
+  "-vv"
+]
+markers = [
+  "integration: Integration tests requiring a browser"
+]
+norecursedirs = ["env", "envs", ".tox"]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py39,py310,py311,py312,py313,mypy
+isolated_build = True
+requires =
+  tox-conda
+  tox-gh-actions
+
+[gh-actions]
+python =
+    3.9: py39, mypy
+    3.10: py310, mypy
+    3.11: py311
+    3.12: py312
+    3.13: py313
+
+[testenv]
+deps =
+  pytest
+extras = dev
+conda_channels =
+    anaconda-cloud
+    defaults
+conda_deps =
+    conda
+    anaconda-assistant-sdk
+commands = pytest
+
+[testenv:mypy]
+deps =
+    mypy
+extras = dev
+conda_channels =
+    anaconda-cloud
+    defaults
+conda_deps =
+    anaconda-assistant-sdk
+commands = mypy
+"""
+
+[tool.vendoring]
+destination = "src/anaconda_assistant_conda/_vendor/"
+namespace = "anaconda_assistant_conda._vendor"
+protected-files = ["__init__.py", "requirements.txt"]
+requirements = "src/anaconda_assistant_conda/_vendor/requirements.txt"
+
+[tool.vendoring.license.directories]
+setuptools = "pkg_resources"
+
+[tool.vendoring.license.fallback-urls]
+pkce = "https://github.com/RomeoDespres/pkce/raw/master/LICENSE"
