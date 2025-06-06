@@ -22,11 +22,11 @@ def test_dummy_data(dummy_test_data: dict[str, Any]) -> None:
     assert dummy_test_data["test_dict"] == {"key": "value"}
 
 
-def test_wat() -> None:
-    """Test that the wat is working."""
+def test_mcp() -> None:
+    """Test that the mcp is working."""
     assert True
 
 
-def test_anaconda_assistant_wat() -> None:
-    """Test that the anaconda assistant wat is working."""
+def test_anaconda_assistant_add() -> None:
+    """Test that the anaconda assistant mcp is working."""
     assert add(1, 2) == 3
