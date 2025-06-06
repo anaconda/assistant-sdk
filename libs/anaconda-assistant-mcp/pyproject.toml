@@ -80,7 +80,7 @@ module = "rich_click.*"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
-module = "conda.*"
+module = "mcp.*"
 
 [tool.pytest.ini_options]
 addopts = [
