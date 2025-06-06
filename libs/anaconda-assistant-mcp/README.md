@@ -1,4 +1,4 @@
-# anaconda-assistant-conda
+# anaconda-assistant-mcp
 
 The Anaconda AI Assistant conda plugin brings AI assistance to your conda workflows.
 You will need an account on Anaconda.cloud. Visit the [sign-up](https://anaconda.cloud/sign-up) page
@@ -16,7 +16,7 @@ This package is a [conda plugin](https://docs.conda.io/projects/conda/en/latest/
 Conda version 24.1 or newer is required.
 
 ```text
-conda install -n base -c anaconda-cloud anaconda-assistant-conda
+conda install -n base -c anaconda-cloud anaconda-assistant-mcp
 ```
 
 ## Terms of use

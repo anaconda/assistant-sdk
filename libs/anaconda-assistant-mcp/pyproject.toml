@@ -13,10 +13,10 @@ dependencies = [
   "tomli",
   "tomli-w"
 ]
-description = "The Anaconda Assistant conda plugin"
+description = "The Anaconda Assistant MCP plugin"
 dynamic = ["version"]
 license = {text = "BSD-3-Clause"}
-name = "anaconda-assistant-conda"
+name = "anaconda-assistant-mcp"
 readme = "README.md"
 requires-python = ">=3.9"
 
@@ -59,7 +59,7 @@ include = [
 source = "vcs"
 
 [tool.hatch.version.raw-options]
-git_describe_command = "git describe --dirty --tags --long --match 'anaconda-assistant-conda-*'"
+git_describe_command = "git describe --dirty --tags --long --match 'anaconda-assistant-mcp-*'"
 root = "../.."
 
 [tool.mypy]
