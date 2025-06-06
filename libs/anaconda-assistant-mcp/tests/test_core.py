@@ -1,6 +1,6 @@
 from typing import Any
 import pytest
-from anaconda_assistant_mcp.core import add
+from anaconda_assistant_mcp.cli import add, subtract
 
 
 @pytest.fixture
@@ -30,3 +30,8 @@ def test_mcp() -> None:
 def test_anaconda_assistant_add() -> None:
     """Test that the anaconda assistant mcp is working."""
     assert add(1, 2) == 3
+
+
+def test_anaconda_assistant_subtract() -> None:
+    """Test that the anaconda assistant mcp is working."""
+    assert subtract(1, 2) == -1

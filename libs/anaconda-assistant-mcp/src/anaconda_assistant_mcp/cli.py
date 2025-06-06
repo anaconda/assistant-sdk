@@ -1,4 +1,7 @@
 import typer
+from mcp.server.fastmcp import FastMCP, Context
+
+mcp = FastMCP("Anaconda Assistant MCP")
 
 helptext = """
 The conda assistant, powered by Anaconda Assistant. \n
@@ -20,4 +23,16 @@ def _() -> None:
 
 @mcp_app.command(name="server-start")
 def server_start() -> None:
-    pass
+    mcp.run()
+
+
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    """Add two numbers"""
+    return a + b
+
+
+@mcp.tool()
+def subtract(a: int, b: int) -> int:
+    """Subtract two numbers"""
+    return a - b

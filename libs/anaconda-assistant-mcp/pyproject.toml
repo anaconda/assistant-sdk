@@ -11,7 +11,9 @@ dependencies = [
   "requests",
   "pydantic >=2",
   "tomli",
-  "tomli-w"
+  "tomli-w",
+  "mcp>=1.0.0",
+  "mcp[cli]>=1.0.0",
 ]
 description = "The Anaconda Assistant MCP plugin"
 dynamic = ["version"]
