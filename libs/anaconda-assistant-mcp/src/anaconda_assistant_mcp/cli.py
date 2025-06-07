@@ -1,5 +1,5 @@
 import typer
-from mcp.server.fastmcp import FastMCP, Context
+from fastmcp import FastMCP, Context
 from rich.console import Console
 
 console = Console()
@@ -40,6 +40,7 @@ def subtract(a: int, b: int) -> int:
     return a - b
 
 
+@mcp_app.command(name="list")
 @mcp.tool()
 def list_packages() -> None:
     """List all conda packages"""
@@ -51,11 +52,30 @@ def list_packages() -> None:
             ["conda", "list"], capture_output=True, text=True, check=True
         )
         console.print(result.stdout)
+        return result.stdout
     except subprocess.CalledProcessError as e:
         console.print(f"[red]Error running conda list:[/red] {e.stderr}")
         raise SystemExit(1)
 
-    console.print("[green bold]Hello from Anaconda Assistant![/green bold]")
+
+@mcp_app.command(name="list-pretend")
+@mcp.tool()
+def list_pretend_packages() -> None:
+    """List all conda packages"""
+
+    import os
+    import json
+
+    console.print("Here we go.... 📁")
+    conda_list_file = os.path.join(os.path.dirname(__file__), "conda-list.txt")
+    console.print(conda_list_file)
+
+    with open(conda_list_file, "r") as f:
+        conda_list = f.read()
+
+    console.print(conda_list)
+
+    return conda_list
 
 
 @mcp.tool()

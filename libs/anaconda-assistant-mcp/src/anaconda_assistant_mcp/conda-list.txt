@@ -1,0 +1,11 @@
+# packages in environment at /opt/anaconda3:
+#
+# Name                             Version              Build                Channel
+aext-assistant                     4.20.0               py313hca03da5_jl4_0
+aext-assistant-server              4.20.0               py313hca03da5_0
+aext-core                          4.20.0               py313hca03da5_jl4_0
+aext-core-server                   4.20.0               py313hca03da5_0
+aext-environments-server           4.20.0               py313hca03da5_0
+aext-panels                        4.20.0               py313hca03da5_0
+aext-panels-server                 4.20.0               py313hca03da5_0
+aext-project-filebrowser-server    4.20.0               py313hb41f31a_0

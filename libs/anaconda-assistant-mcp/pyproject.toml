@@ -14,6 +14,7 @@ dependencies = [
   "tomli-w",
   "mcp>=1.0.0",
   "mcp[cli]>=1.0.0",
+  "fastmcp==2.0.0",
 ]
 description = "The Anaconda Assistant MCP plugin"
 dynamic = ["version"]
