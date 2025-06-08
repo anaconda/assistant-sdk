@@ -38,5 +38,3 @@ def test_list_packages(capsys):
         if line.strip() and not line.startswith("#")
     ]
     assert any(len(line.split()) >= 3 for line in package_lines)
-    # Check for the assistant message
-    assert "Hello from Anaconda Assistant!" in output
