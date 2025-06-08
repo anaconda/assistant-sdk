@@ -46,7 +46,7 @@ def subtract(a: int, b: int) -> int:
 
 @mcp_app.command(name="list")
 @mcp.tool()
-def list_packages() -> None:
+def list_packages() -> str:
     """List all conda packages"""
 
     try:
@@ -63,7 +63,7 @@ def list_packages() -> None:
 
 @mcp_app.command(name="list-pretend")
 @mcp.tool()
-def list_pretend_packages() -> None:
+def list_pretend_packages() -> str:
     """List all conda packages"""
 
     import os
@@ -82,7 +82,7 @@ def list_pretend_packages() -> None:
 
 
 @mcp.tool()
-def list_envs() -> None:
+def list_envs() -> str:
     """List all conda environments"""
     import subprocess
 
