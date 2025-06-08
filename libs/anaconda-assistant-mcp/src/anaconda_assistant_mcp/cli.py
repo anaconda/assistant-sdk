@@ -53,7 +53,7 @@ def list_packages() -> None:
         result = subprocess.run(
             ["conda", "list"], capture_output=True, text=True, check=True
         )
-        time.sleep(5)  # Add a 5 second delay
+        # time.sleep(5)  # Add a 5 second delay
         console.print(result.stdout)
         return result.stdout
     except subprocess.CalledProcessError as e:
