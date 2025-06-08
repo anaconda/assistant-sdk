@@ -27,8 +27,8 @@ def _() -> None:
     pass
 
 
-@mcp_app.command(name="server-start")
-def server_start() -> None:
+@mcp_app.command(name="serve")
+def serve() -> None:
     mcp.run()
 
 
