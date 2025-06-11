@@ -2,6 +2,7 @@ import typer
 import subprocess
 import time
 
+
 from fastmcp import FastMCP, Context
 from rich.console import Console
 
@@ -29,7 +30,12 @@ def _() -> None:
 
 @mcp_app.command(name="serve")
 def serve() -> None:
-    mcp.run()
+    mcp.run(transport="stdio")
+
+
+# ---
+# Tools
+# ---
 
 
 @mcp.tool()
@@ -44,7 +50,6 @@ def subtract(a: int, b: int) -> int:
     return a - b
 
 
-@mcp_app.command(name="list")
 @mcp.tool()
 def list_packages() -> str:
     """List all conda packages"""
@@ -61,7 +66,6 @@ def list_packages() -> str:
         raise SystemExit(1)
 
 
-@mcp_app.command(name="list-pretend")
 @mcp.tool()
 def list_pretend_packages() -> str:
     """List all conda packages"""
