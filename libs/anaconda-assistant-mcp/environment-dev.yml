@@ -1,0 +1,14 @@
+# Local dev conda dependencies
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python=3.10
+- conda
+- tox=3
+- tox-conda
+- cruft
+- pip
+- pip:
+    - "-e ../anaconda-assistant-sdk"
+    - "-e .[dev]"
