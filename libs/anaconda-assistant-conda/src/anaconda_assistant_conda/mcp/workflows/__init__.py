@@ -1,3 +1,0 @@
-"""
-Workflow modules initialization.
-"""
