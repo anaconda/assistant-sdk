@@ -31,6 +31,7 @@ make setup
 To run test commands, you don't want to run `conda assist` since it'll pick up the version of conda on your system. You want the conda install for this repo so you can run the plugin. To do this, you run:
 
 ```shell
+cd libs/anaconda-assistant-mcp
 ./env/bin/conda mcp serve
 ```
 
