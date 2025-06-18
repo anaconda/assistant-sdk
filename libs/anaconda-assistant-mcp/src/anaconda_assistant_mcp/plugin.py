@@ -2,7 +2,7 @@ from typing import Generator
 
 from conda import plugins
 
-from .cli import mcp_app
+from .server import mcp_app
 
 
 @plugins.hookimpl
