@@ -95,6 +95,8 @@ Try using it by typing "mcp list packages". You should see it prompt you. After 
 
 the name `conda-mcp-dev` can be any string. The purpose of it is to help you identify the MCP in the respective MCP host's UI whether it be Claude or Cursor.
 
+Make sure to not enable MCP servers / tools with overlapping goals. Sometimes your MCP server won't get called because another MCP server will pick up the request.
+
 ### Run the unit tests
 
 ```shell
