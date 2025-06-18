@@ -63,6 +63,10 @@ Add this to your JSON under `mcpServers`:
 }
 ```
 
+To see code changes reflected in Cursor, go to the top right gear icon ⚙️ and click it, select "Tools & Integrations" in the left menu, then toggle the name of the MCP server on. In our case, that's "conda-mcp-dev", but it can be any string you choose. Every time you make changes to the code, you should toggle the sever off and on again so the changes are picked up.
+
+Now, to test a feature. Open a new chat, remove all the context and type "mcp list packages". This should prompt you with the `list_packages` MCP tool. Press ⌘⏎ to run the tool.
+
 #### Claude Desktop
 
 Claude settings are the same, just under a different directory:
@@ -81,6 +85,10 @@ Claude settings are the same, just under a different directory:
   }
 }
 ```
+
+Seeting changes reflected in Claude is more difficult than in Cursor. The most reliable way is to restart the Claude Desktop app.
+
+Try using it by typing "mcp list packages". You should see it prompt you. After accepting, it should run the tool.
 
 #### Notes
 
