@@ -21,7 +21,7 @@ The conda assistant, powered by Anaconda Assistant. \n
 See https://anaconda.github.io/assistant-sdk/ for more information.
 """
 
-mcp_app = typer.Typer(
+mcp_app_experiments = typer.Typer(
     help=helptext,
     add_help_option=True,
     no_args_is_help=True,
@@ -29,12 +29,12 @@ mcp_app = typer.Typer(
 )
 
 
-@mcp_app.callback(invoke_without_command=True, no_args_is_help=True)
+@mcp_app_experiments.callback(invoke_without_command=True, no_args_is_help=True)
 def _() -> None:
     pass
 
 
-@mcp_app.command(name="serve")
+@mcp_app_experiments.command(name="serve")
 def serve() -> None:
     mcp.run(transport="stdio")
 
