@@ -19,9 +19,10 @@ def print_env_info(index, env_path):
         exists = os.path.exists(env_path)
         is_accessible = os.access(env_path, os.R_OK) if exists else False
 
-        print(f"{index:2d}. {env_name}")
-        print(f"    Path: {env_path}")
-        print(
+        output = []
+        output.append(f"{index:2d}. {env_name}")
+        output.append(f"    Path: {env_path}")
+        output.append(
             f"    Status: {'✓ Active' if exists and is_accessible else '✗ Inaccessible'}"
         )
 
@@ -40,15 +41,16 @@ def print_env_info(index, env_path):
                     )
                     if result.returncode == 0:
                         python_version = result.stdout.strip()
-                        print(f"    Python: {python_version}")
+                        output.append(f"    Python: {python_version}")
                 except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
                     pass
 
         if is_base:
-            print(f"    Type: Base Environment")
+            output.append(f"    Type: Base Environment")
 
-        print()
+        output.append("")
+
+        return "\n".join(output)
 
     except Exception as e:
-        print(f"    Error reading environment info: {e}")
-        print()
+        return f"    Error reading environment info: {e}\n"

@@ -165,23 +165,25 @@ from .list_env_info import print_env_info
 @mcp.tool()
 def list_envs_with_details() -> str:
     """List all conda environments with details"""
-    print("Available Conda Environments:")
-    print("=" * 50)
 
     # Get all known environment prefixes
     env_prefixes = list_all_known_prefixes()
 
     if not env_prefixes:
-        print("No conda environments found.")
-        return
+        return "No conda environments found."
 
     # Sort environments for consistent output
     env_prefixes = sorted(env_prefixes)
 
+    output = []
+    output.append("Available Conda Environments:")
+    output.append("=" * 50)
     for i, env_path in enumerate(env_prefixes, 1):
-        print_env_info(i, env_path)
+        output.append(print_env_info(i, env_path))
+
+    return "\n".join(output)
 
 
 if __name__ == "__main__":
     # print("hello")
-    list_envs2()
+    print(list_envs_with_details())
