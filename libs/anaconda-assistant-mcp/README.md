@@ -31,14 +31,60 @@ make setup
 To run test commands, you don't want to run `conda assist` since it'll pick up the version of conda on your system. You want the conda install for this repo so you can run the plugin. To do this, you run:
 
 ```shell
-./env/bin/conda assist ...
+./env/bin/conda mcp serve
 ```
 
 On Windows, you'll do:
 
 ```shell
-.\env\Scripts\conda assist ...
+.\env\Scripts\conda mcp serve
 ```
+
+This will run the MCP server. Use it for sanity checking. To actually test fully, you'll want to add them MCP server into Claude Desktop or Cursor.
+
+#### Cursor
+
+The MCP config file is in your home directory at:
+
+```
+~/.cursor/mcp.json
+```
+
+Add this to your JSON under `mcpServers`:
+
+```json
+{
+  "mcpServers": {
+    "conda-mcp-dev": {
+      "command": "<PATH_TO_SDK_REPO>/libs/anaconda-assistant-mcp/env/bin/conda",
+      "args": ["mcp", "serve"]
+    }
+  }
+}
+```
+
+#### Claude Desktop
+
+Claude settings are the same, just under a different directory:
+
+```
+'~/Library/Application Support/Claude/claude_desktop_config.json'
+```
+
+```json
+{
+  "mcpServers": {
+    "conda-mcp-dev": {
+      "command": "<PATH_TO_SDK_REPO>/libs/anaconda-assistant-mcp/env/bin/conda",
+      "args": ["mcp", "serve"]
+    }
+  }
+}
+```
+
+#### Notes
+
+the name `conda-mcp-dev` can be any string. The purpose of it is to help you identify the MCP in the respective MCP host's UI whether it be Claude or Cursor.
 
 ### Run the unit tests
 
