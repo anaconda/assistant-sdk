@@ -2,7 +2,7 @@ import pytest
 from fastmcp import FastMCP, Client
 import asyncio
 
-from anaconda_assistant_mcp.cli import mcp
+from anaconda_assistant_mcp.experiments.server_experiments import mcp
 
 # client = Client(mcp)
 
