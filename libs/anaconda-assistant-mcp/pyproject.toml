@@ -12,8 +12,6 @@ dependencies = [
   "pydantic >=2",
   "tomli",
   "tomli-w",
-  "mcp>=1.0.0",
-  "mcp[cli]>=1.0.0",
   # 2.7.0 installs fine, but MCP server can't be started in Cursor
   # 2.6.x result in segfaults on macos
   "fastmcp==2.5.2",
