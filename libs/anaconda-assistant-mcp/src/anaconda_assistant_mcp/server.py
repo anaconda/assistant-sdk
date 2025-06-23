@@ -1,7 +1,10 @@
 import typer
+import json
 
 from fastmcp import FastMCP, Context
 from conda.api import SubdirData
+
+from .tools_core.list_environment import list_environment_core
 
 mcp = FastMCP("Anaconda Assistant MCP")
 
@@ -92,9 +95,17 @@ async def search_packages(
     ]
 
 
-def main():
+@mcp.tool()
+async def list_environment() -> str:
+    """List all conda environments"""
+    return json.dumps(list_environment_core(), indent=2)
+
+
+async def main():
     mcp.run(transport="stdio")
+    # res = await list_environment()
+    # print(res)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

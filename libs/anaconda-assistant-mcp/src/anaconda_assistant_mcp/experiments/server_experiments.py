@@ -6,15 +6,10 @@ import json
 import asyncio
 import json
 
-from conda import CondaError, plugins
-from conda.cli.conda_argparse import BUILTIN_COMMANDS
-from conda.exception_handler import ExceptionHandler
-from conda.exceptions import PackagesNotFoundError
-
-from fastmcp import FastMCP, Context
+from fastmcp import FastMCP
 from rich.console import Console
 
-from . import list_env_info
+from ..tools_core.list_environment import list_environment_core
 
 
 console = Console()
@@ -159,7 +154,7 @@ async def list_envs_old() -> str:
 @mcp.tool()
 async def list_envs() -> str:
     """List all conda environments with details"""
-    return json.dumps(list_env_info.list_envs(), indent=2)
+    return json.dumps(list_environment_core(), indent=2)
 
 
 async def main():
