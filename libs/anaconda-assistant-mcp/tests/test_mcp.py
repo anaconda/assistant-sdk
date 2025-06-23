@@ -2,7 +2,8 @@ import pytest
 from fastmcp import Client
 import json
 
-from anaconda_assistant_mcp.experiments.server_experiments import mcp
+from conda.core.envs_manager import list_all_known_prefixes
+from anaconda_assistant_mcp.server import mcp
 
 
 @pytest.fixture(autouse=True)
@@ -12,15 +13,25 @@ def setup():
 
 
 @pytest.mark.asyncio
-async def test_add():
+async def test_list_environment_has_base():
     async with client:
-        result = await client.call_tool("add", {"a": 1, "b": 3})
-        assert result[0].text == "4"
+        conda_result = await client.call_tool("list_environment", {})
+        parsed_result = json.loads(conda_result[0].text)
+        assert any(env["name"] == "base" for env in parsed_result)
 
 
 @pytest.mark.asyncio
-async def test_list_envs_has_base():
+async def test_list_environment_has_all_envs():
     async with client:
-        conda_result = await client.call_tool("list_envs", {})
+        conda_result = await client.call_tool("list_environment", {})
         parsed_result = json.loads(conda_result[0].text)
-        assert any(env["name"] == "base" for env in parsed_result)
+
+        known_prefixes = list_all_known_prefixes()
+        known_prefixes = sorted(known_prefixes)
+
+        # Extract paths from parsed_result
+        result_paths = [env["path"] for env in parsed_result]
+        result_paths = sorted(result_paths)
+
+        # Assert that both lists contain the same paths
+        assert known_prefixes == result_paths
