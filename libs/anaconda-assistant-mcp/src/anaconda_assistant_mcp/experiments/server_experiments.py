@@ -3,6 +3,8 @@ import typer
 import subprocess
 import time
 import json
+import asyncio
+import json
 
 from conda import CondaError, plugins
 from conda.cli.conda_argparse import BUILTIN_COMMANDS
@@ -11,6 +13,8 @@ from conda.exceptions import PackagesNotFoundError
 
 from fastmcp import FastMCP, Context
 from rich.console import Console
+
+from .list_env_info import list_envs_json
 
 
 console = Console()
@@ -45,53 +49,52 @@ def serve() -> None:
 
 
 @mcp.tool()
-def add(a: int, b: int) -> int:
+async def add(a: int, b: int) -> int:
     """Add two numbers"""
     return a + b
 
 
 @mcp.tool()
-def subtract(a: int, b: int) -> int:
+async def subtract(a: int, b: int) -> int:
     """Subtract two numbers"""
     return a - b
 
 
 @mcp.tool()
-def list_packages() -> str:
-    """List all conda packages"""
-
+async def list_packages() -> str:
+    """List all conda packages using the conda package"""
     try:
-        result = subprocess.run(
-            ["/opt/anaconda3/bin/conda", "list", "--json"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        packages = json.loads(result.stdout)
-        packages = packages[:10]
+        from conda.api import list_packages
+        from conda.base.context import context
+
+        # Get packages from the current environment
+        packages = list_packages(context.prefix)
+
+        # Format the packages for output
         formatted_packages = []
         for package in packages:
             formatted_package = {
-                "name": package["name"],
-                "version": package["version"],
-                "build": package["build_string"],
-                "channel": package["channel"],
-                # "platform": package["platform"],
-                # "build_number": package["build_number"],
-                # "base_url": package["base_url"],
-                # "dist_name": package["dist_name"]
+                "name": package.name,
+                "version": package.version,
+                "build": package.build_string,
+                "channel": package.channel.name if package.channel else None,
             }
             formatted_packages.append(formatted_package)
-            res = json.dumps(formatted_packages, indent=2)
-            print(res)
-        return res
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Error running conda list:[/red] {e.stderr}")
+
+        # Limit to first 10 packages for readability
+        formatted_packages = formatted_packages[:10]
+
+        result = json.dumps(formatted_packages, indent=2)
+        print(result)
+        return result
+
+    except Exception as e:
+        console.print(f"[red]Error listing packages with conda API:[/red] {e}")
         raise SystemExit(1)
 
 
 @mcp.tool()
-def list_pretend_packages() -> str:
+async def list_pretend_packages() -> str:
     """List all conda packages"""
 
     conda_list = """# packages in environment at /opt/anaconda3 🫨 5 seconds:
@@ -127,7 +130,7 @@ aext-project-filebrowser-server    4.20.0               py313hb41f31a_0
 
 
 @mcp.tool()
-def sleep_five_seconds() -> str:
+async def sleep_five_seconds() -> str:
     """Sleep for 5 seconds using subprocess"""
     try:
         subprocess.run(["sleep", "5"], check=True)
@@ -139,7 +142,7 @@ def sleep_five_seconds() -> str:
 
 
 @mcp.tool()
-def list_envs() -> str:
+async def list_envs() -> str:
     """List all conda environments"""
 
     try:
@@ -158,32 +161,17 @@ def list_envs() -> str:
         raise SystemExit(1)
 
 
-from conda.core.envs_manager import list_all_known_prefixes
-from .list_env_info import print_env_info
-
-
 @mcp.tool()
-def list_envs_with_details() -> str:
+async def list_envs_with_details() -> str:
     """List all conda environments with details"""
+    return json.dumps(list_envs_json(), indent=2)
 
-    # Get all known environment prefixes
-    env_prefixes = list_all_known_prefixes()
 
-    if not env_prefixes:
-        return "No conda environments found."
-
-    # Sort environments for consistent output
-    env_prefixes = sorted(env_prefixes)
-
-    output = []
-    output.append("Available Conda Environments:")
-    output.append("=" * 50)
-    for i, env_path in enumerate(env_prefixes, 1):
-        output.append(print_env_info(i, env_path))
-
-    return "\n".join(output)
+async def main():
+    """Run the MCP server"""
+    res = await list_envs_with_details()
+    print(res)
 
 
 if __name__ == "__main__":
-    # print("hello")
-    print(list_envs_with_details())
+    asyncio.run(main())
