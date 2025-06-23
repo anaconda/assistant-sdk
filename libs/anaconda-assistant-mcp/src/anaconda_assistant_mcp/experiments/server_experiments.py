@@ -14,7 +14,7 @@ from conda.exceptions import PackagesNotFoundError
 from fastmcp import FastMCP, Context
 from rich.console import Console
 
-from .list_env_info import list_envs
+from . import list_env_info
 
 
 console = Console()
@@ -159,12 +159,12 @@ async def list_envs_old() -> str:
 @mcp.tool()
 async def list_envs() -> str:
     """List all conda environments with details"""
-    return json.dumps(list_envs(), indent=2)
+    return json.dumps(list_env_info.list_envs(), indent=2)
 
 
 async def main():
     """Run the MCP server"""
-    res = await list_envs_with_details()
+    res = await list_envs()
     print(res)
 
 
