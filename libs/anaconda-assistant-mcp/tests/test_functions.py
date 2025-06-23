@@ -1,8 +1,6 @@
 from typing import Any
 import pytest
 from anaconda_assistant_mcp.experiments.server_experiments import add, subtract
-import subprocess
-from unittest.mock import patch, MagicMock
 
 
 @pytest.mark.asyncio
