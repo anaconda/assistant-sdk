@@ -2,6 +2,7 @@ import typer
 import asyncio
 
 from fastmcp import FastMCP, Context
+from conda.api import SubdirData
 
 mcp = FastMCP("Anaconda Assistant MCP")
 
@@ -72,6 +73,24 @@ async def remove_environment(name: str) -> str:
     """Remove a conda environment"""
     # TODO: Implement environment removal
     return f"Environment removal not implemented yet: {name}"
+
+
+@mcp.tool(
+    name="search_packages",
+    description="Search for available Conda packages matching a query string.",
+)
+async def search_packages(
+    query: str, channel: str = None, platform: str = None
+) -> list[str]:
+    """Search available conda packages matching the given query, channel, and platform."""
+    return [
+        str(match)
+        for match in SubdirData.query_all(
+            query,
+            channels=[channel] if channel else None,
+            subdirs=[platform] if platform else None,
+        )
+    ]
 
 
 def main():
