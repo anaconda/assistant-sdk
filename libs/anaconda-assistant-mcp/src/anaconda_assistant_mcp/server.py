@@ -1,4 +1,5 @@
 import typer
+import asyncio
 
 from fastmcp import FastMCP, Context
 
@@ -37,28 +38,28 @@ def serve() -> None:
 
 
 @mcp.tool()
-def list_packages() -> str:
+async def list_packages() -> str:
     """List all conda packages"""
     # TODO: Implement package listing
     return "Package listing not implemented yet"
 
 
 @mcp.tool()
-def install_package(package_name: str) -> str:
+async def install_package(package_name: str) -> str:
     """Install a conda package"""
     # TODO: Implement package installation
     return f"Package installation not implemented yet: {package_name}"
 
 
 @mcp.tool()
-def uninstall_package(package_name: str) -> str:
+async def uninstall_package(package_name: str) -> str:
     """Uninstall a conda package"""
     # TODO: Implement package uninstallation
     return f"Package uninstallation not implemented yet: {package_name}"
 
 
 @mcp.tool()
-def create_environment(name: str, python_version: str = "3.10") -> str:
+async def create_environment(name: str, python_version: str = "3.10") -> str:
     """Create a new conda environment"""
     # TODO: Implement environment creation
     return (
@@ -67,7 +68,7 @@ def create_environment(name: str, python_version: str = "3.10") -> str:
 
 
 @mcp.tool()
-def remove_environment(name: str) -> str:
+async def remove_environment(name: str) -> str:
     """Remove a conda environment"""
     # TODO: Implement environment removal
     return f"Environment removal not implemented yet: {name}"
