@@ -1,5 +1,4 @@
 import typer
-import asyncio
 
 from fastmcp import FastMCP, Context
 from conda.api import SubdirData
