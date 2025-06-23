@@ -4,7 +4,7 @@ from conda.base.context import context
 from conda.core.envs_manager import list_all_known_prefixes
 
 
-def list_envs_json():
+def list_envs():
     """List all conda environments with details"""
 
     # Get all known environment prefixes

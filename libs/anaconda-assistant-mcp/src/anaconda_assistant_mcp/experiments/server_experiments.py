@@ -14,7 +14,7 @@ from conda.exceptions import PackagesNotFoundError
 from fastmcp import FastMCP, Context
 from rich.console import Console
 
-from .list_env_info import list_envs_json
+from .list_env_info import list_envs
 
 
 console = Console()
@@ -142,29 +142,24 @@ async def sleep_five_seconds() -> str:
 
 
 @mcp.tool()
-async def list_envs() -> str:
+async def list_envs_old() -> str:
     """List all conda environments"""
 
-    try:
-        result = subprocess.run(
-            ["/opt/anaconda3/bin/conda", "env", "list", "--json"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
+    result = subprocess.run(
+        ["/opt/anaconda3/bin/conda", "env", "list", "--json"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
 
-        envs = json.loads(result.stdout)["envs"]
-        pp(envs)
-        return envs
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Error running conda env list:[/red] {e.stderr}")
-        raise SystemExit(1)
+    envs = json.loads(result.stdout)["envs"]
+    return envs
 
 
 @mcp.tool()
-async def list_envs_with_details() -> str:
+async def list_envs() -> str:
     """List all conda environments with details"""
-    return json.dumps(list_envs_json(), indent=2)
+    return json.dumps(list_envs(), indent=2)
 
 
 async def main():
