@@ -3,6 +3,8 @@ import typer
 import subprocess
 import time
 import json
+import asyncio
+import json
 
 from conda import CondaError, plugins
 from conda.cli.conda_argparse import BUILTIN_COMMANDS
@@ -11,6 +13,8 @@ from conda.exceptions import PackagesNotFoundError
 
 from fastmcp import FastMCP, Context
 from rich.console import Console
+
+from .list_env_info import list_envs_json
 
 
 console = Console()
@@ -81,7 +85,7 @@ async def list_packages() -> str:
         formatted_packages = formatted_packages[:10]
 
         result = json.dumps(formatted_packages, indent=2)
-        # print(result)
+        print(result)
         return result
 
     except Exception as e:
@@ -157,27 +161,17 @@ async def list_envs() -> str:
         raise SystemExit(1)
 
 
-from conda.core.envs_manager import list_all_known_prefixes
-from .list_env_info import print_env_info
-
-
 @mcp.tool()
 async def list_envs_with_details() -> str:
     """List all conda environments with details"""
+    return json.dumps(list_envs_json(), indent=2)
 
-    # Get all known environment prefixes
-    env_prefixes = list_all_known_prefixes()
 
-    if not env_prefixes:
-        return "No conda environments found."
+async def main():
+    """Run the MCP server"""
+    res = await list_envs_with_details()
+    print(res)
 
-    # Sort environments for consistent output
-    env_prefixes = sorted(env_prefixes)
 
-    output = []
-    output.append("Available Conda Environments:")
-    output.append("=" * 50)
-    for i, env_path in enumerate(env_prefixes, 1):
-        output.append(print_env_info(i, env_path))
-
-    return "\n".join(output)
+if __name__ == "__main__":
+    asyncio.run(main())
