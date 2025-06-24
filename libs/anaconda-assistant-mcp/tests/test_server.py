@@ -10,7 +10,7 @@ mock_query_all_response = [
 
 
 @pytest.mark.asyncio
-async def test_search_packages(monkeypatch) -> None:
+async def test_search_packages(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         "conda.api.SubdirData.query_all",
         lambda query, channels=None, subdirs=None: mock_query_all_response,

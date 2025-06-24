@@ -6,25 +6,24 @@ from conda.core.envs_manager import list_all_known_prefixes
 from anaconda_assistant_mcp.server import mcp
 
 
-@pytest.fixture(autouse=True)
-def setup() -> None:
-    global client
-    client = Client(mcp)
+@pytest.fixture()
+def client() -> Client:
+    return Client(mcp)
 
 
 @pytest.mark.asyncio
-async def test_list_environment_has_base() -> None:
+async def test_list_environment_has_base(client: Client) -> None:
     async with client:
         conda_result = await client.call_tool("list_environment", {})
-        parsed_result = json.loads(conda_result[0].text)
+        parsed_result = json.loads(conda_result[0].text)  # type: ignore[union-attr]
         assert any(env["name"] == "base" for env in parsed_result)
 
 
 @pytest.mark.asyncio
-async def test_list_environment_has_all_envs() -> None:
+async def test_list_environment_has_all_envs(client: Client) -> None:
     async with client:
         conda_result = await client.call_tool("list_environment", {})
-        parsed_result = json.loads(conda_result[0].text)
+        parsed_result = json.loads(conda_result[0].text)  # type: ignore[union-attr]
 
         known_prefixes = list_all_known_prefixes()
         known_prefixes = sorted(known_prefixes)
