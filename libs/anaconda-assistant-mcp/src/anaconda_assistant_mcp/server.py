@@ -10,7 +10,7 @@ mcp = FastMCP("Anaconda Assistant MCP")
 
 helptext = """
 The MCP server. \n
-See https://anaconda.github.io/assistant-sdk/ for more information.
+See https://github.com/anaconda/assistant-sdk/tree/main/libs/anaconda-assistant-mcp for more information.
 """
 
 mcp_app = typer.Typer(
