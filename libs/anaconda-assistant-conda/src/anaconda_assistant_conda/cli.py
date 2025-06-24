@@ -11,7 +11,7 @@ console = Console()
 
 helptext = """
 The conda assistant, powered by Anaconda Assistant. \n
-See https://anaconda.github.io/assistant-sdk/ for more information.
+See https://anaconda.com/docs/tools/working-with-conda/cli-assistant for more information.
 """
 
 app = typer.Typer(
