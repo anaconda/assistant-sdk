@@ -4,14 +4,6 @@ requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
 
 [project]
 dependencies = [
-  "anaconda-cli-base >=0.5",
-  "anaconda-assistant-sdk >=0.4",
-  "anaconda-auth >=0.8",
-  "rich",
-  "requests",
-  "pydantic >=2",
-  "tomli",
-  "tomli-w",
   "asyncio",
   # 2.7.0 installs fine, but MCP server can't be started in Cursor
   # 2.6.x result in segfaults on macos
@@ -30,14 +22,10 @@ anaconda-assistant = "anaconda_assistant_mcp.plugin"
 [project.optional-dependencies]
 dev = [
   "mypy",
-  "pytest>=7.0.0",
-  "pytest-asyncio>=0.21.0",
+  "pytest",
   "pytest-cov",
   "pytest-mock",
-  "responses",
   "tox",
-  "types-requests",
-  "responses"
 ]
 publish = [
   "build",
@@ -133,7 +121,6 @@ conda_channels =
     defaults
 conda_deps =
     conda
-    anaconda-assistant-sdk
 commands = pytest
 
 [testenv:mypy]
@@ -143,8 +130,6 @@ extras = dev
 conda_channels =
     anaconda-cloud
     defaults
-conda_deps =
-    anaconda-assistant-sdk
 commands = mypy
 """
 
