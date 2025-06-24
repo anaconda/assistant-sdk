@@ -8,10 +8,6 @@ from .tools_core.list_environment import list_environment_core
 
 mcp = FastMCP("Anaconda Assistant MCP")
 
-# ---
-# CLI conda plugin setup
-# ---
-
 helptext = """
 The MCP server. \n
 See https://anaconda.github.io/assistant-sdk/ for more information.
@@ -103,8 +99,6 @@ async def list_environment() -> str:
 
 async def main():
     mcp.run(transport="stdio")
-    # res = await list_environment()
-    # print(res)
 
 
 if __name__ == "__main__":
