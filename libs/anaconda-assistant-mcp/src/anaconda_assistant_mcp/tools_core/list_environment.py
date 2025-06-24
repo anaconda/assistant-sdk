@@ -21,7 +21,7 @@ def list_environment_core() -> list[dict]:
     return output
 
 
-def get_env_info(env_path):
+def get_env_info(env_path: str) -> dict:
     """Print information about a single environment"""
     # Get environment name
     env_name = os.path.basename(env_path)

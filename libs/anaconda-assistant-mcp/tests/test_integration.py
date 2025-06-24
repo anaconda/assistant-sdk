@@ -7,13 +7,13 @@ from anaconda_assistant_mcp.server import mcp
 
 
 @pytest.fixture(autouse=True)
-def setup():
+def setup() -> None:
     global client
     client = Client(mcp)
 
 
 @pytest.mark.asyncio
-async def test_list_environment_has_base():
+async def test_list_environment_has_base() -> None:
     async with client:
         conda_result = await client.call_tool("list_environment", {})
         parsed_result = json.loads(conda_result[0].text)
@@ -21,7 +21,7 @@ async def test_list_environment_has_base():
 
 
 @pytest.mark.asyncio
-async def test_list_environment_has_all_envs():
+async def test_list_environment_has_all_envs() -> None:
     async with client:
         conda_result = await client.call_tool("list_environment", {})
         parsed_result = json.loads(conda_result[0].text)
