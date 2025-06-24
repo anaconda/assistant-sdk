@@ -4,7 +4,6 @@ requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
 
 [project]
 dependencies = [
-  "asyncio",
   # 2.7.0 installs fine, but MCP server can't be started in Cursor
   # 2.6.x result in segfaults on macos
   "fastmcp==2.5.2",
@@ -14,7 +13,7 @@ dynamic = ["version"]
 license = {text = "BSD-3-Clause"}
 name = "anaconda-assistant-mcp"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.entry-points.conda]
 anaconda-assistant = "anaconda_assistant_mcp.plugin"
