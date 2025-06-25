@@ -12,7 +12,7 @@ mcp: FastMCP = FastMCP("Anaconda Assistant MCP")
 
 helptext = """
 The MCP server. \n
-See https://anaconda.github.io/assistant-sdk/ for more information.
+See https://github.com/anaconda/assistant-sdk/tree/main/libs/anaconda-assistant-mcp for more information.
 """
 
 mcp_app = typer.Typer(
@@ -80,13 +80,13 @@ async def remove_environment(name: str) -> str:
     description="Search for available Conda packages matching a query string.",
 )
 async def search_packages(
-    query: str, channel: Optional[str] = None, platform: Optional[str] = None
+    package_name: str, channel: Optional[str] = None, platform: Optional[str] = None
 ) -> list[str]:
-    """Search available conda packages matching the given query, channel, and platform."""
+    """Search available conda packages matching the given package_name: channel, and platform."""
     return [
         str(match)
         for match in SubdirData.query_all(
-            query,
+            package_name,
             channels=[channel] if channel else None,
             subdirs=[platform] if platform else None,
         )

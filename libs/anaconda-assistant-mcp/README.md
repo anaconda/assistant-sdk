@@ -1,8 +1,6 @@
 # anaconda-assistant-mcp
 
-The Anaconda MCP conda plugin brings an MCP server to your
-
-The plugin provides a new subcommand called `conda mcp serve` that will spin up an MCP server.
+This conda plugin provides a new subcommand called `conda mcp serve` that will spin up an MCP server.
 
 ## Installation
 
