@@ -5,6 +5,12 @@ import json
 from conda.core.envs_manager import list_all_known_prefixes
 from anaconda_assistant_mcp.server import mcp
 
+# NOTE: Would love to call underlying function directly, but the @mcp.tool() decorator
+# seems to prevent access to the underlying function.
+# And docs say to test this way:
+# https://gofastmcp.com/patterns/testing
+# In any case, this is a good test of the MCP server.
+
 
 @pytest.fixture()
 def client() -> Client:
