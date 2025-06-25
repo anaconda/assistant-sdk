@@ -33,13 +33,9 @@ requirements:
 test:
   imports:
     - anaconda_assistant_mcp
-    - anaconda_assistant_mcp.plugin
-    - anaconda_assistant_mcp.config
-    - anaconda_assistant_mcp.prompt_debug_config
   commands:
     - python -c "from anaconda_assistant_mcp import __version__; assert __version__ == \"{{ version }}\""
 about:
-#  home: {{ project['urls']['repository'] }}
   summary: {{ project['description'] }}
   license: {{ project['license']['text'] }}
   license_file: LICENSE

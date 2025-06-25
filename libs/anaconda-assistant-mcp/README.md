@@ -1,14 +1,6 @@
 # anaconda-assistant-mcp
 
-The Anaconda AI Assistant conda plugin brings AI assistance to your conda workflows.
-You will need an account on Anaconda.cloud. Visit the [sign-up](https://anaconda.cloud/sign-up) page
-to create an account.
-
-Refer to [https://anaconda.com/pricing](https://www.anaconda.com/pricing) for information about the
-number of Anaconda AI Assistant requests you can make.
-
-The plugin provides a new subcommand called `conda assist` and will automatically summarize error messages
-for all conda commands and provide suggestions on how to correct the error.
+This conda plugin provides a new subcommand called `conda mcp serve` that will spin up an MCP server.
 
 ## Installation
 
@@ -16,7 +8,7 @@ This package is a [conda plugin](https://docs.conda.io/projects/conda/en/latest/
 Conda version 24.1 or newer is required.
 
 ```text
-conda install -n base -c anaconda-cloud anaconda-assistant-mcp
+conda install -n base -c anaconda-assistant-mcp
 ```
 
 ## Setup for development
@@ -28,7 +20,7 @@ Then run:
 make setup
 ```
 
-To run test commands, you don't want to run `conda assist` since it'll pick up the version of conda on your system. You want the conda install for this repo so you can run the plugin. To do this, you run:
+To run test commands, you don't want to run `conda mcp serve` since it'll pick up the version of conda on your system. You want the conda install for this repo so you can run the plugin. To do this, you run:
 
 ```shell
 cd libs/anaconda-assistant-mcp

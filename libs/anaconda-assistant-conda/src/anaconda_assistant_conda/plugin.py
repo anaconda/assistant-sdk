@@ -56,7 +56,9 @@ def create_message(
     # If we don't have a config option, we ask the user
     if debug_mode is None:
         debug_mode = prompt_debug_config()
-    elif debug_mode == "automatic":
+
+    # Now, we should have a `debug_mode` we can use
+    if debug_mode == "automatic":
         stream_response(error, prompt, is_a_tty=is_a_tty)
     elif debug_mode == "ask":
         should_debug = Confirm.ask(
@@ -69,6 +71,12 @@ def create_message(
                 "\nOK, goodbye! 👋\n"
                 f"To change default behavior, run {config_command_styled}\n"
             )
+    elif debug_mode == "off":
+        return
+    else:
+        # This should never happen, but we'll raise an error if it does.
+        # This should be caught at toml validation
+        raise ValueError(f"Invalid debug mode: {debug_mode}")
 
 
 def error_handler(command: str) -> None:

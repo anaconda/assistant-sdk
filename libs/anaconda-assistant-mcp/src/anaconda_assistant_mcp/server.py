@@ -1,23 +1,19 @@
-import typer
-import asyncio
 import json
+import asyncio
+import typer
 
-from fastmcp import FastMCP, Context
 from typing import List, Optional
+from fastmcp import FastMCP, Context
 from conda.api import SubdirData
 
 from .tools_core.list_environment import list_environment_core
 from .tools_core.create_environment import create_environment_core
 
-mcp = FastMCP("Anaconda Assistant MCP")
-
-# ---
-# CLI conda plugin setup
-# ---
+mcp: FastMCP = FastMCP("Anaconda Assistant MCP")
 
 helptext = """
 The MCP server. \n
-See https://anaconda.github.io/assistant-sdk/ for more information.
+See https://github.com/anaconda/assistant-sdk/tree/main/libs/anaconda-assistant-mcp for more information.
 """
 
 mcp_app = typer.Typer(
@@ -102,13 +98,13 @@ async def remove_environment(name: str) -> str:
     description="Search for available Conda packages matching a query string.",
 )
 async def search_packages(
-    query: str, channel: str = None, platform: str = None
+    package_name: str, channel: Optional[str] = None, platform: Optional[str] = None
 ) -> list[str]:
-    """Search available conda packages matching the given query, channel, and platform."""
+    """Search available conda packages matching the given package_name: channel, and platform."""
     return [
         str(match)
         for match in SubdirData.query_all(
-            query,
+            package_name,
             channels=[channel] if channel else None,
             subdirs=[platform] if platform else None,
         )
@@ -121,10 +117,8 @@ async def list_environment() -> str:
     return json.dumps(list_environment_core(), indent=2)
 
 
-async def main():
+async def main() -> None:
     mcp.run(transport="stdio")
-    # res = await list_environment()
-    # print(res)
 
 
 if __name__ == "__main__":
