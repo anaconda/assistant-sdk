@@ -34,16 +34,7 @@ def show_environment_details_core(env_name: Optional[str] = None, prefix: Option
     python_version = get_python_version_from_env(str(env_prefix))
 
     # Get channels (not always available, so best effort)
-    channels = []
-    try:
-        condarc_path = os.path.join(os.path.expanduser("~"), ".condarc")
-        if os.path.exists(condarc_path):
-            import yaml
-            with open(condarc_path, "r") as f:
-                condarc = yaml.safe_load(f)
-                channels = condarc.get("channels", [])
-    except Exception:
-        pass
+    channels = get_channels_from_condarc()
 
     return {
         "packages": packages,
@@ -64,3 +55,17 @@ def get_python_version_from_env(env_prefix: str) -> str:
         return output.decode().strip().split()[-1]
     except Exception:
         return ""
+
+def get_channels_from_condarc() -> list:
+    """Attempt to get channels from the user's .condarc file."""
+    channels = []
+    try:
+        condarc_path = os.path.join(os.path.expanduser("~"), ".condarc")
+        if os.path.exists(condarc_path):
+            import yaml
+            with open(condarc_path, "r") as f:
+                condarc = yaml.safe_load(f)
+                channels = condarc.get("channels", [])
+    except Exception:
+        pass
+    return channels
