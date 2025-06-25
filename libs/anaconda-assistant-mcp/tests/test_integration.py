@@ -55,6 +55,8 @@ async def test_search_packages(monkeypatch: pytest.MonkeyPatch, client: Client) 
         lambda query, channels=None, subdirs=None: mock_query_all_response,
     )
     async with client:
-        conda_result = await client.call_tool("search_packages", {"query": "numpy"})
+        conda_result = await client.call_tool(
+            "search_packages", {"package_name": "numpy"}
+        )
         parsed_result = json.loads(conda_result[0].text)  # type: ignore[union-attr]
         assert parsed_result == mock_query_all_response
