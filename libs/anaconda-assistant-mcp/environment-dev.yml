@@ -7,6 +7,7 @@ dependencies:
   - conda
   - tox=3
   - tox-conda
+  - pytest-asyncio
   - cruft
   - pip
   - pip:
