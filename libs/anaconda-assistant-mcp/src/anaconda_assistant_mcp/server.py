@@ -1,5 +1,4 @@
 import typer
-import subprocess
 import asyncio
 import json
 
@@ -8,6 +7,7 @@ from typing import List, Optional
 from conda.api import SubdirData
 
 from .tools_core.list_environment import list_environment_core
+from .tools_core.create_environment import create_environment_core
 
 mcp = FastMCP("Anaconda Assistant MCP")
 
@@ -66,17 +66,7 @@ async def uninstall_package(package_name: str) -> str:
 
 @mcp.tool(
     name="create_environment",
-    description="Create a new Conda environment with the specified name, optional python version, and optional packages.",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "env_name": {"type": "string", "description": "The name of the new environment."},
-            "python_version": {"type": "string", "description": "Python version to install (e.g., '3.11')"},
-            "packages": {"type": "array", "items": {"type": "string"}, "description": "Packages to install."},
-            "prefix": {"type": "string", "description": "Full path to environment (optional)."}
-        },
-        "required": ["env_name"]
-    }
+    description="Create a new Conda environment with the specified name, optional python version, and optional packages."
 )
 async def create_environment(
     env_name: str,
@@ -88,21 +78,16 @@ async def create_environment(
     Create a new conda environment with the given name, python version, and packages.
     Returns the full path to the created environment.
     """
-    cmd: List[str] = ["conda", "create", "-y"]
-    if prefix:
-        cmd += ["--prefix", prefix]
-    else:
-        cmd += ["--name", env_name]
-    if python_version:
-        cmd.append(f"python={python_version}")
-    if packages:
-        cmd.extend(packages)
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        env_path = prefix if prefix else _default_conda_env_path(env_name)
+        env_path = create_environment_core(
+            env_name=env_name,
+            python_version=python_version,
+            packages=packages,
+            prefix=prefix
+        )
         return env_path
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Conda create failed: {e.stderr}")
+    except Exception as e:
+        raise RuntimeError(f"Conda create failed: {str(e)}")
 
 
 @mcp.tool()
@@ -110,13 +95,6 @@ async def remove_environment(name: str) -> str:
     """Remove a conda environment"""
     # TODO: Implement environment removal
     return f"Environment removal not implemented yet: {name}"
-
-
-def _default_conda_env_path(env_name: str) -> str:
-    import os
-    from subprocess import check_output
-    envs_dir = check_output(["conda", "info", "--base"], text=True).strip()
-    return os.path.join(envs_dir, "envs", env_name)
 
 
 @mcp.tool(
