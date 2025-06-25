@@ -25,19 +25,19 @@ The Python clients and integrations provide `api_key` as a keyword argument.
 
 In order to use the Anaconda Assistant SDK and derived integrations the user must first agree to
 
-* Our [terms of service and privacy policy](https://anaconda.com/legal)
-* Assert that they are more than 13 years old
-* Opt-in or Opt-out of Data Collection
+- Our [terms of service and privacy policy](https://anaconda.com/legal)
+- Assert that they are more than 13 years old
+- Opt-in or Opt-out of Data Collection
 
 On Data Collection:
 If you opt-in you will enjoy personalized recommendations and contribute to smarter features.
 
 We prioritize your privacy:
 
-* Your data is never sold
-* Always secured
-* This setting only affects the data Anaconda stores
-* It does not affect the data that is sent to Open AI
+- Your data is never sold
+- Always secured
+- This setting only affects the data Anaconda stores
+- It does not affect the data that is sent to Open AI
 
 To agree to the terms of service and configure data collection edit the `~/.anaconda/config.toml` file
 
@@ -103,7 +103,7 @@ Each Anaconda subscription plan enforces a limit on the number of requests (call
 limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached
 the `.completions()` function will throw a `DailyQuotaExceeded` exception.
 
-Users can upgrade their plans by visiting [https://anaconda.cloud/profile/subscriptions](https://anaconda.cloud/profile/subscriptions).
+Users can upgrade their plans by visiting [anaconda.com/app/profile/subscriptions](https://anaconda.com/app/profile/subscriptions).
 
 ## Integrations
 
