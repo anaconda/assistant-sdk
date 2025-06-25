@@ -11,13 +11,13 @@ def show_environment_details_core(env_name: Optional[str] = None, prefix: Option
     """Show installed packages and metadata for a given Conda environment."""
     # Determine the prefix (path) to the environment
     if prefix:
-        env_prefix = prefix
+        env_prefix = str(prefix)
     elif env_name:
         if env_name == "base":
-            env_prefix = context.root_prefix
+            env_prefix = str(context.root_prefix)
         else:
             try:
-                env_prefix = locate_prefix_by_name(env_name)
+                env_prefix = str(locate_prefix_by_name(env_name))
             except Exception:
                 raise ValueError(f"Environment not found: {env_name}")
     else:
@@ -62,7 +62,7 @@ def get_channels_from_condarc() -> list:
     try:
         condarc_path = os.path.join(os.path.expanduser("~"), ".condarc")
         if os.path.exists(condarc_path):
-            import yaml
+            import yaml  # type: ignore
             with open(condarc_path, "r") as f:
                 condarc = yaml.safe_load(f)
                 channels = condarc.get("channels", [])
