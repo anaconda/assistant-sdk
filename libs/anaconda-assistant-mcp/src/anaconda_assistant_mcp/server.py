@@ -78,13 +78,13 @@ async def remove_environment(name: str) -> str:
     description="Search for available Conda packages matching a query string.",
 )
 async def search_packages(
-    query: str, channel: str = None, platform: str = None
+    package_name: str, channel: str = None, platform: str = None
 ) -> list[str]:
-    """Search available conda packages matching the given query, channel, and platform."""
+    """Search available conda packages matching the given package_name: channel, and platform."""
     return [
         str(match)
         for match in SubdirData.query_all(
-            query,
+            package_name,
             channels=[channel] if channel else None,
             subdirs=[platform] if platform else None,
         )
