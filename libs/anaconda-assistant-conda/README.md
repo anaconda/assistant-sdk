@@ -1,7 +1,7 @@
 # anaconda-assistant-conda
 
 The Anaconda AI Assistant conda plugin brings AI assistance to your conda workflows.
-You will need an account on Anaconda.cloud. Visit the [sign-up](https://anaconda.cloud/sign-up) page
+You will need an account on Anaconda.com. Visit the [sign-up](https://anaconda.com/sign-up) page
 to create an account.
 
 Refer to [https://anaconda.com/pricing](https://www.anaconda.com/pricing) for information about the
@@ -28,7 +28,7 @@ See the [documentation from the anaconda-assistant-sdk](https://github.com/anaco
 
 ## Authentication
 
-When you use any of the Anaconda AI Assistant features you will be prompted to login to your Anaconda.cloud
+When you use any of the Anaconda AI Assistant features you will be prompted to login to your Anaconda.com
 account if you have not already done so. This will open your browser and prompt you to complete the login.
 
 You can also login using the Anaconda CLI
@@ -39,10 +39,10 @@ anaconda login
 
 ## Daily quotas
 
-Each Anaconda.cloud subscription plan enforces a limit on the number of requests.
+Each Anaconda.com subscription plan enforces a limit on the number of requests.
 The limits are documented on the [Plans and Pricing page](https://www.anaconda.com/pricing). Once the limit is reached the plugin will display a message to wait for 24 hours.
 
-Users can upgrade their plans by visiting [https://anaconda.cloud/profile/subscriptions](https://anaconda.cloud/profile/subscriptions).
+Users can upgrade their plans by visiting the [Anaconda subcriptions page](https://anaconda.com/app/profile/subscriptions).
 
 ## Error messages
 

@@ -126,7 +126,8 @@ class ChatClient:
         self.auth_client: AuthClient = AuthClient(api_key=api_key)
 
         if self.api_client._config.accepted_terms is None:
-            msg = dedent(f"""\
+            msg = dedent(
+                f"""\
                 You have not accepted the terms of service.
                 You must accept our terms of service and Privacy Policy
                 https://anaconda.com/legal
@@ -135,7 +136,8 @@ class ChatClient:
 
                 [plugin.assistant]
                 accepted_terms = true
-                """)
+                """
+            )
             raise UnspecifiedAcceptedTermsError(msg)
         elif not self.api_client._config.accepted_terms:
             raise NotAcceptedTermsError(
@@ -143,7 +145,8 @@ class ChatClient:
             )
 
         if self.api_client._config.data_collection is None:
-            msg = dedent(f"""\
+            msg = dedent(
+                f"""\
                 You have not declared to opt-in or opt-out of data collection. Please set this configuration in
                 {anaconda_config_path()} as follows to enable data collection:
 
@@ -154,7 +157,8 @@ class ChatClient:
 
                 [plugin.assistant]
                 data_collection = false
-                """)
+                """
+            )
             raise UnspecifiedDataCollectionChoice(msg)
 
         self.id: str = str(uuid4())
@@ -209,7 +213,7 @@ class ChatClient:
             if e.response.status_code == 429:
                 raise DailyQuotaExceeded(
                     "You have reached your request limit. Please try again in 24 hours.\n"
-                    "Or visit https://anaconda.cloud/profile/subscriptions to upgrade your account"
+                    "Or visit https://anaconda.com/app/profile/subscriptions to upgrade your account"
                 )
 
             raise
