@@ -6,7 +6,7 @@ requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
 dependencies = [
   # 2.7.0 installs fine, but MCP server can't be started in Cursor
   # 2.6.x result in segfaults on macos
-  "fastmcp==2.5.2",
+  "fastmcp==2.8.1",
 ]
 description = "The Anaconda Assistant MCP plugin"
 dynamic = ["version"]
