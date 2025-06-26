@@ -83,7 +83,29 @@ async def create_environment(
         )
         return env_path
     except Exception as e:
-        raise RuntimeError(f"Conda create failed: {str(e)}")
+        # Provide more descriptive error messages based on the exception type
+        error_msg = str(e)
+        
+        # Check for common conda-specific error patterns
+        if "UnsatisfiableError" in error_msg or "solving environment" in error_msg.lower():
+            reason = "Package dependency conflicts or unsatisfiable requirements"
+        elif "PackagesNotFoundError" in error_msg or "packages are missing" in error_msg.lower():
+            reason = "One or more packages not found in available channels"
+        elif "permission" in error_msg.lower() or "access" in error_msg.lower():
+            reason = "Permission denied - check if you have write access to the environment location"
+        elif "network" in error_msg.lower() or "connection" in error_msg.lower():
+            reason = "Network connectivity issue - check your internet connection and conda channels"
+        elif "disk space" in error_msg.lower() or "no space" in error_msg.lower():
+            reason = "Insufficient disk space for environment creation"
+        elif "environment already exists" in error_msg.lower():
+            reason = "Environment already exists - consider using a different name or removing the existing environment"
+        else:
+            reason = "Unexpected error during environment creation"
+        
+        raise RuntimeError(
+            f"Failed to create conda environment '{env_name}': {reason}. "
+            f"Error details: {error_msg}"
+        )
 
 
 @mcp.tool()

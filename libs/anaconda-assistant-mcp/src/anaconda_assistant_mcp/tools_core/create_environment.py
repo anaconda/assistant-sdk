@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from conda.base.context import context
 from conda.core.solve import Solver
-from conda.core.link import UnlinkLinkTransaction
 from conda.core.envs_manager import register_env
 from conda.models.match_spec import MatchSpec
 from conda.core.index import get_index
