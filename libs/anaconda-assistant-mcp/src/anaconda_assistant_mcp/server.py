@@ -42,14 +42,6 @@ def serve() -> None:
 # Tools
 # ---
 
-@mcp.tool()
-async def create_environment(name: str, python_version: str = "3.10") -> str:
-    """Create a new conda environment"""
-    # TODO: Implement environment creation
-    return (
-        f"Environment creation not implemented yet: {name} with Python {python_version}"
-    )
-
 
 @mcp.tool()
 async def remove_environment(name: str) -> str:
@@ -88,10 +80,10 @@ async def uninstall_package(package_name: str) -> str:
 
 @mcp.tool()
 async def create_environment(
-    env_name: str,
-    python_version: Optional[str] = None,
-    packages: Optional[List[str]] = None,
-    prefix: Optional[str] = None
+    env_name: Annotated[str, Field(description="The name of the environment to create. This will be used to generate the environment path if no prefix is specified.")],
+    python_version: Annotated[Optional[str], Field(description="Optional Python version specification (e.g., '3.9', '3.10.0'). If not provided, the latest available Python version will be used.")] = None,
+    packages: Annotated[Optional[List[str]], Field(description="Optional list of package specifications to install in the environment. Each package can include version constraints (e.g., ['numpy>=1.20', 'pandas']). If not provided, only Python will be installed.")] = None,
+    prefix: Annotated[Optional[str], Field(description="Optional full path where the environment should be created. If not provided, the environment will be created in the default conda environments directory using the env_name.")] = None
 ) -> str:
     """
     Create a new conda environment with the specified configuration.
@@ -100,24 +92,12 @@ async def create_environment(
     solving package dependencies, downloading packages, and installing them to the target location.
     Progress updates are provided during the creation process.
     
-    Args:
-        env_name: The name of the environment to create. This will be used to generate
-                 the environment path if no prefix is specified.
-        python_version: Optional Python version specification (e.g., "3.9", "3.10.0").
-                       If not provided, the latest available Python version will be used.
-        packages: Optional list of package specifications to install in the environment.
-                 Each package can include version constraints (e.g., ["numpy>=1.20", "pandas"]).
-                 If not provided, only Python will be installed.
-        prefix: Optional full path where the environment should be created.
-               If not provided, the environment will be created in the default conda
-               environments directory using the env_name.
-    
     Returns:
         The full path to the created conda environment.
     
     Raises:
-        RuntimeError: If environment creation fails due to dependency conflicts,
-                     missing packages, permission issues, or other errors.
+        ToolError: If environment creation fails due to dependency conflicts,
+                  missing packages, permission issues, or other errors.
     
     Example:
         Create a basic Python environment:
