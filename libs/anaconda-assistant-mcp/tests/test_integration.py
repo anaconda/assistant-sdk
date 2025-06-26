@@ -60,3 +60,25 @@ async def test_search_packages(monkeypatch: pytest.MonkeyPatch, client: Client) 
         )
         parsed_result = json.loads(conda_result[0].text)  # type: ignore[union-attr]
         assert parsed_result == mock_query_all_response
+
+
+@pytest.mark.asyncio
+async def test_show_environment_details(monkeypatch: pytest.MonkeyPatch, client: Client) -> None:
+    async with client:
+        monkeypatch.setattr(
+            "conda.core.prefix_data.PrefixData.iter_records",
+            lambda self: [type('Record', (), {'name': 'numpy'})()],
+        )
+        monkeypatch.setattr(
+            "anaconda_assistant_mcp.tools_core.environment_details.get_python_version_from_env",
+            lambda env_prefix: "3.2.1",
+        )
+        monkeypatch.setattr(
+            "anaconda_assistant_mcp.tools_core.environment_details.get_channels_from_condarc",
+            lambda: ["conda-forge"],
+        )
+        conda_result = await client.call_tool("show_environment_details", {"env_name": "base"})
+        parsed_result = json.loads(conda_result[0].text)  # type: ignore[union-attr]
+        assert parsed_result["python_version"] == "3.2.1"
+        assert parsed_result["packages"] == ["numpy"]
+        assert parsed_result["channels"] == ["conda-forge"]

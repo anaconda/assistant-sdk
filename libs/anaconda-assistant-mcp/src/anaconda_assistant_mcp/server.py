@@ -1,12 +1,14 @@
 import typer
 import json
 import asyncio
-from typing import Optional
+from typing import Optional, Annotated
+from pydantic import Field
 
 from fastmcp import FastMCP, Context
 from conda.api import SubdirData
 
 from .tools_core.list_environment import list_environment_core
+from .tools_core.environment_details import show_environment_details_core
 
 mcp: FastMCP = FastMCP("Anaconda Assistant MCP")
 
@@ -37,12 +39,34 @@ def serve() -> None:
 # Tools
 # ---
 
+@mcp.tool()
+async def create_environment(name: str, python_version: str = "3.10") -> str:
+    """Create a new conda environment"""
+    # TODO: Implement environment creation
+    return (
+        f"Environment creation not implemented yet: {name} with Python {python_version}"
+    )
+
 
 @mcp.tool()
-async def list_packages() -> str:
-    """List all conda packages"""
-    # TODO: Implement package listing
-    return "Package listing not implemented yet"
+async def remove_environment(name: str) -> str:
+    """Remove a conda environment"""
+    # TODO: Implement environment removal
+    return f"Environment removal not implemented yet: {name}"
+
+@mcp.tool()
+async def list_environment() -> str:
+    """List all conda environments"""
+    return json.dumps(list_environment_core(), indent=2)
+
+
+@mcp.tool()
+async def show_environment_details(
+    env_name: Annotated[Optional[str], Field(description="The name of the environment to inspect.")] = None,
+    prefix: Annotated[Optional[str], Field(description="The full path to the environment (used instead of name).")] = None
+) -> str:
+    """Show installed packages and metadata for a given Conda environment."""
+    return json.dumps(show_environment_details_core(env_name=env_name, prefix=prefix), indent=2)
 
 
 @mcp.tool()
@@ -58,21 +82,6 @@ async def uninstall_package(package_name: str) -> str:
     # TODO: Implement package uninstallation
     return f"Package uninstallation not implemented yet: {package_name}"
 
-
-@mcp.tool()
-async def create_environment(name: str, python_version: str = "3.10") -> str:
-    """Create a new conda environment"""
-    # TODO: Implement environment creation
-    return (
-        f"Environment creation not implemented yet: {name} with Python {python_version}"
-    )
-
-
-@mcp.tool()
-async def remove_environment(name: str) -> str:
-    """Remove a conda environment"""
-    # TODO: Implement environment removal
-    return f"Environment removal not implemented yet: {name}"
 
 
 @mcp.tool(
@@ -93,10 +102,9 @@ async def search_packages(
     ]
 
 
-@mcp.tool()
-async def list_environment() -> str:
-    """List all conda environments"""
-    return json.dumps(list_environment_core(), indent=2)
+# ---
+# Main
+# ---
 
 
 async def main() -> None:
