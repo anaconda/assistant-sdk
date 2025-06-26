@@ -41,13 +41,6 @@ def create_environment_core(
     # Convert specs to MatchSpec objects
     match_specs = [MatchSpec(spec) for spec in specs]
     
-    # Get the index for the channels
-    index = get_index(
-        channel_urls=context.channels,
-        prepend=False,
-        platform=context.subdir
-    )
-    
     # Create solver
     solver = Solver(
         prefix=env_path,

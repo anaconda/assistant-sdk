@@ -60,10 +60,7 @@ async def uninstall_package(package_name: str) -> str:
     return f"Package uninstallation not implemented yet: {package_name}"
 
 
-@mcp.tool(
-    name="create_environment",
-    description="Create a new Conda environment with the specified name, optional python version, and optional packages."
-)
+@mcp.tool()
 async def create_environment(
     env_name: str,
     python_version: Optional[str] = None,
@@ -71,18 +68,78 @@ async def create_environment(
     prefix: Optional[str] = None
 ) -> str:
     """
-    Create a new conda environment with the given name, python version, and packages.
-    Returns the full path to the created environment.
+    Create a new conda environment with the specified configuration.
+    
+    This tool creates a new conda environment using conda's internal APIs. The process involves
+    solving package dependencies, downloading packages, and installing them to the target location.
+    Progress updates are provided during the creation process.
+    
+    Args:
+        env_name: The name of the environment to create. This will be used to generate
+                 the environment path if no prefix is specified.
+        python_version: Optional Python version specification (e.g., "3.9", "3.10.0").
+                       If not provided, the latest available Python version will be used.
+        packages: Optional list of package specifications to install in the environment.
+                 Each package can include version constraints (e.g., ["numpy>=1.20", "pandas"]).
+                 If not provided, only Python will be installed.
+        prefix: Optional full path where the environment should be created.
+               If not provided, the environment will be created in the default conda
+               environments directory using the env_name.
+    
+    Returns:
+        The full path to the created conda environment.
+    
+    Raises:
+        RuntimeError: If environment creation fails due to dependency conflicts,
+                     missing packages, permission issues, or other errors.
+    
+    Example:
+        Create a basic Python environment:
+        >>> create_environment("myenv")
+        
+        Create environment with specific Python version:
+        >>> create_environment("myenv", python_version="3.9")
+        
+        Create environment with packages:
+        >>> create_environment("myenv", packages=["numpy", "pandas>=1.3"])
+        
+        Create environment in custom location:
+        >>> create_environment("myenv", prefix="/custom/path/myenv")
     """
     try:
+        # Report initial progress
+        await mcp.report_progress(
+            "Starting conda environment creation...",
+            percentage=0
+        )
+        
+        # Report solving progress
+        await mcp.report_progress(
+            "Solving package dependencies...",
+            percentage=25
+        )
+        
         env_path = create_environment_core(
             env_name=env_name,
             python_version=python_version,
             packages=packages,
             prefix=prefix
         )
+        
+        # Report completion
+        await mcp.report_progress(
+            f"Environment '{env_name}' created successfully at {env_path}",
+            percentage=100
+        )
+        
         return env_path
     except Exception as e:
+        # Report error progress
+        await mcp.report_progress(
+            f"Environment creation failed: {str(e)}",
+            percentage=100
+        )
+        
         # Provide more descriptive error messages based on the exception type
         error_msg = str(e)
         
