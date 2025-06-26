@@ -4,6 +4,7 @@ import typer
 
 from typing import List, Optional
 from fastmcp import FastMCP, Context
+from fastmcp.exceptions import ToolError
 from conda.api import SubdirData
 
 from .tools_core.list_environment import list_environment_core
@@ -159,7 +160,7 @@ async def create_environment(
         else:
             reason = "Unexpected error during environment creation"
         
-        raise RuntimeError(
+        raise ToolError(
             f"Failed to create conda environment '{env_name}': {reason}. "
             f"Error details: {error_msg}"
         )
