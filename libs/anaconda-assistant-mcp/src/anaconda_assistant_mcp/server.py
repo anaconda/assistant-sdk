@@ -1,14 +1,17 @@
 import typer
-import asyncio
 import json
+import asyncio
+from typing import Optional, Annotated
+from pydantic import Field
 
 from fastmcp import FastMCP, Context
 from conda.api import SubdirData
 
 from .tools_core.list_environment import list_environment_core
+from .tools_core.environment_details import show_environment_details_core
 from .tools_core.update_environment import update_environment_core
 
-mcp = FastMCP("Anaconda Assistant MCP")
+mcp: FastMCP = FastMCP("Anaconda Assistant MCP")
 
 helptext = """
 The MCP server. \n
@@ -43,6 +46,37 @@ async def list_packages() -> str:
     """List all conda packages"""
     # TODO: Implement package listing
     return "Package listing not implemented yet"
+
+
+@mcp.tool()
+async def create_environment(name: str, python_version: str = "3.10") -> str:
+    """Create a new conda environment"""
+    # TODO: Implement environment creation
+    return (
+        f"Environment creation not implemented yet: {name} with Python {python_version}"
+    )
+
+
+@mcp.tool()
+async def remove_environment(name: str) -> str:
+    """Remove a conda environment"""
+    # TODO: Implement environment removal
+    return f"Environment removal not implemented yet: {name}"
+
+
+@mcp.tool()
+async def list_environment() -> str:
+    """List all conda environments"""
+    return json.dumps(list_environment_core(), indent=2)
+
+
+@mcp.tool()
+async def show_environment_details(
+    env_name: Annotated[Optional[str], Field(description="The name of the environment to inspect.")] = None,
+    prefix: Annotated[Optional[str], Field(description="The full path to the environment (used instead of name).")] = None
+) -> str:
+    """Show installed packages and metadata for a given Conda environment."""
+    return json.dumps(show_environment_details_core(env_name=env_name, prefix=prefix), indent=2)
 
 
 @mcp.tool()
@@ -107,26 +141,25 @@ async def remove_environment(name: str) -> str:
     description="Search for available Conda packages matching a query string.",
 )
 async def search_packages(
-    query: str, channel: str = None, platform: str = None
+    package_name: str, channel: Optional[str] = None, platform: Optional[str] = None
 ) -> list[str]:
-    """Search available conda packages matching the given query, channel, and platform."""
+    """Search available conda packages matching the given package_name: channel, and platform."""
     return [
         str(match)
         for match in SubdirData.query_all(
-            query,
+            package_name,
             channels=[channel] if channel else None,
             subdirs=[platform] if platform else None,
         )
     ]
 
 
-@mcp.tool()
-async def list_environment() -> str:
-    """List all conda environments"""
-    return json.dumps(list_environment_core(), indent=2)
+# ---
+# Main
+# ---
 
 
-async def main():
+async def main() -> None:
     mcp.run(transport="stdio")
 
 
