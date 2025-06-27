@@ -44,12 +44,6 @@ def serve() -> None:
 
 
 @mcp.tool()
-async def remove_environment(name: str) -> str:
-    """Remove a conda environment"""
-    # TODO: Implement environment removal
-    return f"Environment removal not implemented yet: {name}"
-
-@mcp.tool()
 async def list_environment() -> str:
     """List all conda environments"""
     return json.dumps(list_environment_core(), indent=2)
