@@ -80,6 +80,7 @@ async def uninstall_package(package_name: str) -> str:
 
 @mcp.tool()
 async def create_environment(
+    context: Context,
     env_name: Annotated[str, Field(description="The name of the environment to create. This will be used to generate the environment path if no prefix is specified.")],
     python_version: Annotated[Optional[str], Field(description="Optional Python version specification (e.g., '3.9', '3.10.0'). If not provided, the latest available Python version will be used.")] = None,
     packages: Annotated[Optional[List[str]], Field(description="Optional list of package specifications to install in the environment. Each package can include version constraints (e.g., ['numpy>=1.20', 'pandas']). If not provided, only Python will be installed.")] = None,
@@ -114,13 +115,13 @@ async def create_environment(
     """
     try:
         # Report initial progress
-        await mcp.report_progress(
+        await context.report_progress(
             "Starting conda environment creation...",
             percentage=0
         )
         
         # Report solving progress
-        await mcp.report_progress(
+        await context.report_progress(
             "Solving package dependencies...",
             percentage=25
         )
@@ -133,7 +134,7 @@ async def create_environment(
         )
         
         # Report completion
-        await mcp.report_progress(
+        await context.report_progress(
             f"Environment '{env_name}' created successfully at {env_path}",
             percentage=100
         )
@@ -141,7 +142,7 @@ async def create_environment(
         return env_path
     except Exception as e:
         # Report error progress
-        await mcp.report_progress(
+        await context.report_progress(
             f"Environment creation failed: {str(e)}",
             percentage=100
         )
