@@ -5,7 +5,7 @@ from conda.base.context import context
 from conda.core.solve import Solver
 from conda.core.envs_manager import register_env
 from conda.models.match_spec import MatchSpec
-from conda.core.index import get_index
+from conda.models.channel import Channel
 
 
 def create_environment_core(
@@ -41,10 +41,13 @@ def create_environment_core(
     # Convert specs to MatchSpec objects
     match_specs = [MatchSpec(spec) for spec in specs]
     
+    # Convert string channels to Channel objects
+    channels = [Channel(channel) for channel in context.channels]
+    
     # Create solver
     solver = Solver(
         prefix=env_path,
-        channels=context.channels,
+        channels=channels,
         subdirs=[context.subdir],
         specs_to_add=match_specs
     )
