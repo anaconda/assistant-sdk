@@ -110,14 +110,14 @@ async def create_environment(
     try:
         # Report initial progress
         await context.report_progress(
-            "Starting conda environment creation...",
-            percentage=0
+            0,
+            100
         )
         
         # Report solving progress
         await context.report_progress(
-            "Solving package dependencies...",
-            percentage=25
+            25,
+            100
         )
         
         env_path = create_environment_core(
@@ -129,16 +129,16 @@ async def create_environment(
         
         # Report completion
         await context.report_progress(
-            f"Environment '{env_name}' created successfully at {env_path}",
-            percentage=100
+            100,
+            100
         )
         
         return env_path
     except Exception as e:
         # Report error progress
         await context.report_progress(
-            f"Environment creation failed: {str(e)}",
-            percentage=100
+            100,
+            100
         )
         
         # Provide more descriptive error messages based on the exception type
