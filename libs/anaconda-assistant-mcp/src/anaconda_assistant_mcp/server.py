@@ -44,7 +44,6 @@ def serve() -> None:
 # ---
 
 
-
 @mcp.tool()
 async def list_environment() -> str:
     """List all conda environments"""
