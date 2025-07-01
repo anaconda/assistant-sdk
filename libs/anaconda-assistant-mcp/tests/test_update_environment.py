@@ -3,6 +3,7 @@ import tempfile
 import pytest
 import json
 import re
+from typing import Generator
 from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 from fastmcp import Client
@@ -37,7 +38,7 @@ def existing_env_path(temp_env_dir: str) -> str:
 
 
 @pytest.fixture
-def mock_context() -> Mock:
+def mock_context() -> Generator[Mock, None, None]:
     """Mock conda context for testing."""
     with patch('anaconda_assistant_mcp.tools_core.update_environment.context') as mock_ctx:
         mock_ctx.channels = ('defaults', 'conda-forge')
@@ -47,7 +48,7 @@ def mock_context() -> Mock:
 
 
 @pytest.fixture
-def mock_solver() -> Mock:
+def mock_solver() -> Generator[Mock, None, None]:
     """Mock Solver class."""
     with patch('anaconda_assistant_mcp.tools_core.update_environment.Solver') as mock_solver_cls:
         mock_solver = Mock()
@@ -58,7 +59,7 @@ def mock_solver() -> Mock:
 
 
 @pytest.fixture
-def mock_get_index() -> Mock:
+def mock_get_index() -> Generator[Mock, None, None]:
     """Mock get_index function."""
     with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index') as mock_index:
         yield mock_index

@@ -2,6 +2,7 @@ import os
 import tempfile
 import pytest
 import json
+from typing import Generator
 from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 from fastmcp import Client
@@ -21,14 +22,14 @@ from anaconda_assistant_mcp.server import mcp
 # =============================================================================
 
 @pytest.fixture
-def temp_env_dir():
+def temp_env_dir() -> str:
     """Create a temporary directory for testing environment creation."""
     with tempfile.TemporaryDirectory() as temp_dir:
         yield temp_dir
 
 
 @pytest.fixture
-def mock_context():
+def mock_context() -> Generator[Mock, None, None]:
     """Mock conda context for testing."""
     with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_ctx:
         mock_ctx.channels = ('defaults', 'conda-forge')
@@ -38,7 +39,7 @@ def mock_context():
 
 
 @pytest.fixture
-def mock_solver():
+def mock_solver() -> Generator[Mock, None, None]:
     """Mock Solver class."""
     with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
         mock_solver = Mock()
@@ -49,7 +50,7 @@ def mock_solver():
 
 
 @pytest.fixture
-def mock_register_env():
+def mock_register_env() -> Generator[Mock, None, None]:
     """Mock register_env function."""
     with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env') as mock_register:
         yield mock_register
@@ -68,7 +69,7 @@ def client() -> Client:
 class TestCreateEnvironmentCore:
     """Unit tests for create_environment_core function."""
 
-    def test_create_environment_core_basic(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_basic(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test basic environment creation with default Python."""
         env_name = "test_env"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -107,7 +108,7 @@ class TestCreateEnvironmentCore:
         # Verify environment was registered
         mock_register_env.assert_called_once_with(env_path)
 
-    def test_create_environment_core_with_python_version(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_with_python_version(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with specific Python version."""
         env_name = "test_env_py39"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -129,7 +130,7 @@ class TestCreateEnvironmentCore:
         # Check that the version spec contains the expected version
         assert str(specs[0].version) == f"{python_version}.*"
 
-    def test_create_environment_core_with_packages(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_with_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with additional packages."""
         env_name = "test_env_with_packages"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -153,7 +154,7 @@ class TestCreateEnvironmentCore:
         assert 'numpy' in package_names
         assert 'pandas' in package_names
 
-    def test_create_environment_core_with_python_and_packages(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_with_python_and_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with both Python version and packages."""
         env_name = "test_env_complete"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -183,7 +184,7 @@ class TestCreateEnvironmentCore:
         assert 'numpy' in package_names
         assert 'pandas' in package_names
 
-    def test_create_environment_core_uses_default_path(self, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_uses_default_path(self, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test that environment uses default path when prefix is not provided."""
         env_name = "test_env_default_path"
         
@@ -196,7 +197,7 @@ class TestCreateEnvironmentCore:
         call_args = mock_solver.call_args
         assert call_args[1]['prefix'] == expected_path
 
-    def test_create_environment_core_creates_directory(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_creates_directory(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test that the function creates the environment directory if it doesn't exist."""
         env_name = "test_env_new_dir"
         env_path = os.path.join(temp_env_dir, "new_subdir", env_name)
@@ -212,7 +213,7 @@ class TestCreateEnvironmentCore:
         assert result == env_path
         assert os.path.exists(env_path)
 
-    def test_create_environment_core_handles_existing_directory(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_handles_existing_directory(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test that the function works when the directory already exists."""
         env_name = "test_env_existing"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -229,7 +230,7 @@ class TestCreateEnvironmentCore:
         assert result == env_path
         # Should not raise an error when directory already exists
 
-    def test_create_environment_core_empty_packages_list(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_empty_packages_list(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with empty packages list."""
         env_name = "test_env_empty_packages"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -248,7 +249,7 @@ class TestCreateEnvironmentCore:
         assert len(specs) == 1
         assert specs[0].name == 'python'
 
-    def test_create_environment_core_none_packages(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_none_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with None packages."""
         env_name = "test_env_none_packages"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -267,7 +268,7 @@ class TestCreateEnvironmentCore:
         assert len(specs) == 1
         assert specs[0].name == 'python'
 
-    def test_create_environment_core_solver_error(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_solver_error(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test that solver errors are properly propagated."""
         env_name = "test_env_solver_error"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -282,7 +283,7 @@ class TestCreateEnvironmentCore:
                 prefix=env_path
             )
 
-    def test_create_environment_core_transaction_error(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_transaction_error(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test that transaction execution errors are properly propagated."""
         env_name = "test_env_transaction_error"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -299,7 +300,7 @@ class TestCreateEnvironmentCore:
                 prefix=env_path
             )
 
-    def test_create_environment_core_channel_conversion(self, temp_env_dir, mock_context, mock_solver, mock_register_env):
+    def test_create_environment_core_channel_conversion(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test that string channels are properly converted to Channel objects."""
         env_name = "test_env_channels"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -331,7 +332,7 @@ class TestCreateEnvironmentIntegration:
     """Integration tests for the create_environment MCP tool."""
 
     @pytest.mark.asyncio
-    async def test_create_environment_basic(self, client: Client, temp_env_dir):
+    async def test_create_environment_basic(self, client: Client, temp_env_dir: str) -> None:
         """Test basic environment creation through MCP."""
         env_name = "test_mcp_env"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -366,7 +367,7 @@ class TestCreateEnvironmentIntegration:
                         mock_transaction.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_create_environment_with_python_version(self, client: Client, temp_env_dir):
+    async def test_create_environment_with_python_version(self, client: Client, temp_env_dir: str) -> None:
         """Test environment creation with Python version through MCP."""
         env_name = "test_mcp_py_env"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -404,7 +405,7 @@ class TestCreateEnvironmentIntegration:
                         assert str(python_spec.version) == f"{python_version}.*"
 
     @pytest.mark.asyncio
-    async def test_create_environment_with_packages(self, client: Client, temp_env_dir):
+    async def test_create_environment_with_packages(self, client: Client, temp_env_dir: str) -> None:
         """Test environment creation with packages through MCP."""
         env_name = "test_mcp_packages_env"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -443,7 +444,7 @@ class TestCreateEnvironmentIntegration:
                         assert 'pandas' in package_names
 
     @pytest.mark.asyncio
-    async def test_create_environment_complete(self, client: Client, temp_env_dir):
+    async def test_create_environment_complete(self, client: Client, temp_env_dir: str) -> None:
         """Test complete environment creation with all parameters through MCP."""
         env_name = "test_mcp_complete_env"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -492,7 +493,7 @@ class TestCreateEnvironmentIntegration:
                         assert 'matplotlib' in package_names
 
     @pytest.mark.asyncio
-    async def test_create_environment_uses_default_path(self, client: Client):
+    async def test_create_environment_uses_default_path(self, client: Client) -> None:
         """Test that environment uses default path when prefix is not provided."""
         env_name = "test_mcp_default_path"
         
@@ -520,7 +521,7 @@ class TestCreateEnvironmentIntegration:
                         assert result[0].text == expected_path  # type: ignore[union-attr]
 
     @pytest.mark.asyncio
-    async def test_create_environment_solver_error(self, client: Client, temp_env_dir):
+    async def test_create_environment_solver_error(self, client: Client, temp_env_dir: str) -> None:
         """Test that solver errors are properly handled and reported through MCP."""
         env_name = "test_mcp_solver_error"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -551,7 +552,7 @@ class TestCreateEnvironmentIntegration:
                     assert "Package dependency conflicts" in error_text
 
     @pytest.mark.asyncio
-    async def test_create_environment_transaction_error(self, client: Client, temp_env_dir):
+    async def test_create_environment_transaction_error(self, client: Client, temp_env_dir: str) -> None:
         """Test that transaction execution errors are properly handled through MCP."""
         env_name = "test_mcp_transaction_error"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -584,7 +585,7 @@ class TestCreateEnvironmentIntegration:
                     assert "Permission denied" in error_text
 
     @pytest.mark.asyncio
-    async def test_create_environment_progress_reporting(self, client: Client, temp_env_dir):
+    async def test_create_environment_progress_reporting(self, client: Client, temp_env_dir: str) -> None:
         """Test that progress is reported during environment creation."""
         env_name = "test_mcp_progress"
         env_path = os.path.join(temp_env_dir, env_name)
@@ -617,7 +618,7 @@ class TestCreateEnvironmentIntegration:
                         # and may not be directly testable in this context
 
     @pytest.mark.asyncio
-    async def test_create_environment_empty_packages(self, client: Client, temp_env_dir):
+    async def test_create_environment_empty_packages(self, client: Client, temp_env_dir: str) -> None:
         """Test environment creation with empty packages list through MCP."""
         env_name = "test_mcp_empty_packages"
         env_path = os.path.join(temp_env_dir, env_name)
