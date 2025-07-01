@@ -201,10 +201,7 @@ async def remove_environment(name: str) -> str:
     return f"Environment removal not implemented yet: {name}"
 
 
-@mcp.tool(
-    name="search_packages",
-    description="Search for available Conda packages matching a query string.",
-)
+@mcp.tool()
 async def search_packages(
     package_name: str, channel: Optional[str] = None, platform: Optional[str] = None
 ) -> list[str]:
