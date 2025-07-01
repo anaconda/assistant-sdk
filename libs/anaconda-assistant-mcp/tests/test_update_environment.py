@@ -22,14 +22,14 @@ from anaconda_assistant_mcp.server import mcp
 # =============================================================================
 
 @pytest.fixture
-def temp_env_dir():
+def temp_env_dir() -> str:
     """Create a temporary directory for testing environment updates."""
     with tempfile.TemporaryDirectory() as temp_dir:
         yield temp_dir
 
 
 @pytest.fixture
-def existing_env_path(temp_env_dir):
+def existing_env_path(temp_env_dir: str) -> str:
     """Create a temporary environment directory that exists."""
     env_path = os.path.join(temp_env_dir, "existing_env")
     os.makedirs(env_path, exist_ok=True)
@@ -37,7 +37,7 @@ def existing_env_path(temp_env_dir):
 
 
 @pytest.fixture
-def mock_context():
+def mock_context() -> Mock:
     """Mock conda context for testing."""
     with patch('anaconda_assistant_mcp.tools_core.update_environment.context') as mock_ctx:
         mock_ctx.channels = ('defaults', 'conda-forge')
@@ -47,7 +47,7 @@ def mock_context():
 
 
 @pytest.fixture
-def mock_solver():
+def mock_solver() -> Mock:
     """Mock Solver class."""
     with patch('anaconda_assistant_mcp.tools_core.update_environment.Solver') as mock_solver_cls:
         mock_solver = Mock()
@@ -58,7 +58,7 @@ def mock_solver():
 
 
 @pytest.fixture
-def mock_get_index():
+def mock_get_index() -> Mock:
     """Mock get_index function."""
     with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index') as mock_index:
         yield mock_index
@@ -77,7 +77,7 @@ def client() -> Client:
 class TestUpdateEnvironmentCore:
     """Unit tests for update_environment_core function."""
 
-    def test_update_environment_core_basic(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_basic(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test basic environment update with packages."""
         packages = ["numpy", "pandas"]
         
@@ -100,11 +100,12 @@ class TestUpdateEnvironmentCore:
         assert specs[0].name == 'numpy'
         assert specs[1].name == 'pandas'
         
-        # Verify channels were passed as strings
+        # Verify channels were converted to Channel objects
         channels = call_args[1]['channels']
         assert len(channels) == 2
-        assert channels[0] == 'defaults'
-        assert channels[1] == 'conda-forge'
+        assert all(isinstance(ch, Channel) for ch in channels)
+        assert channels[0].name == 'defaults'
+        assert channels[1].name == 'conda-forge'
         
         # Verify transaction was executed
         mock_solver_instance = mock_solver.return_value
@@ -118,7 +119,7 @@ class TestUpdateEnvironmentCore:
             platform='linux-64'
         )
 
-    def test_update_environment_core_with_env_name(self, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_with_env_name(self, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test environment update using environment name."""
         packages = ["numpy>=1.20", "pandas"]
         env_name = "test_env"
@@ -146,7 +147,7 @@ class TestUpdateEnvironmentCore:
             assert str(specs[0].version) == '>=1.20'
             assert specs[1].name == 'pandas'
 
-    def test_update_environment_core_with_complex_packages(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_with_complex_packages(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test environment update with complex package specifications."""
         packages = ["numpy>=1.20,<2.0", "pandas=1.5.*", "matplotlib"]
         
@@ -174,9 +175,9 @@ class TestUpdateEnvironmentCore:
         matplotlib_spec = next(s for s in specs if s.name == 'matplotlib')
         assert matplotlib_spec.version is None  # No version constraint
 
-    def test_update_environment_core_empty_packages(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_empty_packages(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test environment update with empty packages list."""
-        packages = []
+        packages: list[str] = []
         
         result = update_environment_core(
             packages=packages,
@@ -190,14 +191,14 @@ class TestUpdateEnvironmentCore:
         specs = call_args[1]['specs_to_add']
         assert len(specs) == 0
 
-    def test_update_environment_core_missing_env_name_and_prefix(self, mock_context):
+    def test_update_environment_core_missing_env_name_and_prefix(self, mock_context: Mock) -> None:
         """Test that ValueError is raised when neither env_name nor prefix is provided."""
         packages = ["numpy"]
         
         with pytest.raises(ValueError, match="Either env_name or prefix must be provided"):
             update_environment_core(packages=packages)
 
-    def test_update_environment_core_nonexistent_env_prefix(self, temp_env_dir, mock_context):
+    def test_update_environment_core_nonexistent_env_prefix(self, temp_env_dir: str, mock_context: Mock) -> None:
         """Test that ValueError is raised when environment doesn't exist."""
         packages = ["numpy"]
         nonexistent_path = os.path.join(temp_env_dir, "nonexistent_env")
@@ -208,7 +209,7 @@ class TestUpdateEnvironmentCore:
                 prefix=nonexistent_path
             )
 
-    def test_update_environment_core_nonexistent_env_name(self, mock_context):
+    def test_update_environment_core_nonexistent_env_name(self, mock_context: Mock) -> None:
         """Test that ValueError is raised when environment name doesn't exist."""
         packages = ["numpy"]
         env_name = "nonexistent_env"
@@ -224,7 +225,7 @@ class TestUpdateEnvironmentCore:
                     env_name=env_name
                 )
 
-    def test_update_environment_core_solver_error(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_solver_error(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test that solver errors are properly propagated."""
         packages = ["numpy"]
         
@@ -238,7 +239,7 @@ class TestUpdateEnvironmentCore:
                 prefix=existing_env_path
             )
 
-    def test_update_environment_core_transaction_error(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_transaction_error(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test that transaction execution errors are properly propagated."""
         packages = ["numpy"]
         
@@ -254,7 +255,7 @@ class TestUpdateEnvironmentCore:
                 prefix=existing_env_path
             )
 
-    def test_update_environment_core_channel_conversion(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_channel_conversion(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test that string channels are properly converted to Channel objects."""
         packages = ["numpy"]
         
@@ -268,12 +269,13 @@ class TestUpdateEnvironmentCore:
         
         assert result == existing_env_path
         
-        # Verify channels were passed as strings
+        # Verify channels were converted to Channel objects
         call_args = mock_solver.call_args
         channels = call_args[1]['channels']
         assert len(channels) == 2
-        assert channels[0] == 'custom-channel'
-        assert channels[1] == 'another-channel'
+        assert all(isinstance(ch, Channel) for ch in channels)
+        assert channels[0].name == 'custom-channel'
+        assert channels[1].name == 'another-channel'
         
         # Verify get_index was called with the correct channels
         mock_get_index.assert_called_once_with(
@@ -282,7 +284,7 @@ class TestUpdateEnvironmentCore:
             platform='linux-64'
         )
 
-    def test_update_environment_core_matchspec_conversion(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_matchspec_conversion(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test that package strings are properly converted to MatchSpec objects."""
         packages = ["numpy>=1.20", "pandas=1.5.*", "matplotlib"]
         
@@ -312,7 +314,7 @@ class TestUpdateEnvironmentCore:
         assert matplotlib_spec.name == 'matplotlib'
         assert matplotlib_spec.version is None
 
-    def test_update_environment_core_priority_env_name_over_prefix(self, existing_env_path, mock_context, mock_solver, mock_get_index):
+    def test_update_environment_core_priority_env_name_over_prefix(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test that prefix takes priority when both env_name and prefix are provided."""
         packages = ["numpy"]
         env_name = "test_env"
@@ -339,7 +341,7 @@ class TestUpdateEnvironmentIntegration:
     """Integration tests for the update_environment MCP tool."""
 
     @pytest.mark.asyncio
-    async def test_update_environment_basic(self, client: Client, existing_env_path):
+    async def test_update_environment_basic(self, client: Client, existing_env_path: str) -> None:
         """Test basic environment update through MCP."""
         packages = ["numpy", "pandas"]
         
@@ -373,7 +375,7 @@ class TestUpdateEnvironmentIntegration:
                         mock_transaction.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_update_environment_with_env_name(self, client: Client):
+    async def test_update_environment_with_env_name(self, client: Client) -> None:
         """Test environment update using environment name through MCP."""
         packages = ["numpy>=1.20", "pandas"]
         env_name = "test_env"
@@ -410,7 +412,7 @@ class TestUpdateEnvironmentIntegration:
                             assert call_args[1]['prefix'] == expected_path
 
     @pytest.mark.asyncio
-    async def test_update_environment_with_complex_packages(self, client: Client, existing_env_path):
+    async def test_update_environment_with_complex_packages(self, client: Client, existing_env_path: str) -> None:
         """Test environment update with complex package specifications through MCP."""
         packages = ["numpy>=1.20,<2.0", "pandas=1.5.*", "matplotlib"]
         
@@ -454,9 +456,9 @@ class TestUpdateEnvironmentIntegration:
                         assert matplotlib_spec.version is None
 
     @pytest.mark.asyncio
-    async def test_update_environment_empty_packages(self, client: Client, existing_env_path):
+    async def test_update_environment_empty_packages(self, client: Client, existing_env_path: str) -> None:
         """Test environment update with empty packages list through MCP."""
-        packages = []
+        packages: list[str] = []
         
         from fastmcp.exceptions import ToolError
         with pytest.raises(ToolError) as exc_info:
@@ -472,7 +474,7 @@ class TestUpdateEnvironmentIntegration:
         assert "Must specify at least one package to update/install." in error_text
 
     @pytest.mark.asyncio
-    async def test_update_environment_missing_parameters(self, client: Client):
+    async def test_update_environment_missing_parameters(self, client: Client) -> None:
         """Test that appropriate error is raised when neither env_name nor prefix is provided."""
         packages = ["numpy"]
         
@@ -490,7 +492,7 @@ class TestUpdateEnvironmentIntegration:
             assert "Either env_name or prefix must be provided" in error_text
 
     @pytest.mark.asyncio
-    async def test_update_environment_nonexistent_env(self, client: Client, temp_env_dir):
+    async def test_update_environment_nonexistent_env(self, client: Client, temp_env_dir: str) -> None:
         """Test that appropriate error is raised when environment doesn't exist."""
         packages = ["numpy"]
         nonexistent_path = os.path.join(temp_env_dir, "nonexistent_env")
@@ -510,7 +512,7 @@ class TestUpdateEnvironmentIntegration:
             assert "Environment does not exist" in error_text
 
     @pytest.mark.asyncio
-    async def test_update_environment_solver_error(self, client: Client, existing_env_path):
+    async def test_update_environment_solver_error(self, client: Client, existing_env_path: str) -> None:
         """Test that solver errors are properly handled and reported through MCP."""
         packages = ["numpy"]
         
@@ -540,7 +542,7 @@ class TestUpdateEnvironmentIntegration:
                     assert "Package dependency conflicts" in error_text
 
     @pytest.mark.asyncio
-    async def test_update_environment_transaction_error(self, client: Client, existing_env_path):
+    async def test_update_environment_transaction_error(self, client: Client, existing_env_path: str) -> None:
         """Test that transaction execution errors are properly handled through MCP."""
         packages = ["numpy"]
         
@@ -572,7 +574,7 @@ class TestUpdateEnvironmentIntegration:
                     assert "Permission denied" in error_text
 
     @pytest.mark.asyncio
-    async def test_update_environment_priority_prefix_over_env_name(self, client: Client, existing_env_path):
+    async def test_update_environment_priority_prefix_over_env_name(self, client: Client, existing_env_path: str) -> None:
         """Test that prefix takes priority when both env_name and prefix are provided through MCP."""
         packages = ["numpy"]
         env_name = "test_env"

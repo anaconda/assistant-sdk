@@ -5,6 +5,7 @@ from conda.base.context import context
 from conda.core.solve import Solver
 from conda.core.link import UnlinkLinkTransaction
 from conda.models.match_spec import MatchSpec
+from conda.models.channel import Channel
 from conda.core.index import get_index
 
 
@@ -39,10 +40,13 @@ def update_environment_core(
         platform=context.subdir
     )
     
+    # Convert string channels to Channel objects
+    channels = [Channel(channel) for channel in context.channels]
+    
     # Create solver for updating the environment
     solver = Solver(
         prefix=env_path,
-        channels=context.channels,
+        channels=channels,
         subdirs=[context.subdir],
         specs_to_add=match_specs
     )

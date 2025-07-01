@@ -173,8 +173,8 @@ async def create_environment(
 )
 async def update_environment(
     packages: list[str],
-    env_name: str = None,
-    prefix: str = None
+    env_name: Optional[str] = None,
+    prefix: Optional[str] = None
 ) -> str:
     """
     Update an existing conda environment (by name or prefix) by installing/updating packages.
