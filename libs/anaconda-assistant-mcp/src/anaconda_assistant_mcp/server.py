@@ -12,6 +12,7 @@ from conda.api import SubdirData
 from .tools_core.list_environment import list_environment_core
 from .tools_core.create_environment import create_environment_core
 from .tools_core.environment_details import show_environment_details_core
+from .tools_core.update_environment import update_environment_core
 
 mcp: FastMCP = FastMCP("Anaconda Assistant MCP")
 
@@ -164,6 +165,33 @@ async def create_environment(
             f"Failed to create conda environment '{env_name}': {reason}. "
             f"Error details: {error_msg}"
         )
+
+
+@mcp.tool(
+    name="update_environment",
+    description="Update an existing Conda environment by adding or updating packages. Specify env_name or prefix."
+)
+async def update_environment(
+    packages: list[str],
+    env_name: Optional[str] = None,
+    prefix: Optional[str] = None
+) -> str:
+    """
+    Update an existing conda environment (by name or prefix) by installing/updating packages.
+    Returns the full path to the updated environment.
+    """
+    if not packages:
+        raise ValueError("Must specify at least one package to update/install.")
+
+    try:
+        env_path = update_environment_core(
+            packages=packages,
+            env_name=env_name,
+            prefix=prefix
+        )
+        return env_path
+    except Exception as e:
+        raise RuntimeError(f"Conda update failed: {str(e)}")
 
 
 @mcp.tool()
