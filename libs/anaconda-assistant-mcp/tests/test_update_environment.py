@@ -23,7 +23,7 @@ from anaconda_assistant_mcp.server import mcp
 # =============================================================================
 
 @pytest.fixture
-def temp_env_dir() -> str:
+def temp_env_dir() -> Generator[str, None, None]:
     """Create a temporary directory for testing environment updates."""
     with tempfile.TemporaryDirectory() as temp_dir:
         yield temp_dir
