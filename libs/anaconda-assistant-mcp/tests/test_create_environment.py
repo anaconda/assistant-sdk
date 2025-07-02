@@ -32,10 +32,11 @@ def temp_env_dir() -> Generator[str, None, None]:
 def mock_context() -> Generator[Mock, None, None]:
     """Mock conda context for testing."""
     with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_ctx:
-        mock_ctx.channels = ('defaults', 'conda-forge')
-        mock_ctx.subdir = 'linux-64'
-        mock_ctx.envs_dirs = ['/tmp/conda/envs']
-        yield mock_ctx
+        with patch('anaconda_assistant_mcp.tools_core.shared.context', mock_ctx):
+            mock_ctx.channels = ('defaults',)
+            mock_ctx.subdir = 'linux-64'
+            mock_ctx.envs_dirs = ['/tmp/conda/envs']
+            yield mock_ctx
 
 
 @pytest.fixture
@@ -95,10 +96,9 @@ class TestCreateEnvironmentCore:
         
         # Verify channels were converted properly
         channels = call_args[1]['channels']
-        assert len(channels) == 2
+        assert len(channels) == 1
         assert all(isinstance(ch, Channel) for ch in channels)
         assert channels[0].name == 'defaults'
-        assert channels[1].name == 'conda-forge'
         
         # Verify transaction was executed
         mock_solver_instance = mock_solver.return_value
@@ -190,7 +190,8 @@ class TestCreateEnvironmentCore:
         
         result = create_environment_core(env_name=env_name)
         
-        expected_path = os.path.join('/tmp/conda/envs', env_name)
+        # The actual path will be based on the real conda environment
+        expected_path = os.path.join(mock_context.envs_dirs[0], env_name)
         assert result == expected_path
         
         # Verify Solver was called with the expected path
@@ -308,20 +309,22 @@ class TestCreateEnvironmentCore:
         # Set up mock context with specific channels
         mock_context.channels = ('custom-channel', 'another-channel')
         
-        result = create_environment_core(
-            env_name=env_name,
-            prefix=env_path
-        )
-        
-        assert result == env_path
-        
-        # Verify channels were converted to Channel objects
-        call_args = mock_solver.call_args
-        channels = call_args[1]['channels']
-        assert len(channels) == 2
-        assert all(isinstance(ch, Channel) for ch in channels)
-        assert channels[0].name == 'custom-channel'
-        assert channels[1].name == 'another-channel'
+        # Also mock the shared module's context
+        with patch('anaconda_assistant_mcp.tools_core.shared.context', mock_context):
+            result = create_environment_core(
+                env_name=env_name,
+                prefix=env_path
+            )
+            
+            assert result == env_path
+            
+            # Verify channels were converted to Channel objects
+            call_args = mock_solver.call_args
+            channels = call_args[1]['channels']
+            assert len(channels) == 2
+            assert all(isinstance(ch, Channel) for ch in channels)
+            assert channels[0].name == 'custom-channel'
+            assert channels[1].name == 'another-channel'
 
 
 # =============================================================================
@@ -498,27 +501,28 @@ class TestCreateEnvironmentIntegration:
         env_name = "test_mcp_default_path"
         
         with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
-            mock_context.channels = ('defaults',)
-            mock_context.subdir = 'linux-64'
-            mock_context.envs_dirs = ['/tmp/conda/envs']
-            
-            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
-                mock_solver = Mock()
-                mock_transaction = Mock()
-                mock_solver.solve_for_transaction.return_value = mock_transaction
-                mock_solver_cls.return_value = mock_solver
+            with patch('anaconda_assistant_mcp.tools_core.shared.context', mock_context):
+                mock_context.channels = ('defaults',)
+                mock_context.subdir = 'linux-64'
+                mock_context.envs_dirs = ['/tmp/conda/envs']
                 
-                with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
-                    async with client:
-                        result = await client.call_tool(
-                            "create_environment",
-                            {
-                                "env_name": env_name
-                            }
-                        )
-                        
-                        expected_path = os.path.join('/tmp/conda/envs', env_name)
-                        assert result[0].text == expected_path  # type: ignore[union-attr]
+                with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
+                    mock_solver = Mock()
+                    mock_transaction = Mock()
+                    mock_solver.solve_for_transaction.return_value = mock_transaction
+                    mock_solver_cls.return_value = mock_solver
+                    
+                    with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
+                        async with client:
+                            result = await client.call_tool(
+                                "create_environment",
+                                {
+                                    "env_name": env_name
+                                }
+                            )
+                            
+                            expected_path = os.path.join('/tmp/conda/envs', env_name)
+                            assert result[0].text == expected_path  # type: ignore[union-attr]
 
     @pytest.mark.asyncio
     async def test_create_environment_solver_error(self, client: Client, temp_env_dir: str) -> None:

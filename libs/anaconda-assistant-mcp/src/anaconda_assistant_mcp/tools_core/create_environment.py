@@ -5,7 +5,12 @@ from conda.base.context import context
 from conda.core.solve import Solver
 from conda.core.envs_manager import register_env
 from conda.models.match_spec import MatchSpec
-from conda.models.channel import Channel
+
+from .shared import (
+    resolve_environment_path,
+    convert_channels_to_objects,
+    build_package_specs
+)
 
 
 def create_environment_core(
@@ -19,30 +24,19 @@ def create_environment_core(
     Returns the full path to the created environment.
     """
     # Determine the environment path
-    if prefix:
-        env_path = prefix
-    else:
-        env_path = _get_default_env_path(env_name)
+    env_path = resolve_environment_path(env_name=env_name, prefix=prefix)
     
     # Create the environment directory if it doesn't exist
     os.makedirs(env_path, exist_ok=True)
     
     # Build the list of specs to install
-    specs = []
-    if python_version:
-        specs.append(f"python={python_version}")
-    if packages:
-        specs.extend(packages)
-    
-    # If no specs provided, install python
-    if not specs:
-        specs = ["python"]
+    specs = build_package_specs(python_version=python_version, packages=packages)
     
     # Convert specs to MatchSpec objects
     match_specs = [MatchSpec(spec) for spec in specs]
     
     # Convert string channels to Channel objects
-    channels = [Channel(channel) for channel in context.channels]
+    channels = convert_channels_to_objects()
     
     # Create solver
     solver = Solver(
@@ -64,6 +58,4 @@ def create_environment_core(
     return env_path
 
 
-def _get_default_env_path(env_name: str) -> str:
-    """Get the default path for an environment with the given name."""
-    return os.path.join(context.envs_dirs[0], env_name) 
+ 

@@ -1,12 +1,16 @@
-import os
 from typing import List, Optional
 
 from conda.base.context import context
 from conda.core.solve import Solver
 from conda.core.link import UnlinkLinkTransaction
 from conda.models.match_spec import MatchSpec
-from conda.models.channel import Channel
 from conda.core.index import get_index
+
+from .shared import (
+    resolve_environment_path,
+    validate_environment_exists,
+    convert_channels_to_objects
+)
 
 
 def update_environment_core(
@@ -19,16 +23,10 @@ def update_environment_core(
     Returns the full path to the updated environment.
     """
     # Determine the environment path
-    if prefix:
-        env_path = prefix
-    elif env_name:
-        env_path = _get_default_env_path(env_name)
-    else:
-        raise ValueError("Either env_name or prefix must be provided.")
+    env_path = resolve_environment_path(env_name=env_name, prefix=prefix)
     
     # Verify the environment exists
-    if not os.path.exists(env_path):
-        raise ValueError(f"Environment does not exist: {env_path}")
+    validate_environment_exists(env_path)
     
     # Convert specs to MatchSpec objects
     match_specs = [MatchSpec(spec) for spec in packages]
@@ -41,7 +39,7 @@ def update_environment_core(
     )
     
     # Convert string channels to Channel objects
-    channels = [Channel(channel) for channel in context.channels]
+    channels = convert_channels_to_objects()
     
     # Create solver for updating the environment
     solver = Solver(
@@ -60,6 +58,4 @@ def update_environment_core(
     return env_path
 
 
-def _get_default_env_path(env_name: str) -> str:
-    """Get the default path for an environment with the given name."""
-    return os.path.join(context.envs_dirs[0], env_name) 
+ 
