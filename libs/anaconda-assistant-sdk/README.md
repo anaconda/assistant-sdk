@@ -1,11 +1,17 @@
 # anaconda-assistant
 
+[![Anaconda](https://img.shields.io/conda/v/anaconda/anaconda-assistant-sdk?style=for-the-badge&logo=anaconda&color=blue&label=anaconda)](https://anaconda.org/anaconda/anaconda-assistant-sdk)
+[![PyPI](https://img.shields.io/pypi/v/anaconda-assistant-sdk?style=for-the-badge&logo=pypi&color=blue)](https://pypi.org/project/anaconda-assistant-sdk/)
+[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/anaconda-assistant-sdk?style=for-the-badge&logo=conda-forge&color=blue)](https://anaconda.org/conda-forge/anaconda-assistant-sdk)
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/anaconda/assistant-sdk/ci-anaconda-assistant-sdk.yml?style=for-the-badge&label=tests&logo=github)
+
 The Anaconda Assistant Python client
 
 ## Installation
 
 ```text
-conda install -c anaconda-cloud anaconda-assistant-sdk
+conda install anaconda-assistant-sdk
 ```
 
 ## How to authenticate
