@@ -1,10 +1,13 @@
-import os
 from typing import Optional
 from conda.base.context import context
 from conda.core.prefix_data import PrefixData
 from conda.base.context import locate_prefix_by_name
-import sys
-import subprocess
+
+from .shared import (
+    resolve_environment_path,
+    get_python_version_from_env,
+    get_channels_from_condarc
+)
 
 
 def show_environment_details_core(env_name: Optional[str] = None, prefix: Optional[str] = None) -> dict:
@@ -42,30 +45,3 @@ def show_environment_details_core(env_name: Optional[str] = None, prefix: Option
         "channels": channels,
     }
 
-def get_python_version_from_env(env_prefix: str) -> str:
-    """Attempt to get the Python version from the environment's python executable."""
-    if sys.platform == "win32":
-        python_bin = os.path.join(env_prefix, "Scripts", "python.exe")
-    else:
-        python_bin = os.path.join(env_prefix, "bin", "python")
-    if not os.path.exists(python_bin):
-        return ""
-    try:
-        output = subprocess.check_output([python_bin, "--version"], stderr=subprocess.STDOUT)
-        return output.decode().strip().split()[-1]
-    except Exception:
-        return ""
-
-def get_channels_from_condarc() -> list:
-    """Attempt to get channels from the user's .condarc file."""
-    channels = []
-    try:
-        condarc_path = os.path.join(os.path.expanduser("~"), ".condarc")
-        if os.path.exists(condarc_path):
-            import yaml  # type: ignore
-            with open(condarc_path, "r") as f:
-                condarc = yaml.safe_load(f)
-                channels = condarc.get("channels", [])
-    except Exception:
-        pass
-    return channels

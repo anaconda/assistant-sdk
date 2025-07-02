@@ -1,7 +1,7 @@
-import os
-
 from conda.base.context import context
 from conda.core.envs_manager import list_all_known_prefixes
+
+from .shared import get_env_info
 
 
 def list_environment_core() -> list[dict]:
@@ -21,25 +21,4 @@ def list_environment_core() -> list[dict]:
     return output
 
 
-def get_env_info(env_path: str) -> dict:
-    """Print information about a single environment"""
-    # Get environment name
-    env_name = os.path.basename(env_path)
-    if env_name == "":
-        env_name = os.path.basename(os.path.dirname(env_path))
 
-    # Check if this is the base environment
-    is_base = env_path == context.root_prefix
-    if is_base:
-        env_name = "base"
-
-    # Check if environment exists and is accessible
-    # exists = os.path.exists(env_path)
-    # is_accessible = os.access(env_path, os.R_OK) if exists else False
-
-    output = {
-        "name": env_name,
-        "path": env_path,
-    }
-
-    return output
