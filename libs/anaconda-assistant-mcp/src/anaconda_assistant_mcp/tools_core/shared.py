@@ -62,9 +62,9 @@ def validate_environment_exists(env_path: str) -> None:
         raise ValueError(f"Environment does not exist: {env_path}")
 
 
-def convert_channels_to_objects() -> List[Channel]:
+def get_channels_from_context() -> List[Channel]:
     """
-    Convert string channels from context to Channel objects.
+    Get Channel objects from the conda context.
     
     Returns:
         List of Channel objects

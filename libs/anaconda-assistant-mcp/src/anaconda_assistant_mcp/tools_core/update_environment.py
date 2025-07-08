@@ -9,7 +9,7 @@ from conda.core.index import get_index
 from .shared import (
     resolve_environment_path,
     validate_environment_exists,
-    convert_channels_to_objects
+    get_channels_from_context
 )
 
 
@@ -39,7 +39,7 @@ def update_environment_core(
     )
     
     # Convert string channels to Channel objects
-    channels = convert_channels_to_objects()
+    channels = get_channels_from_context()
     
     # Create solver for updating the environment
     solver = Solver(

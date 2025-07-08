@@ -8,7 +8,7 @@ from conda.models.match_spec import MatchSpec
 
 from .shared import (
     resolve_environment_path,
-    convert_channels_to_objects,
+    get_channels_from_context,
     build_package_specs
 )
 
@@ -36,7 +36,7 @@ def create_environment_core(
     match_specs = [MatchSpec(spec) for spec in specs]
     
     # Convert string channels to Channel objects
-    channels = convert_channels_to_objects()
+    channels = get_channels_from_context()
     
     # Create solver
     solver = Solver(
