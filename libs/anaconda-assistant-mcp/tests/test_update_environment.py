@@ -85,7 +85,7 @@ class TestUpdateEnvironmentCore:
         packages = ["numpy>=1.20", "pandas"]
         
         # Mock get_channels_from_condarc to return expected channels
-        with patch('anaconda_assistant_mcp.tools_core.shared.get_channels_from_condarc') as mock_get_channels:
+        with patch('anaconda_assistant_mcp.tools_core.update_environment.get_channels_from_condarc') as mock_get_channels:
             mock_get_channels.return_value = ['conda-forge', 'defaults', 'pkgs/main', 'pkgs/r']
             
             result = update_environment_core(
@@ -119,7 +119,7 @@ class TestUpdateEnvironmentCore:
         
         # Verify get_index was called
         mock_get_index.assert_called_once_with(
-            channel_urls=['conda-forge', 'defaults', 'https://repo.anaconda.com/pkgs/main', 'https://repo.anaconda.com/pkgs/r'],
+            channel_urls=['conda-forge', 'defaults', 'pkgs/main', 'pkgs/r'],
             prepend=False,
             platform='linux-64'
         )

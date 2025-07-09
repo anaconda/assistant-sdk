@@ -76,7 +76,7 @@ class TestCreateEnvironmentCore:
         env_path = os.path.join(temp_env_dir, env_name)
         
         # Mock get_channels_from_condarc to return expected channels
-        with patch('anaconda_assistant_mcp.tools_core.shared.get_channels_from_condarc') as mock_get_channels:
+        with patch('anaconda_assistant_mcp.tools_core.create_environment.get_channels_from_condarc') as mock_get_channels:
             mock_get_channels.return_value = ['conda-forge', 'defaults', 'pkgs/main', 'pkgs/r']
             
             result = create_environment_core(
@@ -316,7 +316,6 @@ class TestCreateEnvironmentCore:
         # Mock get_channels_from_condarc to return custom channels
         with patch('anaconda_assistant_mcp.tools_core.create_environment.get_channels_from_condarc') as mock_get_channels:
             mock_get_channels.return_value = ['custom-channel', 'another-channel']
-            print(f"Mock return value: {mock_get_channels.return_value}")
             
             result = create_environment_core(
                 env_name=env_name,
@@ -328,7 +327,6 @@ class TestCreateEnvironmentCore:
         # Verify channels were converted to Channel objects
         call_args = mock_solver.call_args
         channels = call_args[1]['channels']
-        print(f"Actual channels: {[ch.name for ch in channels]}")
         assert len(channels) == 2
         assert all(isinstance(ch, Channel) for ch in channels)
         assert channels[0].name == 'custom-channel'
