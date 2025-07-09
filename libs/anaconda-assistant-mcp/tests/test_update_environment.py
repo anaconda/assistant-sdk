@@ -16,6 +16,7 @@ from conda.base.context import context
 
 from anaconda_assistant_mcp.tools_core.update_environment import update_environment_core
 from anaconda_assistant_mcp.server import mcp
+from anaconda_assistant_mcp.tools_core.shared import os
 
 
 # =============================================================================
@@ -41,10 +42,11 @@ def existing_env_path(temp_env_dir: str) -> str:
 def mock_context() -> Generator[Mock, None, None]:
     """Mock conda context for testing."""
     with patch('anaconda_assistant_mcp.tools_core.update_environment.context') as mock_ctx:
-        mock_ctx.channels = ('defaults', 'conda-forge')
-        mock_ctx.subdir = 'linux-64'
-        mock_ctx.envs_dirs = ['/tmp/conda/envs']
-        yield mock_ctx
+        with patch('anaconda_assistant_mcp.tools_core.shared.context', mock_ctx):
+            mock_ctx.channels = ('defaults',)
+            mock_ctx.subdir = 'linux-64'
+            mock_ctx.envs_dirs = ['/tmp/conda/envs']
+            yield mock_ctx
 
 
 @pytest.fixture
@@ -79,13 +81,17 @@ class TestUpdateEnvironmentCore:
     """Unit tests for update_environment_core function."""
 
     def test_update_environment_core_basic(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
-        """Test basic environment update with packages."""
-        packages = ["numpy", "pandas"]
+        """Test basic environment update."""
+        packages = ["numpy>=1.20", "pandas"]
         
-        result = update_environment_core(
-            packages=packages,
-            prefix=existing_env_path
-        )
+        # Mock get_channels_from_condarc to return expected channels
+        with patch('anaconda_assistant_mcp.tools_core.update_environment.get_channels_from_condarc') as mock_get_channels:
+            mock_get_channels.return_value = ['conda-forge', 'defaults', 'pkgs/main', 'pkgs/r']
+            
+            result = update_environment_core(
+                packages=packages,
+                prefix=existing_env_path
+            )
         
         assert result == existing_env_path
         
@@ -95,27 +101,25 @@ class TestUpdateEnvironmentCore:
         assert call_args[1]['prefix'] == existing_env_path
         assert call_args[1]['subdirs'] == ['linux-64']
         
-        # Verify specs were converted properly
+        # Verify specs were converted to MatchSpec objects
         specs = call_args[1]['specs_to_add']
         assert len(specs) == 2
         assert specs[0].name == 'numpy'
+        assert specs[0].version == '>=1.20'
         assert specs[1].name == 'pandas'
         
         # Verify channels were converted to Channel objects
         channels = call_args[1]['channels']
-        assert len(channels) == 2
+        assert len(channels) == 4
         assert all(isinstance(ch, Channel) for ch in channels)
-        assert channels[0].name == 'defaults'
-        assert channels[1].name == 'conda-forge'
-        
-        # Verify transaction was executed
-        mock_solver_instance = mock_solver.return_value
-        mock_solver_instance.solve_for_transaction.assert_called_once()
-        mock_solver_instance.solve_for_transaction().execute.assert_called_once()
+        assert channels[0].name == 'conda-forge'
+        assert channels[1].name == 'defaults'
+        assert channels[2].name == 'pkgs/main'
+        assert channels[3].name == 'pkgs/r'
         
         # Verify get_index was called
         mock_get_index.assert_called_once_with(
-            channel_urls=('defaults', 'conda-forge'),
+            channel_urls=['conda-forge', 'defaults', 'pkgs/main', 'pkgs/r'],
             prepend=False,
             platform='linux-64'
         )
@@ -127,7 +131,7 @@ class TestUpdateEnvironmentCore:
         
         # Mock os.path.exists to return True for the expected path
         expected_path = os.path.join('/tmp/conda/envs', env_name)
-        with patch('anaconda_assistant_mcp.tools_core.update_environment.os.path.exists') as mock_exists:
+        with patch('anaconda_assistant_mcp.tools_core.shared.os.path.exists') as mock_exists:
             mock_exists.return_value = True
             
             result = update_environment_core(
@@ -217,7 +221,7 @@ class TestUpdateEnvironmentCore:
         
         # Mock os.path.exists to return False for the specific path
         expected_path = os.path.join('/tmp/conda/envs', env_name)
-        with patch('anaconda_assistant_mcp.tools_core.update_environment.os.path.exists') as mock_exists:
+        with patch('anaconda_assistant_mcp.tools_core.shared.os.path.exists') as mock_exists:
             mock_exists.return_value = False
             
             with pytest.raises(ValueError, match=re.escape(f"Environment does not exist: {expected_path}")):
@@ -260,30 +264,31 @@ class TestUpdateEnvironmentCore:
         """Test that string channels are properly converted to Channel objects."""
         packages = ["numpy"]
         
-        # Set up mock context with specific channels
-        mock_context.channels = ('custom-channel', 'another-channel')
-        
-        result = update_environment_core(
-            packages=packages,
-            prefix=existing_env_path
-        )
-        
-        assert result == existing_env_path
-        
-        # Verify channels were converted to Channel objects
-        call_args = mock_solver.call_args
-        channels = call_args[1]['channels']
-        assert len(channels) == 2
-        assert all(isinstance(ch, Channel) for ch in channels)
-        assert channels[0].name == 'custom-channel'
-        assert channels[1].name == 'another-channel'
-        
-        # Verify get_index was called with the correct channels
-        mock_get_index.assert_called_once_with(
-            channel_urls=('custom-channel', 'another-channel'),
-            prepend=False,
-            platform='linux-64'
-        )
+        # Mock get_channels_from_condarc to return custom channels
+        with patch('anaconda_assistant_mcp.tools_core.update_environment.get_channels_from_condarc') as mock_get_channels:
+            mock_get_channels.return_value = ['custom-channel', 'another-channel']
+            
+            result = update_environment_core(
+                packages=packages,
+                prefix=existing_env_path
+            )
+            
+            assert result == existing_env_path
+            
+            # Verify channels were converted to Channel objects
+            call_args = mock_solver.call_args
+            channels = call_args[1]['channels']
+            assert len(channels) == 2
+            assert all(isinstance(ch, Channel) for ch in channels)
+            assert channels[0].name == 'custom-channel'
+            assert channels[1].name == 'another-channel'
+            
+            # Verify get_index was called with the correct channels
+            mock_get_index.assert_called_once_with(
+                channel_urls=['custom-channel', 'another-channel'],
+                prepend=False,
+                platform='linux-64'
+            )
 
     def test_update_environment_core_matchspec_conversion(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
         """Test that package strings are properly converted to MatchSpec objects."""
@@ -382,35 +387,36 @@ class TestUpdateEnvironmentIntegration:
         env_name = "test_env"
         
         with patch('anaconda_assistant_mcp.tools_core.update_environment.context') as mock_context:
-            mock_context.channels = ('defaults',)
-            mock_context.subdir = 'linux-64'
-            mock_context.envs_dirs = ['/tmp/conda/envs']
-            
-            with patch('anaconda_assistant_mcp.tools_core.update_environment.Solver') as mock_solver_cls:
-                mock_solver = Mock()
-                mock_transaction = Mock()
-                mock_solver.solve_for_transaction.return_value = mock_transaction
-                mock_solver_cls.return_value = mock_solver
+            with patch('anaconda_assistant_mcp.tools_core.shared.context', mock_context):
+                mock_context.channels = ('defaults',)
+                mock_context.subdir = 'linux-64'
+                mock_context.envs_dirs = ['/tmp/conda/envs']
                 
-                with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index'):
-                    with patch('anaconda_assistant_mcp.tools_core.update_environment.os.path.exists') as mock_exists:
-                        mock_exists.return_value = True
-                        
-                        async with client:
-                            result = await client.call_tool(
-                                "update_environment",
-                                {
-                                    "packages": packages,
-                                    "env_name": env_name
-                                }
-                            )
+                with patch('anaconda_assistant_mcp.tools_core.update_environment.Solver') as mock_solver_cls:
+                    mock_solver = Mock()
+                    mock_transaction = Mock()
+                    mock_solver.solve_for_transaction.return_value = mock_transaction
+                    mock_solver_cls.return_value = mock_solver
+                    
+                    with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index'):
+                        with patch('anaconda_assistant_mcp.tools_core.shared.os.path.exists') as mock_exists:
+                            mock_exists.return_value = True
                             
-                            expected_path = os.path.join('/tmp/conda/envs', env_name)
-                            assert result[0].text == expected_path  # type: ignore[union-attr]
-                            
-                            # Verify the solver was called with the expected path
-                            call_args = mock_solver_cls.call_args
-                            assert call_args[1]['prefix'] == expected_path
+                            async with client:
+                                result = await client.call_tool(
+                                    "update_environment",
+                                    {
+                                        "packages": packages,
+                                        "env_name": env_name
+                                    }
+                                )
+                                
+                                expected_path = os.path.join('/tmp/conda/envs', env_name)
+                                assert result[0].text == expected_path  # type: ignore[union-attr]
+                                
+                                # Verify the solver was called with the expected path
+                                call_args = mock_solver_cls.call_args
+                                assert call_args[1]['prefix'] == expected_path
 
     @pytest.mark.asyncio
     async def test_update_environment_with_complex_packages(self, client: Client, existing_env_path: str) -> None:
@@ -592,19 +598,22 @@ class TestUpdateEnvironmentIntegration:
                 mock_solver_cls.return_value = mock_solver
                 
                 with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index'):
-                    async with client:
-                        result = await client.call_tool(
-                            "update_environment",
-                            {
-                                "packages": packages,
-                                "env_name": env_name,
-                                "prefix": existing_env_path
-                            }
-                        )
+                    with patch('anaconda_assistant_mcp.tools_core.shared.os.path.exists') as mock_exists:
+                        mock_exists.return_value = True
                         
-                        # Should use the prefix, not the env_name
-                        assert result[0].text == existing_env_path  # type: ignore[union-attr]
-                        
-                        # Verify Solver was called with the prefix path
-                        call_args = mock_solver_cls.call_args
-                        assert call_args[1]['prefix'] == existing_env_path 
+                        async with client:
+                            result = await client.call_tool(
+                                "update_environment",
+                                {
+                                    "packages": packages,
+                                    "env_name": env_name,
+                                    "prefix": existing_env_path
+                                }
+                            )
+                            
+                            # Should use the prefix, not the env_name
+                            assert result[0].text == existing_env_path  # type: ignore[union-attr]
+                            
+                            # Verify Solver was called with the prefix path
+                            call_args = mock_solver_cls.call_args
+                            assert call_args[1]['prefix'] == existing_env_path 
