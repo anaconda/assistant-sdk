@@ -5,11 +5,12 @@ from conda.core.solve import Solver
 from conda.core.link import UnlinkLinkTransaction
 from conda.models.match_spec import MatchSpec
 from conda.core.index import get_index
+from conda.models.channel import Channel
 
 from .shared import (
     resolve_environment_path,
     validate_environment_exists,
-    get_channels_from_context
+    get_channels_from_condarc
 )
 
 
@@ -33,13 +34,14 @@ def update_environment_core(
     
     # Get the index for the channels
     index = get_index(
-        channel_urls=context.channels,
+        channel_urls=get_channels_from_condarc(),
         prepend=False,
         platform=context.subdir
     )
     
     # Convert string channels to Channel objects
-    channels = get_channels_from_context()
+    channel_strings = get_channels_from_condarc()
+    channels = [Channel(channel) for channel in channel_strings]
     
     # Create solver for updating the environment
     solver = Solver(

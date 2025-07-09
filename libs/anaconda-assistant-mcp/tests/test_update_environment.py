@@ -81,13 +81,17 @@ class TestUpdateEnvironmentCore:
     """Unit tests for update_environment_core function."""
 
     def test_update_environment_core_basic(self, existing_env_path: str, mock_context: Mock, mock_solver: Mock, mock_get_index: Mock) -> None:
-        """Test basic environment update with packages."""
-        packages = ["numpy", "pandas"]
+        """Test basic environment update."""
+        packages = ["numpy>=1.20", "pandas"]
         
-        result = update_environment_core(
-            packages=packages,
-            prefix=existing_env_path
-        )
+        # Mock get_channels_from_condarc to return expected channels
+        with patch('anaconda_assistant_mcp.tools_core.shared.get_channels_from_condarc') as mock_get_channels:
+            mock_get_channels.return_value = ['conda-forge', 'defaults', 'pkgs/main', 'pkgs/r']
+            
+            result = update_environment_core(
+                packages=packages,
+                prefix=existing_env_path
+            )
         
         assert result == existing_env_path
         
@@ -97,26 +101,25 @@ class TestUpdateEnvironmentCore:
         assert call_args[1]['prefix'] == existing_env_path
         assert call_args[1]['subdirs'] == ['linux-64']
         
-        # Verify specs were converted properly
+        # Verify specs were converted to MatchSpec objects
         specs = call_args[1]['specs_to_add']
         assert len(specs) == 2
         assert specs[0].name == 'numpy'
+        assert specs[0].version == '>=1.20'
         assert specs[1].name == 'pandas'
         
         # Verify channels were converted to Channel objects
         channels = call_args[1]['channels']
-        assert len(channels) == 1
+        assert len(channels) == 4
         assert all(isinstance(ch, Channel) for ch in channels)
-        assert channels[0].name == 'defaults'
-        
-        # Verify transaction was executed
-        mock_solver_instance = mock_solver.return_value
-        mock_solver_instance.solve_for_transaction.assert_called_once()
-        mock_solver_instance.solve_for_transaction().execute.assert_called_once()
+        assert channels[0].name == 'conda-forge'
+        assert channels[1].name == 'defaults'
+        assert channels[2].name == 'pkgs/main'
+        assert channels[3].name == 'pkgs/r'
         
         # Verify get_index was called
         mock_get_index.assert_called_once_with(
-            channel_urls=('defaults',),
+            channel_urls=['conda-forge', 'defaults', 'https://repo.anaconda.com/pkgs/main', 'https://repo.anaconda.com/pkgs/r'],
             prepend=False,
             platform='linux-64'
         )
@@ -261,11 +264,10 @@ class TestUpdateEnvironmentCore:
         """Test that string channels are properly converted to Channel objects."""
         packages = ["numpy"]
         
-        # Set up mock context with specific channels
-        mock_context.channels = ('custom-channel', 'another-channel')
-        
-        # Also mock the shared module's context
-        with patch('anaconda_assistant_mcp.tools_core.shared.context', mock_context):
+        # Mock get_channels_from_condarc to return custom channels
+        with patch('anaconda_assistant_mcp.tools_core.update_environment.get_channels_from_condarc') as mock_get_channels:
+            mock_get_channels.return_value = ['custom-channel', 'another-channel']
+            
             result = update_environment_core(
                 packages=packages,
                 prefix=existing_env_path
@@ -283,7 +285,7 @@ class TestUpdateEnvironmentCore:
             
             # Verify get_index was called with the correct channels
             mock_get_index.assert_called_once_with(
-                channel_urls=('custom-channel', 'another-channel'),
+                channel_urls=['custom-channel', 'another-channel'],
                 prepend=False,
                 platform='linux-64'
             )

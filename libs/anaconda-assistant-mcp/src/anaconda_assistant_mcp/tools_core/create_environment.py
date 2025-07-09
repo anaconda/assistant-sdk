@@ -5,10 +5,11 @@ from conda.base.context import context
 from conda.core.solve import Solver
 from conda.core.envs_manager import register_env
 from conda.models.match_spec import MatchSpec
+from conda.models.channel import Channel
 
 from .shared import (
     resolve_environment_path,
-    get_channels_from_context,
+    get_channels_from_condarc,
     build_package_specs
 )
 
@@ -36,7 +37,8 @@ def create_environment_core(
     match_specs = [MatchSpec(spec) for spec in specs]
     
     # Convert string channels to Channel objects
-    channels = get_channels_from_context()
+    channel_strings = get_channels_from_condarc()
+    channels = [Channel(channel) for channel in channel_strings]
     
     # Create solver
     solver = Solver(
