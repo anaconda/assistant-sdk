@@ -177,14 +177,16 @@ async def create_environment(
     description="Update an existing Conda environment by adding or updating packages. Specify env_name or prefix."
 )
 async def update_environment(
-    packages: list[str],
+    packages: Annotated[Union[List[str], str], Field(description="List of packages to update/install.")],
     env_name: Optional[str] = None,
     prefix: Optional[str] = None
 ) -> str:
-    """
-    Update an existing conda environment (by name or prefix) by installing/updating packages.
-    Returns the full path to the updated environment.
-    """
+    if isinstance(packages, str):
+        import ast
+        try:
+            packages = ast.literal_eval(packages)
+        except Exception:
+            raise RuntimeError("Could not parse 'packages' argument as a list.")
     if not packages:
         raise ValueError("Must specify at least one package to update/install.")
 
