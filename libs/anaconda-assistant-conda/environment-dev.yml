@@ -12,3 +12,4 @@ dependencies:
 - pip:
     - "-e ../anaconda-assistant-sdk"
     - "-e .[dev]"
+  - fastmcp

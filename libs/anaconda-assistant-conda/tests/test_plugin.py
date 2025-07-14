@@ -7,6 +7,9 @@ from anaconda_assistant_conda.plugin import AssistantCondaConfig
 from conda.exception_handler import ExceptionHandler
 from conda import CondaError
 from conda.exceptions import PackagesNotFoundError
+import subprocess
+import sys
+import os
 
 
 @pytest.mark.usefixtures("is_not_a_tty")
@@ -199,3 +202,16 @@ def test_error_handler_search_packgenotfounderror(
     )
     stderr = capsys.readouterr().err
     assert "conda assist search" not in stderr
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+def test_mcp_client_cli_returns_response():
+    # Assumes MCP server is already running and accessible via stdio
+    # Replace 'python -m anaconda_assistant_conda.cli' with the actual CLI entry point if different
+    cli_path = os.path.join(os.path.dirname(__file__), '../src/anaconda_assistant_conda/cli.py')
+    prompt = "List all conda environments."
+    result = subprocess.run([sys.executable, cli_path, "mcp", prompt], capture_output=True, text=True)
+    assert result.returncode == 0
+    assert "No response from server." not in result.stdout
+    assert result.stdout.strip() != ""
