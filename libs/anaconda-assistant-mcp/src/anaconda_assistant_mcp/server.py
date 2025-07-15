@@ -1,10 +1,9 @@
 import json
 import asyncio
 import typer
-from typing import Optional, Annotated
+from typing import Optional, Annotated, List, Union
 from pydantic import Field
 
-from typing import List, Optional
 from fastmcp import FastMCP, Context
 from fastmcp.exceptions import ToolError
 from conda.api import SubdirData
@@ -13,6 +12,7 @@ from .tools_core.list_environment import list_environment_core
 from .tools_core.create_environment import create_environment_core
 from .tools_core.environment_details import show_environment_details_core
 from .tools_core.update_environment import update_environment_core
+import ast
 
 mcp: FastMCP = FastMCP("Anaconda Assistant MCP")
 
@@ -78,7 +78,7 @@ async def create_environment(
     context: Context,
     env_name: Annotated[str, Field(description="The name of the environment to create. This will be used to generate the environment path if no prefix is specified.")],
     python_version: Annotated[Optional[str], Field(description="Optional Python version specification (e.g., '3.9', '3.10.0'). If not provided, the latest available Python version will be used.")] = None,
-    packages: Annotated[Optional[List[str]], Field(description="Optional list of package specifications to install in the environment. Each package can include version constraints (e.g., ['numpy>=1.20', 'pandas']). If not provided, only Python will be installed.")] = None,
+    packages: Annotated[Optional[Union[List[str], str]], Field(description="Optional list of package specifications to install in the environment. Each package can include version constraints (e.g., ['numpy>=1.20', 'pandas']). If not provided, only Python will be installed.")] = None,
     prefix: Annotated[Optional[str], Field(description="Optional full path where the environment should be created. If not provided, the environment will be created in the default conda environments directory using the env_name.")] = None
 ) -> str:
     """
@@ -108,6 +108,14 @@ async def create_environment(
         Create environment in custom location:
         >>> create_environment("myenv", prefix="/custom/path/myenv")
     """
+    if isinstance(packages, str):
+        try:
+            import ast
+            packages = ast.literal_eval(packages)
+        except Exception:
+            raise ToolError("Could not parse 'packages' argument as a list.")
+    if packages is not None and not isinstance(packages, list):
+        packages = [packages]
     try:
         # Report initial progress
         await context.report_progress(
@@ -172,14 +180,18 @@ async def create_environment(
     description="Update an existing Conda environment by adding or updating packages. Specify env_name or prefix."
 )
 async def update_environment(
-    packages: list[str],
+    packages: Annotated[Union[List[str], str], Field(description="List of packages to update/install.")],
     env_name: Optional[str] = None,
     prefix: Optional[str] = None
 ) -> str:
-    """
-    Update an existing conda environment (by name or prefix) by installing/updating packages.
-    Returns the full path to the updated environment.
-    """
+    if isinstance(packages, str):
+        import ast
+        try:
+            packages = ast.literal_eval(packages)
+        except Exception:
+            raise RuntimeError("Could not parse 'packages' argument as a list.")
+    if not isinstance(packages, list):
+        packages = [packages]
     if not packages:
         raise ValueError("Must specify at least one package to update/install.")
 
