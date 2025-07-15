@@ -110,9 +110,12 @@ async def create_environment(
     """
     if isinstance(packages, str):
         try:
+            import ast
             packages = ast.literal_eval(packages)
         except Exception:
             raise ToolError("Could not parse 'packages' argument as a list.")
+    if packages is not None and not isinstance(packages, list):
+        packages = [packages]
     try:
         # Report initial progress
         await context.report_progress(
@@ -187,6 +190,8 @@ async def update_environment(
             packages = ast.literal_eval(packages)
         except Exception:
             raise RuntimeError("Could not parse 'packages' argument as a list.")
+    if not isinstance(packages, list):
+        packages = [packages]
     if not packages:
         raise ValueError("Must specify at least one package to update/install.")
 
