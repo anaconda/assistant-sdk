@@ -24,14 +24,8 @@ See https://github.com/anaconda/assistant-sdk/tree/main/libs/anaconda-assistant-
 mcp_app = typer.Typer(
     help=helptext,
     add_help_option=True,
-    no_args_is_help=True,
     add_completion=False,
 )
-
-
-@mcp_app.callback(invoke_without_command=True, no_args_is_help=True)
-def _() -> None:
-    pass
 
 
 @mcp_app.command(name="serve")

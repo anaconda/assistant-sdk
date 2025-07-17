@@ -48,9 +48,9 @@ def mcp(prompt: str) -> None:
     """Send a prompt to an already-running MCP server and print the response."""
     async def run():
         async with Client(transport="stdio") as client:
-            # For now, just call the 'chat' tool if available, else print error
+            # Call the list_environment tool as a test
             try:
-                result = await client.call_tool("chat", {"prompt": prompt})
+                result = await client.call_tool("list_environment", {})
                 print(result[0].text if result else "No response from server.")
             except Exception as e:
                 print(f"Error communicating with MCP server: {e}")
