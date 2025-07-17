@@ -6,6 +6,7 @@ requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
 dependencies = [
   "anaconda-cli-base >=0.5",
   "anaconda-assistant-sdk >=0.4",
+  "anaconda-assistant-mcp",
   "anaconda-auth >=0.8",
   "rich",
   "requests",
@@ -128,6 +129,7 @@ conda_channels =
 conda_deps =
     conda
     anaconda-assistant-sdk
+    anaconda-assistant-mcp
 commands = pytest
 
 [testenv:mypy]
