@@ -124,8 +124,8 @@ deps =
   pytest
 extras = dev
 conda_channels =
-    anaconda-cloud/label/dev
     anaconda-cloud
+    conda-forge
     defaults
 conda_deps =
     conda
