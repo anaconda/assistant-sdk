@@ -12,7 +12,7 @@ dependencies = [
   "pydantic >=2",
   "tomli",
   "tomli-w",
-  "fastmcp"
+  "fastmcp <2.0.0"
 ]
 description = "The Anaconda Assistant conda plugin"
 dynamic = ["version"]
