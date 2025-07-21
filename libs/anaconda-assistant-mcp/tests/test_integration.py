@@ -1,3 +1,4 @@
+import sys
 import pytest
 from fastmcp import Client
 import json
@@ -10,6 +11,12 @@ from anaconda_assistant_mcp.server import mcp
 # And docs say to test this way:
 # https://gofastmcp.com/patterns/testing
 # In any case, this is a good test of the MCP server.
+
+
+pytestmark = pytest.mark.skipif(
+    sys.version_info < (3, 10),
+    reason="MCP tests require Python 3.10+"
+)
 
 
 @pytest.fixture()

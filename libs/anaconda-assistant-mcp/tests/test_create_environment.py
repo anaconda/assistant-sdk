@@ -16,6 +16,12 @@ from conda.base.context import context
 from anaconda_assistant_mcp.tools_core.create_environment import create_environment_core
 from anaconda_assistant_mcp.server import mcp
 
+import sys
+
+pytestmark = pytest.mark.skipif(
+    sys.version_info < (3, 10),
+    reason="MCP tests require Python 3.10+"
+)
 
 # =============================================================================
 # FIXTURES
