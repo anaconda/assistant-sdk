@@ -206,7 +206,7 @@ def test_error_handler_search_packgenotfounderror(
 
 
 @pytest.mark.integration
-def test_mcp_client_cli_returns_response():
+def test_mcp_client_cli_returns_response() -> None:
     # Test the MCP server using the actual conda command that users would use
     # This assumes the anaconda-assistant-mcp plugin is installed in the user's conda environment
     import json
