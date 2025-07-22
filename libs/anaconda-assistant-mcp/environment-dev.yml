@@ -10,6 +10,6 @@ dependencies:
   - pytest-asyncio
   - cruft
   - pip
-  - fastmcp<2.0.0
+  - fastmcp==2.8.1
   - pip:
       - "-e .[dev]"
