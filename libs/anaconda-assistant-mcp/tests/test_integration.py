@@ -13,12 +13,6 @@ from anaconda_assistant_mcp.server import mcp
 # In any case, this is a good test of the MCP server.
 
 
-pytestmark = pytest.mark.skipif(
-    sys.version_info < (3, 10),
-    reason="MCP tests require Python 3.10+"
-)
-
-
 @pytest.fixture()
 def client() -> Client:
     return Client(mcp)
