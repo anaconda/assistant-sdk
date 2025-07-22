@@ -70,7 +70,7 @@ files = [
   "src/**/*.py",
   "tests/**/*.py"
 ]
-python_version = "3.9"
+python_version = "3.10"
 
 [[tool.mypy.overrides]]
 ignore_errors = true
@@ -83,6 +83,10 @@ module = "rich_click.*"
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
 module = "conda.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "mcp.*"
 
 [tool.pytest.ini_options]
 addopts = [
