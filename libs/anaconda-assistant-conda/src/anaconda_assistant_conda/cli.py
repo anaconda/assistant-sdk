@@ -46,7 +46,7 @@ def configure() -> None:
 @app.command(name="mcp")
 def mcp(prompt: str) -> None:
     """Send a prompt to an already-running MCP server and print the response."""
-    async def run():
+    async def run() -> None:
         async with Client(transport="stdio") as client:
             # Call the list_environment tool as a test
             try:
