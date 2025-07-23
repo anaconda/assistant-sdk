@@ -18,6 +18,7 @@ from anaconda_assistant_mcp.tools_core.update_environment import update_environm
 from anaconda_assistant_mcp.server import mcp
 from anaconda_assistant_mcp.tools_core.shared import os
 
+import sys
 
 # =============================================================================
 # FIXTURES

@@ -1,3 +1,4 @@
+import sys
 import pytest
 from fastmcp import Client
 import json
