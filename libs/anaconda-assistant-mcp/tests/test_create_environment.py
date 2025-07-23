@@ -1,21 +1,14 @@
 import os
 import tempfile
 import pytest
-import json
 from typing import Generator
-from unittest.mock import Mock, patch, MagicMock
-from pathlib import Path
+from unittest.mock import Mock, patch
 from fastmcp import Client
 
-from conda.core.solve import Solver
-from conda.core.envs_manager import register_env
-from conda.models.match_spec import MatchSpec
 from conda.models.channel import Channel
-from conda.base.context import context
 
 from anaconda_assistant_mcp.tools_core.create_environment import create_environment_core
 from anaconda_assistant_mcp.server import mcp
-
 
 # =============================================================================
 # FIXTURES

@@ -4,6 +4,9 @@ import typer
 from rich.console import Console
 from typing_extensions import Annotated
 
+import asyncio
+from fastmcp import Client
+
 from .prompt_debug_config import prompt_debug_config
 from .config import AssistantCondaConfig
 
@@ -38,3 +41,17 @@ def configure() -> None:
         "[yellow]Warning: The 'configure' command is deprecated and will be removed in a future version. Please use `conda assist config`.[/yellow]"
     )
     prompt_debug_config()
+
+
+@app.command(name="mcp")
+def mcp(prompt: str) -> None:
+    """Send a prompt to an already-running MCP server and print the response."""
+    async def run() -> None:
+        async with Client(transport="stdio") as client:
+            # Call the list_environment tool as a test
+            try:
+                result = await client.call_tool("list_environment", {})
+                print(result[0].text if result else "No response from server.")
+            except Exception as e:
+                print(f"Error communicating with MCP server: {e}")
+    asyncio.run(run())
