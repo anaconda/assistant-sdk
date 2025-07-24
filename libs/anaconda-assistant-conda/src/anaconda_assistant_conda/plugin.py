@@ -136,7 +136,7 @@ def error_handler(command: str) -> None:
                 print(repr(e))
                 sys.exit(1)
 
-            report = self.get_error_report(exc_val, exc_tb)
+            report = self.get_error_report(exc_val, exc_tb)  # type: ignore[arg-type]
             command = get_clean_error_report_command(report)
             prompt = f"COMMAND:\n{command}\nMESSAGE:\n{report['error']}"
             is_a_tty = sys.stdout.isatty()

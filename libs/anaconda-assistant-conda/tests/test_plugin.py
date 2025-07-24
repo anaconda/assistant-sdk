@@ -210,7 +210,7 @@ async def test_mcp_client_can_invoke_tools() -> None:
     """Test that the MCP client can successfully invoke tools from the MCP server."""
     import json
     from fastmcp import Client
-    from anaconda_assistant_mcp.server import mcp
+    from anaconda_assistant_mcp.server import mcp  # type: ignore[import-untyped]
     
     # Create a client that connects to the MCP server
     async with Client(mcp) as client:
@@ -294,7 +294,7 @@ def test_mcp_plugin_registration() -> None:
     if len(mcp_entry_points) == 0:
         # Check if we can at least import the MCP server directly
         try:
-            from anaconda_assistant_mcp.server import mcp, mcp_app
+            from anaconda_assistant_mcp.server import mcp, mcp_app  # type: ignore[import-untyped]
             # If we can import it, that's good enough for the test
             return
         except ImportError:
@@ -302,7 +302,7 @@ def test_mcp_plugin_registration() -> None:
     
     # Check that we can import and instantiate the MCP plugin
     try:
-        from anaconda_assistant_mcp.plugin import conda_subcommands
+        from anaconda_assistant_mcp.plugin import conda_subcommands  # type: ignore[import-untyped]
         # This should not raise an exception
         assert conda_subcommands is not None
     except ImportError as e:
@@ -340,7 +340,7 @@ async def test_mcp_plugin_is_installed_and_accessible() -> None:
     if len(mcp_entry_points) == 0:
         # Check if we can at least import the MCP server directly
         try:
-            from anaconda_assistant_mcp.server import mcp, mcp_app
+            from anaconda_assistant_mcp.server import mcp, mcp_app  # type: ignore[import-untyped]
             # If we can import it, that's good enough for the test
             return
         except ImportError:
@@ -348,7 +348,7 @@ async def test_mcp_plugin_is_installed_and_accessible() -> None:
     
     # Check that we can import the MCP server
     try:
-        from anaconda_assistant_mcp.server import mcp, mcp_app
+        from anaconda_assistant_mcp.server import mcp, mcp_app  # type: ignore[import-untyped]
         assert mcp is not None
         assert mcp_app is not None
     except ImportError as e:

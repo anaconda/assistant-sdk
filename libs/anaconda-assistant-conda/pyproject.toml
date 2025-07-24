@@ -88,6 +88,14 @@ module = "conda.*"
 ignore_missing_imports = true
 module = "mcp.*"
 
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "anaconda_assistant.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "anaconda_assistant_conda.*"
+
 [tool.pytest.ini_options]
 addopts = [
   "--cov=anaconda_assistant_conda",
@@ -148,6 +156,7 @@ conda_channels =
     defaults
 conda_deps =
     anaconda-assistant-sdk
+    anaconda-assistant-mcp
 commands = mypy
 """
 
