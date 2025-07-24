@@ -199,4 +199,4 @@ jobs:
         run: hatch publish ./dist
         env:
           HATCH_INDEX_USER: __token__
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_CONDA_TOKEN }}
+          HATCH_INDEX_AUTH: ${{ secrets.PYPI_MCP_TOKEN }}
