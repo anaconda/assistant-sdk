@@ -105,6 +105,7 @@ markers = [
   "integration: Integration tests requiring a browser"
 ]
 norecursedirs = ["env", "envs", ".tox"]
+asyncio_mode = "auto"
 
 [tool.tox]
 legacy_tox_ini = """
@@ -125,6 +126,7 @@ python =
 [testenv]
 deps =
   pytest
+  pytest-asyncio
 extras = dev
 conda_channels =
     anaconda-cloud
