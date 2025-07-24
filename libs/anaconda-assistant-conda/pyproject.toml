@@ -12,7 +12,8 @@ dependencies = [
   "pydantic >=2",
   "tomli",
   "tomli-w",
-  "fastmcp==2.8.1"
+  "fastmcp==2.8.1",
+  "anaconda-assistant-mcp"
 ]
 description = "The Anaconda Assistant conda plugin"
 dynamic = ["version"]
@@ -125,6 +126,7 @@ python =
 [testenv]
 deps =
   pytest
+  ../anaconda-assistant-mcp
 extras = dev
 conda_channels =
     anaconda-cloud
@@ -132,8 +134,6 @@ conda_channels =
     defaults
 conda_deps =
     conda
-    anaconda-assistant-sdk
-    anaconda-assistant-mcp
 commands = pytest
 
 [testenv:mypy]
