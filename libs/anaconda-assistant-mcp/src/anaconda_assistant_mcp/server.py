@@ -32,6 +32,9 @@ mcp_app = typer.Typer(
 def serve() -> None:
     mcp.run(transport="stdio")
 
+@mcp_app.callback()
+def _callback() -> None:
+    pass
 
 # ---
 # Tools
