@@ -126,6 +126,7 @@ python =
 [testenv]
 deps =
   pytest
+  ../anaconda-assistant-mcp
 extras = dev
 conda_channels =
     anaconda-cloud
