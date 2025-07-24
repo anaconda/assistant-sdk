@@ -14,4 +14,5 @@ Additional plugin or integration packages are also in this repo.
   - A [conda](https://github.com/conda/conda) plugin that provides AI assistance to conda workflows.
   - Error summarization and suggestions for corrections for all conda commands.
 - [anaconda-assistant-mcp](https://github.com/anaconda/assistant-sdk/tree/main/libs/anaconda-assistant-mcp)
-  - A [conda](https://github.com/conda/conda) plugin that provides an MCP server
+  - A [conda](https://github.com/conda/conda) plugin that provides an MCP server and tools to interact with conda
+  - See the [README](https://github.com/anaconda/assistant-sdk/blob/main/libs/anaconda-assistant-mcp/README.md) for more details

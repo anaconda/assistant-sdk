@@ -173,7 +173,7 @@ jobs:
             --user anaconda-cloud \
             ~/dist/*.whl \
             --summary \
-            "The Anaconda Assistant conda plugin" \
+            "The Anaconda Assistant MCP (Model Context Protocol) plugin" \
             $LABEL \
             --force
 
