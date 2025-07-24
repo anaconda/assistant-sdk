@@ -35,8 +35,6 @@ The MCPServer exposes a set of core conda management features, accessible via AP
 - Python 3.10 or newer
 - Conda (Miniconda or Anaconda)
 
-**Note:** This package depends on `fastmcp`, which is only available in the `conda-forge` channel. You must include both channels when installing.
-
 ### Install with both channels (Recommended)
 
 ```bash
