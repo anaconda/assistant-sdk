@@ -69,6 +69,16 @@ To allow AI clients to connect to your MCPServer, you must create a configuratio
 - The `command` field should point to the full path of your conda executable inside your MCP environment.
 - The `args` array should contain the arguments to start the MCP server (typically `["mcp", "serve"]`).
 
+**How to find your conda path:**
+You can find the path to your conda executable by running:
+```bash
+which conda
+```
+Or on Windows:
+```cmd
+where conda
+```
+
 **How to create or edit the file:**
 ```bash
 mkdir -p ~/.cursor
