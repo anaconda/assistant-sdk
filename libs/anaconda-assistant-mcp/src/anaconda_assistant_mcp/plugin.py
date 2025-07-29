@@ -1,4 +1,5 @@
 from typing import Generator
+import sys
 
 from conda import plugins
 from .server import mcp_app
@@ -9,5 +10,5 @@ def conda_subcommands() -> Generator[plugins.CondaSubcommand, None, None]:
     yield plugins.CondaSubcommand(
         name="mcp",
         summary="Anaconda Assistant integration",
-        action=lambda args: mcp_app.invoke(args),
+        action=lambda args: mcp_app(args),
     )

@@ -32,9 +32,10 @@ mcp_app = typer.Typer(
 def serve() -> None:
     mcp.run(transport="stdio")
 
-@mcp_app.callback()
+@mcp_app.callback(invoke_without_command=True)
 def _callback() -> None:
-    pass
+    # If no subcommand is provided, default to serve
+    mcp.run(transport="stdio")
 
 # ---
 # Tools
