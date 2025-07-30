@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, Any
 import sys
 
 from conda import plugins
@@ -7,7 +7,7 @@ from .server import mcp_app
 
 @plugins.hookimpl
 def conda_subcommands() -> Generator[plugins.CondaSubcommand, None, None]:
-    def action(args):
+    def action(args: Any) -> Any:
         # Convert args to sys.argv format that Typer expects
         if args:
             sys.argv = ['mcp'] + list(args)
