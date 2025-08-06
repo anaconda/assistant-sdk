@@ -159,7 +159,7 @@ class TestRemoveEnvironmentCore:
         
         # Mock os.path.exists to return False for the environment path
         # This simulates the directory being removed by another process
-        def mock_exists(path):
+        def mock_exists(path: str) -> bool:
             if path == env_path:
                 return False
             return os.path.exists(path)
