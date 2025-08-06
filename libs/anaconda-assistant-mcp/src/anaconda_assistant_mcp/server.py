@@ -58,20 +58,6 @@ async def show_environment_details(
 
 
 @mcp.tool()
-async def install_package(package_name: str) -> str:
-    """Install a conda package"""
-    # TODO: Implement package installation
-    return f"Package installation not implemented yet: {package_name}"
-
-
-@mcp.tool()
-async def uninstall_package(package_name: str) -> str:
-    """Uninstall a conda package"""
-    # TODO: Implement package uninstallation
-    return f"Package uninstallation not implemented yet: {package_name}"
-
-
-@mcp.tool()
 async def create_environment(
     context: Context,
     env_name: Annotated[str, Field(description="The name of the environment to create. This will be used to generate the environment path if no prefix is specified.")],
