@@ -61,8 +61,7 @@ async def show_environment_details(
 async def create_environment(
     context: Context,
     env_name: Annotated[str, Field(description="The name of the environment to create. This will be used to generate the environment path if no prefix is specified.")],
-    python_version: Annotated[Optional[str], Field(description="Optional Python version specification (e.g., '3.9', '3.10.0'). If not provided, the latest available Python version will be used.")] = None,
-    packages: Annotated[Optional[Union[List[str], str]], Field(description="Optional list of package specifications to install in the environment. Each package can include version constraints (e.g., ['numpy>=1.20', 'pandas']). If not provided, only Python will be installed.")] = None,
+    packages: Annotated[Optional[str], Field(description="Optional comma-separated list of package specifications to install in the environment. Each package can include version constraints (e.g., 'numpy>=1.20,pandas').")] = None,
     prefix: Annotated[Optional[str], Field(description="Optional full path where the environment should be created. If not provided, the environment will be created in the default conda environments directory using the env_name.")] = None
 ) -> str:
     """
@@ -83,23 +82,18 @@ async def create_environment(
         Create a basic Python environment:
         >>> create_environment("myenv")
         
-        Create environment with specific Python version:
-        >>> create_environment("myenv", python_version="3.9")
-        
         Create environment with packages:
-        >>> create_environment("myenv", packages=["numpy", "pandas>=1.3"])
+        >>> create_environment("myenv", packages="numpy,pandas>=1.3")
         
         Create environment in custom location:
         >>> create_environment("myenv", prefix="/custom/path/myenv")
     """
-    if isinstance(packages, str):
-        try:
-            import ast
-            packages = ast.literal_eval(packages)
-        except Exception:
-            raise ToolError("Could not parse 'packages' argument as a list.")
-    if packages is not None and not isinstance(packages, list):
-        packages = [packages]
+
+    if packages is None:
+        packages = []
+    else:
+        packages = packages.split(",")
+
     try:
         # Report initial progress
         await context.report_progress(
@@ -115,7 +109,6 @@ async def create_environment(
         
         env_path = create_environment_core(
             env_name=env_name,
-            python_version=python_version,
             packages=packages,
             prefix=prefix
         )

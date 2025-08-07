@@ -2,8 +2,8 @@ import os
 import sys
 from typing import List, Optional
 
-from conda.base.context import context
-from conda.core.solve import Solver
+from conda.base.context import context, Context
+from conda.api import Solver
 from conda.core.envs_manager import register_env
 from conda.models.match_spec import MatchSpec
 from conda.models.channel import Channel
@@ -11,7 +11,6 @@ from conda.models.channel import Channel
 from .shared import (
     resolve_environment_path,
     get_channels_from_condarc,
-    build_package_specs,
     suppress_conda_output
 )
 
@@ -31,11 +30,8 @@ def create_environment_core(
     # Create the environment directory if it doesn't exist
     os.makedirs(env_path, exist_ok=True)
     
-    # Build the list of specs to install
-    specs = build_package_specs(packages=packages)
-    
     # Convert specs to MatchSpec objects
-    match_specs = [MatchSpec(spec) for spec in specs]
+    match_specs = [MatchSpec(spec) for spec in packages]
     
     # Convert string channels to Channel objects
     channel_strings = get_channels_from_condarc()

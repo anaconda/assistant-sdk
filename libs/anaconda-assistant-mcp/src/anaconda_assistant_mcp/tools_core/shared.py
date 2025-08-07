@@ -10,7 +10,7 @@ import sys
 import subprocess
 import contextlib
 from typing import List, Optional, Tuple
-from conda.base.context import context
+from conda.base.context import context, Context
 from conda.models.channel import Channel
 
 
@@ -119,21 +119,12 @@ def get_python_version_from_env(env_prefix: str) -> str:
 
 def get_channels_from_condarc() -> List[str]:
     """
-    Attempt to get channels from the user's .condarc file.
+    Attempt to get channels from the user's conda context.
     
     Returns:
         List of channel names
     """
-    channels = []
-    try:
-        condarc_path = os.path.join(os.path.expanduser("~"), ".condarc")
-        if os.path.exists(condarc_path):
-            import yaml  # type: ignore
-            with open(condarc_path, "r") as f:
-                condarc = yaml.safe_load(f)
-                channels = condarc.get("channels", [])
-    except Exception:
-        pass
+    channels = Context().channels
     return channels
 
 
@@ -161,28 +152,3 @@ def get_env_info(env_path: str) -> dict:
         "name": env_name,
         "path": env_path,
     }
-
-
-def build_package_specs(python_version: Optional[str] = None, packages: Optional[List[str]] = None) -> List[str]:
-    """
-    Build a list of package specifications for environment creation.
-    
-    Args:
-        python_version: Optional Python version specification
-        packages: Optional list of package specifications
-        
-    Returns:
-        List of package specifications
-    """
-    specs = []
-    
-    if python_version:
-        specs.append(f"python={python_version}")
-    if packages:
-        specs.extend(packages)
-    
-    # If no specs provided, install python
-    if not specs:
-        specs = ["python"]
-    
-    return specs
