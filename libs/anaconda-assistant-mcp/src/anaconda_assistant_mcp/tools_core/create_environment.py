@@ -18,7 +18,6 @@ from .shared import (
 
 def create_environment_core(
     env_name: str,
-    python_version: Optional[str] = None,
     packages: Optional[List[str]] = None,
     prefix: Optional[str] = None
 ) -> str:
@@ -33,7 +32,7 @@ def create_environment_core(
     os.makedirs(env_path, exist_ok=True)
     
     # Build the list of specs to install
-    specs = build_package_specs(python_version=python_version, packages=packages)
+    specs = build_package_specs(packages=packages)
     
     # Convert specs to MatchSpec objects
     match_specs = [MatchSpec(spec) for spec in specs]
