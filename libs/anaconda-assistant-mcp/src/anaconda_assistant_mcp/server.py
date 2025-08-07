@@ -12,6 +12,7 @@ from .tools_core.list_environment import list_environment_core
 from .tools_core.create_environment import create_environment_core
 from .tools_core.environment_details import show_environment_details_core
 from .tools_core.update_environment import update_environment_core
+from .tools_core.remove_environment import remove_environment_core
 import ast
 
 mcp: FastMCP = FastMCP("Anaconda Assistant MCP")
@@ -54,20 +55,6 @@ async def show_environment_details(
 ) -> str:
     """Show installed packages and metadata for a given Conda environment."""
     return json.dumps(show_environment_details_core(env_name=env_name, prefix=prefix), indent=2)
-
-
-@mcp.tool()
-async def install_package(package_name: str) -> str:
-    """Install a conda package"""
-    # TODO: Implement package installation
-    return f"Package installation not implemented yet: {package_name}"
-
-
-@mcp.tool()
-async def uninstall_package(package_name: str) -> str:
-    """Uninstall a conda package"""
-    # TODO: Implement package uninstallation
-    return f"Package uninstallation not implemented yet: {package_name}"
 
 
 @mcp.tool()
@@ -204,10 +191,60 @@ async def update_environment(
 
 
 @mcp.tool()
-async def remove_environment(name: str) -> str:
-    """Remove a conda environment"""
-    # TODO: Implement environment removal
-    return f"Environment removal not implemented yet: {name}"
+async def remove_environment(
+    env_name: Annotated[Optional[str], Field(description="The name of the environment to remove.")] = None,
+    prefix: Annotated[Optional[str], Field(description="The full path to the environment to remove (used instead of name).")] = None
+) -> str:
+    """
+    Remove a conda environment using conda's internal APIs.
+    
+    This tool removes a conda environment by unregistering it from conda's
+    environment list and deleting the environment directory.
+    
+    Args:
+        env_name: Optional name of the environment to remove
+        prefix: Optional full path to the environment to remove
+        
+    Returns:
+        The full path to the removed environment
+        
+    Raises:
+        ToolError: If environment removal fails due to missing environment,
+                  permission issues, or other errors.
+    
+    Example:
+        Remove environment by name:
+        >>> remove_environment("myenv")
+        
+        Remove environment by path:
+        >>> remove_environment(prefix="/path/to/environment")
+    """
+    try:
+        env_path = remove_environment_core(
+            env_name=env_name,
+            prefix=prefix
+        )
+        return env_path
+    except Exception as e:
+        # Provide more descriptive error messages based on the exception type
+        error_msg = str(e)
+        
+        # Check for common conda-specific error patterns
+        if "Cannot remove the base environment" in error_msg:
+            reason = "Cannot remove the base environment - this is a protected environment"
+        elif "Environment does not exist" in error_msg:
+            reason = "Environment does not exist - check the environment name or path"
+        elif "permission" in error_msg.lower() or "access" in error_msg.lower():
+            reason = "Permission denied - check if you have write access to the environment location"
+        elif "directory not empty" in error_msg.lower():
+            reason = "Environment directory could not be removed - some files may be in use"
+        else:
+            reason = "Unexpected error during environment removal"
+        
+        raise ToolError(
+            f"Failed to remove conda environment: {reason}. "
+            f"Error details: {error_msg}"
+        )
 
 
 @mcp.tool()
