@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import List, Optional
 
 from conda.base.context import context
@@ -10,7 +11,8 @@ from conda.models.channel import Channel
 from .shared import (
     resolve_environment_path,
     get_channels_from_condarc,
-    build_package_specs
+    build_package_specs,
+    suppress_conda_output
 )
 
 
@@ -48,11 +50,13 @@ def create_environment_core(
         specs_to_add=match_specs
     )
     
-    # Solve for the transaction
-    transaction = solver.solve_for_transaction()
-    
-    # Execute the transaction
-    transaction.execute()
+    # Execute conda operations with suppressed output to prevent MCP JSON interference
+    with suppress_conda_output():
+        # Solve for the transaction
+        transaction = solver.solve_for_transaction()
+        
+        # Execute the transaction
+        transaction.execute()
     
     # Register the environment
     register_env(env_path)

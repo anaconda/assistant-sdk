@@ -8,9 +8,29 @@ multiple tools_core modules to avoid code duplication.
 import os
 import sys
 import subprocess
+import contextlib
 from typing import List, Optional, Tuple
 from conda.base.context import context
 from conda.models.channel import Channel
+
+
+@contextlib.contextmanager
+def suppress_conda_output():
+    """Context manager to suppress conda's stdout/stderr output during MCP operations."""
+    # Save original stdout/stderr
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+    
+    # Redirect to /dev/null or similar
+    try:
+        with open(os.devnull, 'w') as devnull:
+            sys.stdout = devnull
+            sys.stderr = devnull
+            yield
+    finally:
+        # Restore original stdout/stderr
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
 
 def get_default_env_path(env_name: str) -> str:
