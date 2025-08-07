@@ -9,13 +9,13 @@ import os
 import sys
 import subprocess
 import contextlib
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Generator
 from conda.base.context import context, Context
 from conda.models.channel import Channel
 
 
 @contextlib.contextmanager
-def suppress_conda_output():
+def suppress_conda_output() -> Generator[None, None, None]:
     """Context manager to suppress conda's stdout/stderr output during MCP operations."""
     # Save original stdout/stderr
     old_stdout = sys.stdout
@@ -125,7 +125,7 @@ def get_channels_from_condarc() -> List[str]:
         List of channel names
     """
     channels = Context().channels
-    return channels
+    return list(channels)
 
 
 def get_env_info(env_path: str) -> dict:

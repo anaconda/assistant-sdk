@@ -90,9 +90,9 @@ async def create_environment(
     """
 
     if packages is None:
-        packages = []
+        package_list = []
     else:
-        packages = packages.split(",")
+        package_list = [pkg.strip() for pkg in packages.split(",")]
 
     try:
         # Report initial progress
@@ -109,7 +109,7 @@ async def create_environment(
         
         env_path = create_environment_core(
             env_name=env_name,
-            packages=packages,
+            packages=package_list,
             prefix=prefix
         )
         
