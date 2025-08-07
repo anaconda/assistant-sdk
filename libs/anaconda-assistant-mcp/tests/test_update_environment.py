@@ -337,7 +337,7 @@ class TestUpdateEnvironmentCore:
         
         # Verify Solver was called with the prefix path
         call_args = mock_solver.call_args
-        assert call_args[1]['prefix'] == existing_env_path
+        assert call_args[1]['prefix'] == existing_env_path 
 
 
 # =============================================================================
@@ -380,6 +380,99 @@ class TestUpdateEnvironmentIntegration:
                         mock_solver_cls.assert_called_once()
                         mock_solver.solve_for_transaction.assert_called_once()
                         mock_transaction.execute.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_update_environment_with_string_packages(self, client: Client, existing_env_path: str) -> None:
+        """Test environment update with packages as string through MCP."""
+        packages = '["numpy", "pandas"]'
+        
+        with patch('anaconda_assistant_mcp.tools_core.update_environment.context') as mock_context:
+            mock_context.channels = ('defaults', 'conda-forge')
+            mock_context.subdir = 'linux-64'
+            mock_context.envs_dirs = ['/tmp/conda/envs']
+            
+            with patch('anaconda_assistant_mcp.tools_core.update_environment.Solver') as mock_solver_cls:
+                mock_solver = Mock()
+                mock_transaction = Mock()
+                mock_solver.solve_for_transaction.return_value = mock_transaction
+                mock_solver_cls.return_value = mock_solver
+                
+                with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index'):
+                    async with client:
+                        result = await client.call_tool(
+                            "update_environment",
+                            {
+                                "packages": packages,
+                                "prefix": existing_env_path
+                            }
+                        )
+                        
+                        # Verify the result
+                        assert result[0].text == existing_env_path  # type: ignore[union-attr]
+                        
+                        # Verify the solver was called
+                        mock_solver_cls.assert_called_once()
+                        mock_solver.solve_for_transaction.assert_called_once()
+                        mock_transaction.execute.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_update_environment_with_single_string_package(self, client: Client, existing_env_path: str) -> None:
+        """Test environment update with single package as string through MCP."""
+        packages = ["numpy"]
+        
+        with patch('anaconda_assistant_mcp.tools_core.update_environment.context') as mock_context:
+            mock_context.channels = ('defaults', 'conda-forge')
+            mock_context.subdir = 'linux-64'
+            mock_context.envs_dirs = ['/tmp/conda/envs']
+            
+            with patch('anaconda_assistant_mcp.tools_core.update_environment.Solver') as mock_solver_cls:
+                mock_solver = Mock()
+                mock_transaction = Mock()
+                mock_solver.solve_for_transaction.return_value = mock_transaction
+                mock_solver_cls.return_value = mock_solver
+                
+                with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index'):
+                    async with client:
+                        result = await client.call_tool(
+                            "update_environment",
+                            {
+                                "packages": packages,
+                                "prefix": existing_env_path
+                            }
+                        )
+                        
+                        # Verify the result
+                        assert result[0].text == existing_env_path  # type: ignore[union-attr]
+                        
+                        # Verify the solver was called
+                        mock_solver_cls.assert_called_once()
+                        mock_solver.solve_for_transaction.assert_called_once()
+                        mock_transaction.execute.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_update_environment_with_invalid_string_packages(self, client: Client, existing_env_path: str) -> None:
+        """Test environment update with invalid string packages through MCP."""
+        packages = "invalid json string"
+        
+        with patch('anaconda_assistant_mcp.tools_core.update_environment.context') as mock_context:
+            mock_context.channels = ('defaults', 'conda-forge')
+            mock_context.subdir = 'linux-64'
+            mock_context.envs_dirs = ['/tmp/conda/envs']
+            
+            with patch('anaconda_assistant_mcp.tools_core.update_environment.get_index'):
+                async with client:
+                    with pytest.raises(Exception) as exc_info:
+                        await client.call_tool(
+                            "update_environment",
+                            {
+                                "packages": packages,
+                                "prefix": existing_env_path
+                            }
+                        )
+                    
+                    # Verify the error message
+                    error_text = str(exc_info.value)
+                    assert "Could not parse 'packages' argument as a list" in error_text
 
     @pytest.mark.asyncio
     async def test_update_environment_with_env_name(self, client: Client) -> None:
