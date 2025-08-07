@@ -44,6 +44,55 @@ The limits are documented on the [Plans and Pricing page](https://www.anaconda.c
 
 Users can upgrade their plans by visiting the [Anaconda subcriptions page](https://anaconda.com/app/profile/subscriptions).
 
+## Natural Language Commands
+
+The plugin now supports natural language commands for conda operations. You can use plain English to perform conda tasks:
+
+### Direct Usage
+```bash
+conda assist "create a conda environment with python 3.8 and numpy"
+conda assist "list all my conda environments"
+conda assist "show details for environment myenv"
+conda assist "add pandas to myenv"
+conda assist "remove environment oldenv"
+conda assist "search for scikit-learn"
+```
+
+### Using the chat subcommand
+```bash
+conda assist chat "create a conda environment with python 3.8 and numpy"
+conda assist chat "list all my conda environments"
+```
+
+### Supported Operations
+
+#### Environment Creation
+- "create a conda environment with python 3.8 and numpy"
+- "create a conda environment named myproject with pandas"
+- "new conda environment with matplotlib"
+
+#### Environment Listing
+- "list all my conda environments"
+- "show all conda environments"
+- "what are my conda environments"
+
+#### Environment Details
+- "show details for environment myenv"
+- "what packages are installed in myenv"
+
+#### Environment Updates
+- "add pandas to myenv"
+- "install numpy in myenv"
+- "update matplotlib in myenv"
+
+#### Environment Removal
+- "remove environment oldenv"
+- "delete environment oldenv"
+
+#### Package Search
+- "search for scikit-learn"
+- "find all available versions of numpy"
+
 ## Error messages
 
 Conda command can fail in many ways and sometimes the error message doesn't immediately help you correct the problem.
