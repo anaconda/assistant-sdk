@@ -17,7 +17,7 @@ from .shared import (
 
 def create_environment_core(
     env_name: str,
-    packages: Optional[List[str]] = None,
+    packages: List[str] = [],
     prefix: Optional[str] = None
 ) -> str:
     """
