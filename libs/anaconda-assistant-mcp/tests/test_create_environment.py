@@ -108,26 +108,21 @@ class TestCreateEnvironmentCore:
         mock_register_env.assert_called_once_with(env_path)
 
     def test_create_environment_core_with_python_version(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
-        """Test environment creation with specific Python version."""
-        env_name = "test_env_py39"
+        """Test environment creation without Python version (python_version parameter removed)."""
+        env_name = "test_env_basic"
         env_path = os.path.join(temp_env_dir, env_name)
-        python_version = "3.9"
         
         result = create_environment_core(
             env_name=env_name,
-            python_version=python_version,
             prefix=env_path
         )
         
         assert result == env_path
         
-        # Verify Solver was called with Python version spec
+        # Verify Solver was called with empty specs (no packages provided)
         call_args = mock_solver.call_args
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 1
-        assert specs[0].name == 'python'
-        # Check that the version spec contains the expected version
-        assert str(specs[0].version) == f"{python_version}.*"
+        assert len(specs) == 0
 
     def test_create_environment_core_with_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with additional packages."""
@@ -154,32 +149,26 @@ class TestCreateEnvironmentCore:
         assert 'pandas' in package_names
 
     def test_create_environment_core_with_python_and_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
-        """Test environment creation with both Python version and packages."""
-        env_name = "test_env_complete"
+        """Test environment creation with packages only (python_version parameter removed)."""
+        env_name = "test_env_with_packages"
         env_path = os.path.join(temp_env_dir, env_name)
-        python_version = "3.10"
         packages = ["numpy>=1.20", "pandas"]
         
         result = create_environment_core(
             env_name=env_name,
-            python_version=python_version,
             packages=packages,
             prefix=env_path
         )
         
         assert result == env_path
         
-        # Verify Solver was called with all specs
+        # Verify Solver was called with package specs only
         call_args = mock_solver.call_args
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 3  # python + 2 packages
-        
-        # Check Python version
-        python_spec = next(s for s in specs if s.name == 'python')
-        assert str(python_spec.version) == f"{python_version}.*"
+        assert len(specs) == 2  # 2 packages only
         
         # Check packages
-        package_names = [s.name for s in specs if s.name != 'python']
+        package_names = [s.name for s in specs]
         assert 'numpy' in package_names
         assert 'pandas' in package_names
 
@@ -243,11 +232,10 @@ class TestCreateEnvironmentCore:
         
         assert result == env_path
         
-        # Should include python since no specs were provided
+        # Should be empty since no specs were provided
         call_args = mock_solver.call_args
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 1
-        assert specs[0].name == 'python'
+        assert len(specs) == 0
 
     def test_create_environment_core_none_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with None packages."""
@@ -367,8 +355,8 @@ class TestCreateEnvironmentIntegration:
 
     @pytest.mark.asyncio
     async def test_create_environment_with_python_version(self, client: Client, temp_env_dir: str) -> None:
-        """Test environment creation with Python version through MCP."""
-        env_name = "test_mcp_py_env"
+        """Test environment creation without Python version (python_version parameter removed)."""
+        env_name = "test_mcp_basic_env"
         env_path = os.path.join(temp_env_dir, env_name)
         
         with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
