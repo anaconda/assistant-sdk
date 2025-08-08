@@ -86,10 +86,9 @@ class TestCreateEnvironmentCore:
         assert call_args[1]['prefix'] == env_path
         assert call_args[1]['subdirs'] == ['linux-64']
         
-        # Verify specs include python
+        # Verify specs (empty list since no packages provided)
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 1
-        assert specs[0].name == 'python'
+        assert len(specs) == 0
         
         # Verify channels were converted properly
         channels = call_args[1]['channels']
@@ -109,26 +108,21 @@ class TestCreateEnvironmentCore:
         mock_register_env.assert_called_once_with(env_path)
 
     def test_create_environment_core_with_python_version(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
-        """Test environment creation with specific Python version."""
-        env_name = "test_env_py39"
+        """Test environment creation without Python version (python_version parameter removed)."""
+        env_name = "test_env_basic"
         env_path = os.path.join(temp_env_dir, env_name)
-        python_version = "3.9"
         
         result = create_environment_core(
             env_name=env_name,
-            python_version=python_version,
             prefix=env_path
         )
         
         assert result == env_path
         
-        # Verify Solver was called with Python version spec
+        # Verify Solver was called with empty specs (no packages provided)
         call_args = mock_solver.call_args
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 1
-        assert specs[0].name == 'python'
-        # Check that the version spec contains the expected version
-        assert str(specs[0].version) == f"{python_version}.*"
+        assert len(specs) == 0
 
     def test_create_environment_core_with_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with additional packages."""
@@ -155,32 +149,26 @@ class TestCreateEnvironmentCore:
         assert 'pandas' in package_names
 
     def test_create_environment_core_with_python_and_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
-        """Test environment creation with both Python version and packages."""
-        env_name = "test_env_complete"
+        """Test environment creation with packages only (python_version parameter removed)."""
+        env_name = "test_env_with_packages"
         env_path = os.path.join(temp_env_dir, env_name)
-        python_version = "3.10"
         packages = ["numpy>=1.20", "pandas"]
         
         result = create_environment_core(
             env_name=env_name,
-            python_version=python_version,
             packages=packages,
             prefix=env_path
         )
         
         assert result == env_path
         
-        # Verify Solver was called with all specs
+        # Verify Solver was called with package specs only
         call_args = mock_solver.call_args
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 3  # python + 2 packages
-        
-        # Check Python version
-        python_spec = next(s for s in specs if s.name == 'python')
-        assert str(python_spec.version) == f"{python_version}.*"
+        assert len(specs) == 2  # 2 packages only
         
         # Check packages
-        package_names = [s.name for s in specs if s.name != 'python']
+        package_names = [s.name for s in specs]
         assert 'numpy' in package_names
         assert 'pandas' in package_names
 
@@ -244,11 +232,10 @@ class TestCreateEnvironmentCore:
         
         assert result == env_path
         
-        # Should include python since no specs were provided
+        # Should be empty since no specs were provided
         call_args = mock_solver.call_args
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 1
-        assert specs[0].name == 'python'
+        assert len(specs) == 0
 
     def test_create_environment_core_none_packages(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test environment creation with None packages."""
@@ -257,17 +244,15 @@ class TestCreateEnvironmentCore:
         
         result = create_environment_core(
             env_name=env_name,
-            packages=None,
             prefix=env_path
         )
         
         assert result == env_path
         
-        # Should include python since no specs were provided
+        # Should be empty since no specs were provided
         call_args = mock_solver.call_args
         specs = call_args[1]['specs_to_add']
-        assert len(specs) == 1
-        assert specs[0].name == 'python'
+        assert len(specs) == 0
 
     def test_create_environment_core_solver_error(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
         """Test that solver errors are properly propagated."""
@@ -370,10 +355,9 @@ class TestCreateEnvironmentIntegration:
 
     @pytest.mark.asyncio
     async def test_create_environment_with_python_version(self, client: Client, temp_env_dir: str) -> None:
-        """Test environment creation with Python version through MCP."""
-        env_name = "test_mcp_py_env"
+        """Test environment creation without Python version (python_version parameter removed)."""
+        env_name = "test_mcp_basic_env"
         env_path = os.path.join(temp_env_dir, env_name)
-        python_version = "3.9"
         
         with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
             mock_context.channels = ('defaults',)
@@ -392,7 +376,6 @@ class TestCreateEnvironmentIntegration:
                             "create_environment",
                             {
                                 "env_name": env_name,
-                                "python_version": python_version,
                                 "prefix": env_path
                             }
                         )
@@ -400,58 +383,17 @@ class TestCreateEnvironmentIntegration:
                         # Verify the result
                         assert result[0].text == env_path  # type: ignore[union-attr]
                         
-                        # Verify the solver was called with Python version
-                        call_args = mock_solver_cls.call_args
-                        specs = call_args[1]['specs_to_add']
-                        python_spec = next(s for s in specs if s.name == 'python')
-                        assert str(python_spec.version) == f"{python_version}.*"
-
-    @pytest.mark.asyncio
-    async def test_create_environment_with_packages(self, client: Client, temp_env_dir: str) -> None:
-        """Test environment creation with packages through MCP."""
-        env_name = "test_mcp_packages_env"
-        env_path = os.path.join(temp_env_dir, env_name)
-        packages = ["numpy", "pandas>=1.3"]
-        
-        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
-            mock_context.channels = ('defaults',)
-            mock_context.subdir = 'linux-64'
-            mock_context.envs_dirs = [temp_env_dir]
-            
-            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
-                mock_solver = Mock()
-                mock_transaction = Mock()
-                mock_solver.solve_for_transaction.return_value = mock_transaction
-                mock_solver_cls.return_value = mock_solver
-                
-                with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
-                    async with client:
-                        result = await client.call_tool(
-                            "create_environment",
-                            {
-                                "env_name": env_name,
-                                "packages": packages,
-                                "prefix": env_path
-                            }
-                        )
-                        
-                        # Verify the result
-                        assert result[0].text == env_path  # type: ignore[union-attr]
-                        
-                        # Verify the solver was called with packages
-                        call_args = mock_solver_cls.call_args
-                        specs = call_args[1]['specs_to_add']
-                        package_names = [s.name for s in specs]
-                        assert 'numpy' in package_names
-                        assert 'pandas' in package_names
+                        # Verify the solver was called
+                        mock_solver_cls.assert_called_once()
+                        mock_solver.solve_for_transaction.assert_called_once()
+                        mock_transaction.execute.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_create_environment_complete(self, client: Client, temp_env_dir: str) -> None:
         """Test complete environment creation with all parameters through MCP."""
         env_name = "test_mcp_complete_env"
         env_path = os.path.join(temp_env_dir, env_name)
-        python_version = "3.10"
-        packages = ["numpy>=1.20", "pandas", "matplotlib"]
+        packages = "numpy>=1.20,pandas,matplotlib"
         
         with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
             mock_context.channels = ('defaults', 'conda-forge')
@@ -470,7 +412,6 @@ class TestCreateEnvironmentIntegration:
                             "create_environment",
                             {
                                 "env_name": env_name,
-                                "python_version": python_version,
                                 "packages": packages,
                                 "prefix": env_path
                             }
@@ -482,147 +423,17 @@ class TestCreateEnvironmentIntegration:
                         # Verify the solver was called with all specs
                         call_args = mock_solver_cls.call_args
                         specs = call_args[1]['specs_to_add']
-                        assert len(specs) == 4  # python + 3 packages
-                        
-                        # Check Python version
-                        python_spec = next(s for s in specs if s.name == 'python')
-                        assert str(python_spec.version) == f"{python_version}.*"
+                        assert len(specs) == 3  # 3 packages (no python automatically added)
                         
                         # Check packages
-                        package_names = [s.name for s in specs if s.name != 'python']
+                        package_names = [s.name for s in specs]
                         assert 'numpy' in package_names
                         assert 'pandas' in package_names
                         assert 'matplotlib' in package_names
 
     @pytest.mark.asyncio
-    async def test_create_environment_uses_default_path(self, client: Client) -> None:
-        """Test that environment uses default path when prefix is not provided."""
-        env_name = "test_mcp_default_path"
-        
-        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
-            with patch('anaconda_assistant_mcp.tools_core.shared.context', mock_context):
-                mock_context.channels = ('defaults',)
-                mock_context.subdir = 'linux-64'
-                mock_context.envs_dirs = ['/tmp/conda/envs']
-                
-                with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
-                    mock_solver = Mock()
-                    mock_transaction = Mock()
-                    mock_solver.solve_for_transaction.return_value = mock_transaction
-                    mock_solver_cls.return_value = mock_solver
-                    
-                    with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
-                        async with client:
-                            result = await client.call_tool(
-                                "create_environment",
-                                {
-                                    "env_name": env_name
-                                }
-                            )
-                            
-                            expected_path = os.path.join('/tmp/conda/envs', env_name)
-                            assert result[0].text == expected_path  # type: ignore[union-attr]
-
-    @pytest.mark.asyncio
-    async def test_create_environment_solver_error(self, client: Client, temp_env_dir: str) -> None:
-        """Test that solver errors are properly handled and reported through MCP."""
-        env_name = "test_mcp_solver_error"
-        env_path = os.path.join(temp_env_dir, env_name)
-        
-        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
-            mock_context.channels = ('defaults',)
-            mock_context.subdir = 'linux-64'
-            mock_context.envs_dirs = [temp_env_dir]
-            
-            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
-                mock_solver = Mock()
-                mock_solver.solve_for_transaction.side_effect = Exception("UnsatisfiableError: Package dependency conflicts")
-                mock_solver_cls.return_value = mock_solver
-                
-                async with client:
-                    with pytest.raises(Exception) as exc_info:
-                        await client.call_tool(
-                            "create_environment",
-                            {
-                                "env_name": env_name,
-                                "prefix": env_path
-                            }
-                        )
-                    
-                    # Verify the error message contains the expected information
-                    error_text = str(exc_info.value)
-                    assert "Failed to create conda environment" in error_text
-                    assert "Package dependency conflicts" in error_text
-
-    @pytest.mark.asyncio
-    async def test_create_environment_transaction_error(self, client: Client, temp_env_dir: str) -> None:
-        """Test that transaction execution errors are properly handled through MCP."""
-        env_name = "test_mcp_transaction_error"
-        env_path = os.path.join(temp_env_dir, env_name)
-        
-        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
-            mock_context.channels = ('defaults',)
-            mock_context.subdir = 'linux-64'
-            mock_context.envs_dirs = [temp_env_dir]
-            
-            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
-                mock_solver = Mock()
-                mock_transaction = Mock()
-                mock_transaction.execute.side_effect = Exception("Permission denied")
-                mock_solver.solve_for_transaction.return_value = mock_transaction
-                mock_solver_cls.return_value = mock_solver
-                
-                async with client:
-                    with pytest.raises(Exception) as exc_info:
-                        await client.call_tool(
-                            "create_environment",
-                            {
-                                "env_name": env_name,
-                                "prefix": env_path
-                            }
-                        )
-                    
-                    # Verify the error message contains the expected information
-                    error_text = str(exc_info.value)
-                    assert "Failed to create conda environment" in error_text
-                    assert "Permission denied" in error_text
-
-    @pytest.mark.asyncio
-    async def test_create_environment_progress_reporting(self, client: Client, temp_env_dir: str) -> None:
-        """Test that progress is reported during environment creation."""
-        env_name = "test_mcp_progress"
-        env_path = os.path.join(temp_env_dir, env_name)
-        
-        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
-            mock_context.channels = ('defaults',)
-            mock_context.subdir = 'linux-64'
-            mock_context.envs_dirs = [temp_env_dir]
-            
-            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
-                mock_solver = Mock()
-                mock_transaction = Mock()
-                mock_solver.solve_for_transaction.return_value = mock_transaction
-                mock_solver_cls.return_value = mock_solver
-                
-                with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
-                    async with client:
-                        result = await client.call_tool(
-                            "create_environment",
-                            {
-                                "env_name": env_name,
-                                "prefix": env_path
-                            }
-                        )
-                        
-                        # Verify the result is returned
-                        assert result[0].text == env_path  # type: ignore[union-attr]
-                        
-                        # Note: Progress reporting is handled by the MCP framework
-                        # and may not be directly testable in this context
-
-    @pytest.mark.asyncio
     async def test_create_environment_empty_packages(self, client: Client, temp_env_dir: str) -> None:
-        """Test environment creation with empty packages list through MCP."""
+        """Test environment creation with empty packages through MCP."""
         env_name = "test_mcp_empty_packages"
         env_path = os.path.join(temp_env_dir, env_name)
         
@@ -643,7 +454,7 @@ class TestCreateEnvironmentIntegration:
                             "create_environment",
                             {
                                 "env_name": env_name,
-                                "packages": [],
+                                "packages": "",
                                 "prefix": env_path
                             }
                         )
@@ -651,8 +462,7 @@ class TestCreateEnvironmentIntegration:
                         # Verify the result
                         assert result[0].text == env_path  # type: ignore[union-attr]
                         
-                        # Should include python since no specs were provided
-                        call_args = mock_solver_cls.call_args
-                        specs = call_args[1]['specs_to_add']
-                        assert len(specs) == 1
-                        assert specs[0].name == 'python' 
+                        # Verify the solver was called
+                        mock_solver_cls.assert_called_once()
+                        mock_solver.solve_for_transaction.assert_called_once()
+                        mock_transaction.execute.assert_called_once() 

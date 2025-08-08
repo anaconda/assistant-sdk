@@ -1,3 +1,6 @@
+import sys
+import contextlib
+import os
 from typing import List, Optional
 
 from conda.base.context import context
@@ -10,7 +13,8 @@ from conda.models.channel import Channel
 from .shared import (
     resolve_environment_path,
     validate_environment_exists,
-    get_channels_from_condarc
+    get_channels_from_condarc,
+    suppress_conda_output
 )
 
 
@@ -51,11 +55,13 @@ def update_environment_core(
         specs_to_add=match_specs
     )
     
-    # Solve for the transaction
-    transaction = solver.solve_for_transaction()
-    
-    # Execute the transaction
-    transaction.execute()
+    # Execute conda operations with suppressed output to prevent MCP JSON interference
+    with suppress_conda_output():
+        # Solve for the transaction
+        transaction = solver.solve_for_transaction()
+        
+        # Execute the transaction
+        transaction.execute()
     
     return env_path
 

@@ -8,9 +8,29 @@ multiple tools_core modules to avoid code duplication.
 import os
 import sys
 import subprocess
-from typing import List, Optional, Tuple
-from conda.base.context import context
+import contextlib
+from typing import List, Optional, Tuple, Generator
+from conda.base.context import context, Context
 from conda.models.channel import Channel
+
+
+@contextlib.contextmanager
+def suppress_conda_output() -> Generator[None, None, None]:
+    """Context manager to suppress conda's stdout/stderr output during MCP operations."""
+    # Save original stdout/stderr
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+    
+    # Redirect to /dev/null or similar
+    try:
+        with open(os.devnull, 'w') as devnull:
+            sys.stdout = devnull
+            sys.stderr = devnull
+            yield
+    finally:
+        # Restore original stdout/stderr
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
 
 def get_default_env_path(env_name: str) -> str:
@@ -99,22 +119,13 @@ def get_python_version_from_env(env_prefix: str) -> str:
 
 def get_channels_from_condarc() -> List[str]:
     """
-    Attempt to get channels from the user's .condarc file.
+    Attempt to get channels from the user's conda context.
     
     Returns:
         List of channel names
     """
-    channels = []
-    try:
-        condarc_path = os.path.join(os.path.expanduser("~"), ".condarc")
-        if os.path.exists(condarc_path):
-            import yaml  # type: ignore
-            with open(condarc_path, "r") as f:
-                condarc = yaml.safe_load(f)
-                channels = condarc.get("channels", [])
-    except Exception:
-        pass
-    return channels
+    channels = Context().channels
+    return list(channels)
 
 
 def get_env_info(env_path: str) -> dict:
@@ -141,28 +152,3 @@ def get_env_info(env_path: str) -> dict:
         "name": env_name,
         "path": env_path,
     }
-
-
-def build_package_specs(python_version: Optional[str] = None, packages: Optional[List[str]] = None) -> List[str]:
-    """
-    Build a list of package specifications for environment creation.
-    
-    Args:
-        python_version: Optional Python version specification
-        packages: Optional list of package specifications
-        
-    Returns:
-        List of package specifications
-    """
-    specs = []
-    
-    if python_version:
-        specs.append(f"python={python_version}")
-    if packages:
-        specs.extend(packages)
-    
-    # If no specs provided, install python
-    if not specs:
-        specs = ["python"]
-    
-    return specs
