@@ -310,6 +310,57 @@ class TestCreateEnvironmentCore:
         assert channels[0].name == 'custom-channel'
         assert channels[1].name == 'another-channel'
 
+    def test_create_environment_core_permission_error(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
+        """Test that permission errors are properly propagated."""
+        env_name = "test_env_permission"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Make the transaction execution raise a permission error
+        mock_solver_instance = mock_solver.return_value
+        mock_transaction = Mock()
+        mock_transaction.execute.side_effect = PermissionError("Permission denied")
+        mock_solver_instance.solve_for_transaction.return_value = mock_transaction
+        
+        with pytest.raises(PermissionError, match="Permission denied"):
+            create_environment_core(
+                env_name=env_name,
+                prefix=env_path
+            )
+
+    def test_create_environment_core_access_error(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
+        """Test that access errors are properly propagated."""
+        env_name = "test_env_access"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Make the transaction execution raise an access error
+        mock_solver_instance = mock_solver.return_value
+        mock_transaction = Mock()
+        mock_transaction.execute.side_effect = OSError("Access denied")
+        mock_solver_instance.solve_for_transaction.return_value = mock_transaction
+        
+        with pytest.raises(OSError, match="Access denied"):
+            create_environment_core(
+                env_name=env_name,
+                prefix=env_path
+            )
+
+    def test_create_environment_core_insufficient_access_rights_error(self, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
+        """Test that insufficient access rights errors are properly propagated."""
+        env_name = "test_env_insufficient_access"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Make the transaction execution raise an insufficient access rights error
+        mock_solver_instance = mock_solver.return_value
+        mock_transaction = Mock()
+        mock_transaction.execute.side_effect = OSError("Insufficient access rights")
+        mock_solver_instance.solve_for_transaction.return_value = mock_transaction
+        
+        with pytest.raises(OSError, match="Insufficient access rights"):
+            create_environment_core(
+                env_name=env_name,
+                prefix=env_path
+            )
+
 
 # =============================================================================
 # INTEGRATION TESTS - Testing create_environment MCP tool
@@ -466,3 +517,111 @@ class TestCreateEnvironmentIntegration:
                         mock_solver_cls.assert_called_once()
                         mock_solver.solve_for_transaction.assert_called_once()
                         mock_transaction.execute.assert_called_once() 
+
+    @pytest.mark.asyncio
+    async def test_create_environment_permission_error(self, client: Client, temp_env_dir: str) -> None:
+        """Test that permission error is properly handled through MCP."""
+        env_name = "test_mcp_permission_env"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
+            mock_context.channels = ('defaults',)
+            mock_context.subdir = 'linux-64'
+            mock_context.envs_dirs = [temp_env_dir]
+            
+            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
+                mock_solver = Mock()
+                mock_transaction = Mock()
+                # Simulate permission error
+                mock_transaction.execute.side_effect = PermissionError("Permission denied")
+                mock_solver.solve_for_transaction.return_value = mock_transaction
+                mock_solver_cls.return_value = mock_solver
+                
+                with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
+                    async with client:
+                        with pytest.raises(Exception) as exc_info:
+                            await client.call_tool(
+                                "create_environment",
+                                {
+                                    "env_name": env_name,
+                                    "prefix": env_path
+                                }
+                            )
+                        
+                        # Verify the error message contains the expected permission information
+                        error_text = str(exc_info.value)
+                        assert "Failed to create conda environment" in error_text
+                        assert "Permission denied - check if you have write access to the environment location" in error_text
+                        assert "Permission denied" in error_text
+
+    @pytest.mark.asyncio
+    async def test_create_environment_access_error(self, client: Client, temp_env_dir: str) -> None:
+        """Test that access error is properly handled through MCP."""
+        env_name = "test_mcp_access_env"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
+            mock_context.channels = ('defaults',)
+            mock_context.subdir = 'linux-64'
+            mock_context.envs_dirs = [temp_env_dir]
+            
+            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
+                mock_solver = Mock()
+                mock_transaction = Mock()
+                # Simulate access error
+                mock_transaction.execute.side_effect = OSError("Access denied")
+                mock_solver.solve_for_transaction.return_value = mock_transaction
+                mock_solver_cls.return_value = mock_solver
+                
+                with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
+                    async with client:
+                        with pytest.raises(Exception) as exc_info:
+                            await client.call_tool(
+                                "create_environment",
+                                {
+                                    "env_name": env_name,
+                                    "prefix": env_path
+                                }
+                            )
+                        
+                        # Verify the error message contains the expected access information
+                        error_text = str(exc_info.value)
+                        assert "Failed to create conda environment" in error_text
+                        assert "Permission denied - check if you have write access to the environment location" in error_text
+                        assert "Access denied" in error_text
+
+    @pytest.mark.asyncio
+    async def test_create_environment_insufficient_access_rights_error(self, client: Client, temp_env_dir: str) -> None:
+        """Test that insufficient access rights error is properly handled through MCP."""
+        env_name = "test_mcp_insufficient_access_env"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
+            mock_context.channels = ('defaults',)
+            mock_context.subdir = 'linux-64'
+            mock_context.envs_dirs = [temp_env_dir]
+            
+            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
+                mock_solver = Mock()
+                mock_transaction = Mock()
+                # Simulate insufficient access rights error
+                mock_transaction.execute.side_effect = OSError("Insufficient access rights")
+                mock_solver.solve_for_transaction.return_value = mock_transaction
+                mock_solver_cls.return_value = mock_solver
+                
+                with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
+                    async with client:
+                        with pytest.raises(Exception) as exc_info:
+                            await client.call_tool(
+                                "create_environment",
+                                {
+                                    "env_name": env_name,
+                                    "prefix": env_path
+                                }
+                            )
+                        
+                        # Verify the error message contains the expected access information
+                        error_text = str(exc_info.value)
+                        assert "Failed to create conda environment" in error_text
+                        assert "Permission denied - check if you have write access to the environment location" in error_text
+                        assert "Insufficient access rights" in error_text 
