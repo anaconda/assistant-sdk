@@ -191,6 +191,51 @@ class TestRemoveEnvironmentCore:
         assert not os.path.exists(env_path)  # Directory should be removed
         mock_unregister_env.assert_called_once_with(env_path)
 
+    def test_remove_environment_core_permission_error(self, temp_env_dir: str, mock_context: Mock, mock_unregister_env: Mock) -> None:
+        """Test that RuntimeError is raised when directory removal fails due to permission error."""
+        env_name = "test_env_permission"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Create the environment directory
+        os.makedirs(env_path, exist_ok=True)
+        
+        # Mock shutil.rmtree to raise a permission error
+        with patch('shutil.rmtree') as mock_rmtree:
+            mock_rmtree.side_effect = PermissionError("Permission denied")
+            
+            with pytest.raises(RuntimeError, match="Failed to remove environment"):
+                remove_environment_core(env_name=env_name, prefix=env_path)
+
+    def test_remove_environment_core_access_error(self, temp_env_dir: str, mock_context: Mock, mock_unregister_env: Mock) -> None:
+        """Test that RuntimeError is raised when directory removal fails due to access error."""
+        env_name = "test_env_access"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Create the environment directory
+        os.makedirs(env_path, exist_ok=True)
+        
+        # Mock shutil.rmtree to raise an access error
+        with patch('shutil.rmtree') as mock_rmtree:
+            mock_rmtree.side_effect = OSError("Access denied")
+            
+            with pytest.raises(RuntimeError, match="Failed to remove environment"):
+                remove_environment_core(env_name=env_name, prefix=env_path)
+
+    def test_remove_environment_core_directory_not_empty_error(self, temp_env_dir: str, mock_context: Mock, mock_unregister_env: Mock) -> None:
+        """Test that RuntimeError is raised when directory removal fails due to directory not empty."""
+        env_name = "test_env_not_empty"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Create the environment directory
+        os.makedirs(env_path, exist_ok=True)
+        
+        # Mock shutil.rmtree to raise a directory not empty error
+        with patch('shutil.rmtree') as mock_rmtree:
+            mock_rmtree.side_effect = OSError("Directory not empty")
+            
+            with pytest.raises(RuntimeError, match="Failed to remove environment"):
+                remove_environment_core(env_name=env_name, prefix=env_path)
+
 
 # =============================================================================
 # INTEGRATION TESTS - Testing remove_environment MCP tool
@@ -406,4 +451,103 @@ class TestRemoveEnvironmentIntegration:
                             assert result_path.endswith(env_name)
                             
                             # Verify rmtree was called with the same path
-                            mock_rmtree.assert_called_once_with(result_path) 
+                            mock_rmtree.assert_called_once_with(result_path)
+
+    @pytest.mark.asyncio
+    async def test_remove_environment_permission_error(self, client: Client, temp_env_dir: str) -> None:
+        """Test that permission error is properly handled through MCP."""
+        env_name = "test_mcp_permission_env"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Create the environment directory
+        os.makedirs(env_path, exist_ok=True)
+        
+        with patch('anaconda_assistant_mcp.tools_core.remove_environment.context') as mock_context:
+            mock_context.root_prefix = '/opt/anaconda3'
+            
+            with patch('anaconda_assistant_mcp.tools_core.remove_environment.unregister_env'):
+                with patch('shutil.rmtree') as mock_rmtree:
+                    # Simulate permission error
+                    mock_rmtree.side_effect = PermissionError("Permission denied")
+                    
+                    async with client:
+                        with pytest.raises(Exception) as exc_info:
+                            await client.call_tool(
+                                "remove_environment",
+                                {
+                                    "env_name": env_name,
+                                    "prefix": env_path
+                                }
+                            )
+                        
+                        # Verify the error message contains the expected permission information
+                        error_text = str(exc_info.value)
+                        assert "Failed to remove conda environment" in error_text
+                        assert "Permission denied - check if you have write access to the environment location" in error_text
+                        assert "Permission denied" in error_text
+
+    @pytest.mark.asyncio
+    async def test_remove_environment_access_error(self, client: Client, temp_env_dir: str) -> None:
+        """Test that access error is properly handled through MCP."""
+        env_name = "test_mcp_access_env"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Create the environment directory
+        os.makedirs(env_path, exist_ok=True)
+        
+        with patch('anaconda_assistant_mcp.tools_core.remove_environment.context') as mock_context:
+            mock_context.root_prefix = '/opt/anaconda3'
+            
+            with patch('anaconda_assistant_mcp.tools_core.remove_environment.unregister_env'):
+                with patch('shutil.rmtree') as mock_rmtree:
+                    # Simulate access error
+                    mock_rmtree.side_effect = OSError("Access denied")
+                    
+                    async with client:
+                        with pytest.raises(Exception) as exc_info:
+                            await client.call_tool(
+                                "remove_environment",
+                                {
+                                    "env_name": env_name,
+                                    "prefix": env_path
+                                }
+                            )
+                        
+                        # Verify the error message contains the expected access information
+                        error_text = str(exc_info.value)
+                        assert "Failed to remove conda environment" in error_text
+                        assert "Permission denied - check if you have write access to the environment location" in error_text
+                        assert "Access denied" in error_text
+
+    @pytest.mark.asyncio
+    async def test_remove_environment_directory_not_empty_error(self, client: Client, temp_env_dir: str) -> None:
+        """Test that directory not empty error is properly handled through MCP."""
+        env_name = "test_mcp_not_empty_env"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Create the environment directory
+        os.makedirs(env_path, exist_ok=True)
+        
+        with patch('anaconda_assistant_mcp.tools_core.remove_environment.context') as mock_context:
+            mock_context.root_prefix = '/opt/anaconda3'
+            
+            with patch('anaconda_assistant_mcp.tools_core.remove_environment.unregister_env'):
+                with patch('shutil.rmtree') as mock_rmtree:
+                    # Simulate directory not empty error
+                    mock_rmtree.side_effect = OSError("Directory not empty")
+                    
+                    async with client:
+                        with pytest.raises(Exception) as exc_info:
+                            await client.call_tool(
+                                "remove_environment",
+                                {
+                                    "env_name": env_name,
+                                    "prefix": env_path
+                                }
+                            )
+                        
+                        # Verify the error message contains the expected directory information
+                        error_text = str(exc_info.value)
+                        assert "Failed to remove conda environment" in error_text
+                        assert "Environment directory could not be removed - some files may be in use" in error_text
+                        assert "Directory not empty" in error_text 
