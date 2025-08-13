@@ -9,6 +9,14 @@ from conda.models.channel import Channel
 
 from anaconda_assistant_mcp.tools_core.create_environment import create_environment_core
 from anaconda_assistant_mcp.server import mcp
+from .test_shared import (
+    PERMISSION_ERROR_MESSAGE,
+    CREATE_ENVIRONMENT_ERROR_PREFIX,
+    assert_permission_error_message,
+    parametrize_permission_errors,
+    setup_mock_context_for_permission_test,
+    create_mock_solver_with_permission_error
+)
 
 # =============================================================================
 # FIXTURES
@@ -310,6 +318,25 @@ class TestCreateEnvironmentCore:
         assert channels[0].name == 'custom-channel'
         assert channels[1].name == 'another-channel'
 
+    @parametrize_permission_errors()
+    def test_create_environment_core_permission_errors(self, error_scenario_name: str, error_message: str, exception: Exception, temp_env_dir: str, mock_context: Mock, mock_solver: Mock, mock_register_env: Mock) -> None:
+        """Test that various permission errors are properly propagated."""
+        env_name = f"test_env_{error_scenario_name.lower().replace(' ', '_')}"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        # Make the transaction execution raise the specified permission error
+        mock_solver_instance = mock_solver.return_value
+        mock_transaction = Mock()
+        mock_transaction.execute.side_effect = exception
+        mock_solver_instance.solve_for_transaction.return_value = mock_transaction
+        
+        # Check that the original exception is raised (not wrapped)
+        with pytest.raises(type(exception)):
+            create_environment_core(
+                env_name=env_name,
+                prefix=env_path
+            )
+
 
 # =============================================================================
 # INTEGRATION TESTS - Testing create_environment MCP tool
@@ -466,3 +493,32 @@ class TestCreateEnvironmentIntegration:
                         mock_solver_cls.assert_called_once()
                         mock_solver.solve_for_transaction.assert_called_once()
                         mock_transaction.execute.assert_called_once() 
+
+    @pytest.mark.asyncio
+    @parametrize_permission_errors()
+    async def test_create_environment_permission_errors(self, error_scenario_name: str, error_message: str, exception: Exception, client: Client, temp_env_dir: str) -> None:
+        """Test that various permission errors are properly handled through MCP."""
+        env_name = f"test_mcp_{error_scenario_name.lower().replace(' ', '_')}_env"
+        env_path = os.path.join(temp_env_dir, env_name)
+        
+        with patch('anaconda_assistant_mcp.tools_core.create_environment.context') as mock_context:
+            setup_mock_context_for_permission_test(mock_context, temp_env_dir)
+            
+            with patch('anaconda_assistant_mcp.tools_core.create_environment.Solver') as mock_solver_cls:
+                create_mock_solver_with_permission_error(mock_solver_cls, exception)
+                
+                with patch('anaconda_assistant_mcp.tools_core.create_environment.register_env'):
+                    async with client:
+                        with pytest.raises(Exception) as exc_info:
+                            await client.call_tool(
+                                "create_environment",
+                                {
+                                    "env_name": env_name,
+                                    "prefix": env_path
+                                }
+                            )
+                        
+                        # Verify the error message contains the expected permission information
+                        error_text = str(exc_info.value)
+                        assert_permission_error_message(error_text, CREATE_ENVIRONMENT_ERROR_PREFIX)
+                        assert error_message in error_text 

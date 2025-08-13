@@ -135,7 +135,7 @@ async def create_environment(
             reason = "Package dependency conflicts or unsatisfiable requirements"
         elif "PackagesNotFoundError" in error_msg or "packages are missing" in error_msg.lower():
             reason = "One or more packages not found in available channels"
-        elif "permission" in error_msg.lower() or "access" in error_msg.lower():
+        elif "permission" in error_msg.lower() or "access" in error_msg.lower() or "not permitted" in error_msg.lower():
             reason = "Permission denied - check if you have write access to the environment location"
         elif "network" in error_msg.lower() or "connection" in error_msg.lower():
             reason = "Network connectivity issue - check your internet connection and conda channels"
@@ -227,7 +227,7 @@ async def remove_environment(
             reason = "Cannot remove the base environment - this is a protected environment"
         elif "Environment does not exist" in error_msg:
             reason = "Environment does not exist - check the environment name or path"
-        elif "permission" in error_msg.lower() or "access" in error_msg.lower():
+        elif "permission" in error_msg.lower() or "access" in error_msg.lower() or "not permitted" in error_msg.lower():
             reason = "Permission denied - check if you have write access to the environment location"
         elif "directory not empty" in error_msg.lower():
             reason = "Environment directory could not be removed - some files may be in use"
