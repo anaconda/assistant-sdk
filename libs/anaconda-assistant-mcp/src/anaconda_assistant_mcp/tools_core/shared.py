@@ -17,20 +17,9 @@ from conda.models.channel import Channel
 @contextlib.contextmanager
 def suppress_conda_output() -> Generator[None, None, None]:
     """Context manager to suppress conda's stdout/stderr output during MCP operations."""
-    # Save original stdout/stderr
-    old_stdout = sys.stdout
-    old_stderr = sys.stderr
-    
-    # Redirect to /dev/null or similar
-    try:
-        with open(os.devnull, 'w') as devnull:
-            sys.stdout = devnull
-            sys.stderr = devnull
+    with open(os.devnull, 'w') as devnull:
+        with contextlib.redirect_stdout(devnull), contextlib.redirect_stderr(devnull):
             yield
-    finally:
-        # Restore original stdout/stderr
-        sys.stdout = old_stdout
-        sys.stderr = old_stderr
 
 
 def get_default_env_path(env_name: str) -> str:
