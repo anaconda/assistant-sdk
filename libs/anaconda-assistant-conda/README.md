@@ -125,6 +125,8 @@ On Windows, you'll do:
 .\env\Scripts\conda assist ...
 ```
 
+For a video demo, run `source activate-demo.sh`
+
 ### Run the unit tests
 
 ```shell
